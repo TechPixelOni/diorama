@@ -1,7 +1,0 @@
-# Create alone, for the create-buried section: 6.0.10 on NeoForge 1.21.1.
-# Forge 1.20.1 has no line: Create's release jar there carries its own MixinExtras, which the
-# development run already has, and the game stops before the title screen ("Modules
-# mixinextras.common and MixinExtras export package ..."). For that node pass a folder holding
-# Create, Ponder, Flywheel and Registrate as separate jars, each with its META-INF/jarjar removed.
-# One line per jar: <node> <url>.
-1.21.1-neoforge https://cdn.modrinth.com/data/LNytGWDc/versions/UjX6dr61/create-1.21.1-6.0.10.jar
