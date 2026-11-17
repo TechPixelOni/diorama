@@ -4,26 +4,26 @@ license = "MIT"
 issueTrackerURL = "https://github.com/SunkenInTime/minecraft-orthogonal-map/issues"
 
 [[mods]]
-modId = "diorama"
+modId = "gregedcolonies"
 version = "${version}"
-displayName = "Diorama"
+displayName = "GregedColonies"
 description = "A ray-traced, angled voxel map and minimap."
 authors = "Dara Adedeji"
-displayURL = "https://modrinth.com/mod/diorama-map"
-logoFile = "assets/diorama/icon.png"
+displayURL = "https://modrinth.com/mod/gregedcolonies-map"
+logoFile = "assets/gregedcolonies/icon.png"
 
 [[mixins]]
-config = "diorama.mixins.json"
+config = "gregedcolonies.mixins.json"
 
 [[accessTransformers]]
 file = "META-INF/accesstransformer.cfg"
 
-[[dependencies.diorama]]
+[[dependencies.gregedcolonies]]
 modId = "neoforge"
 type = "required"
 versionRange = "${neoforge}"
 
-[[dependencies.diorama]]
+[[dependencies.gregedcolonies]]
 modId = "minecraft"
 type = "required"
 versionRange = "${minecraft}"

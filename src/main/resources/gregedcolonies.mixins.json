@@ -1,0 +1,27 @@
+{
+	"required": true,
+	"package": "dev.gregedcolonies.mixin",
+	"compatibilityLevel": "JAVA_${java}",
+	"mixins": [
+		"BiomeManagerAccessor",
+		"ChunkMapInvoker"
+	],
+	"client": [
+		"BossBarMixin",
+		"ChatComponentMixin",
+		"ClientChunkCacheMixin",
+		"ClientPacketListenerMixin",
+		"CustomPayloadMixin",
+		"CustomPayloadPacketMixin",
+		"DeathPacketMixin",
+		"EffectIconsMixin",
+		"FtbChunksUpdateMixin",
+		"GameRendererMixin",
+		"LevelChunkMixin",
+		"RealmsServerMixin",
+		"SpriteContentsMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

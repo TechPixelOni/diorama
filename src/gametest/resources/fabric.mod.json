@@ -1,13 +1,13 @@
 {
 	"schemaVersion": 1,
-	"id": "diorama-test",
+	"id": "gregedcolonies-test",
 	"version": "1.0.0",
-	"name": "Diorama test",
+	"name": "GregedColonies test",
 	"environment": "client",
 	"entrypoints": {
-		"fabric-client-gametest": ["dev.diorama.test.DioramaClientTest"]
+		"fabric-client-gametest": ["dev.gregedcolonies.test.GregedColoniesClientTest"]
 	},
 	"depends": {
-		"diorama": "*"
+		"gregedcolonies": "*"
 	}
 }

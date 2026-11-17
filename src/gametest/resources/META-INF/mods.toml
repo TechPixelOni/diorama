@@ -3,16 +3,16 @@ loaderVersion = "[47,)"
 license = "MIT"
 
 [[mods]]
-modId = "diorama_test"
+modId = "gregedcolonies_test"
 version = "1.0.0"
-displayName = "Diorama test"
+displayName = "GregedColonies test"
 
 # The shim runs these, as Fabric runs fabric-client-gametest entrypoints.
-[modproperties.diorama_test]
-fabric-client-gametest = ["dev.diorama.test.DioramaClientTest"]
+[modproperties.gregedcolonies_test]
+fabric-client-gametest = ["dev.gregedcolonies.test.GregedColoniesClientTest"]
 
-[[dependencies.diorama_test]]
-modId = "diorama"
+[[dependencies.gregedcolonies_test]]
+modId = "gregedcolonies"
 mandatory = true
 versionRange = "*"
 ordering = "NONE"

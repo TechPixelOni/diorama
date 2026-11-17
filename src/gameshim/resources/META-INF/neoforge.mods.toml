@@ -3,10 +3,10 @@ loaderVersion = "[4,)"
 license = "MIT AND Apache-2.0"
 
 [[mods]]
-modId = "diorama_gameshim"
+modId = "gregedcolonies_gameshim"
 version = "1.0.0"
-displayName = "Diorama game test shim"
-description = "Runs Diorama's client game tests on NeoForge, which has no client game test API. Test builds only; active with -Ddiorama.gameshim=true."
+displayName = "GregedColonies game test shim"
+description = "Runs GregedColonies's client game tests on NeoForge, which has no client game test API. Test builds only; active with -Dgregedcolonies.gameshim=true."
 
 [[mixins]]
-config = "diorama-gameshim.mixins.json"
+config = "gregedcolonies-gameshim.mixins.json"

@@ -1,29 +1,29 @@
 {
 	"schemaVersion": 1,
-	"id": "diorama",
+	"id": "gregedcolonies",
 	"version": "${version}",
-	"name": "Diorama",
+	"name": "GregedColonies",
 	"description": "A ray-traced, angled voxel map and minimap.",
 	"authors": [
 		"Dara Adedeji"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/diorama-map",
+		"homepage": "https://modrinth.com/mod/gregedcolonies-map",
 		"sources": "https://github.com/SunkenInTime/minecraft-orthogonal-map",
 		"issues": "https://github.com/SunkenInTime/minecraft-orthogonal-map/issues"
 	},
 	"license": "MIT",
-	"icon": "assets/diorama/icon.png",
+	"icon": "assets/gregedcolonies/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.diorama.fabric.DioramaFabricCommon"
+			"dev.gregedcolonies.fabric.GregedColoniesFabricCommon"
 		],
 		"client": [
-			"dev.diorama.fabric.DioramaFabric"
+			"dev.gregedcolonies.fabric.GregedColoniesFabric"
 		],
 		"modmenu": [
-			"dev.diorama.fabric.ModMenuCompat"
+			"dev.gregedcolonies.fabric.ModMenuCompat"
 		]
 	},
 	"depends": {
@@ -38,11 +38,11 @@
 	"custom": {
 		"modmenu": {
 			"links": {
-				"modmenu.modrinth": "https://modrinth.com/mod/diorama-map"
+				"modmenu.modrinth": "https://modrinth.com/mod/gregedcolonies-map"
 			}
 		}
 	},
 	"mixins": [
-		"diorama.mixins.json"
+		"gregedcolonies.mixins.json"
 	]
 }

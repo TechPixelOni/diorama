@@ -26,4 +26,4 @@ stonecutter {
 	}
 }
 
-rootProject.name = "diorama"
+rootProject.name = "gregedcolonies"

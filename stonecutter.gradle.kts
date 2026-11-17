@@ -11,7 +11,7 @@ plugins {
 // and back. Version-specific code that isn't a rename goes in //? if blocks.
 stonecutter active "1.20.1"
 
-// Game tests bake with the tracer unless a run asks otherwise with DIORAMA_GPU_BAKE: it's what they
+// Game tests bake with the tracer unless a run asks otherwise with GREGEDCOLONIES_GPU_BAKE: it's what they
 // were written against, and what boat.dev's graphics-free VMs can do at speed. 0 is the tracer, 1
 // forces the GPU, and any other value, such as auto, leaves the choice to the game, as for a player.
 subprojects {
@@ -19,8 +19,8 @@ subprojects {
 		// As it runs: set while configuring, the whole environment lands in the configuration cache,
 		// and a rerun gets the last run's display.
 		doFirst {
-			if (System.getenv("DIORAMA_GPU_BAKE") == null) {
-				(this as ProcessForkOptions).environment("DIORAMA_GPU_BAKE", "0")
+			if (System.getenv("GREGEDCOLONIES_GPU_BAKE") == null) {
+				(this as ProcessForkOptions).environment("GREGEDCOLONIES_GPU_BAKE", "0")
 			}
 		}
 	}
@@ -154,7 +154,7 @@ stonecutter parameters {
 	// (before 1.21.6, where they draw from a callback) or isn't there at all (NeoForge and Forge,
 	// GUI layers).
 	replacements.regex(current.parsed < "1.21.6" || loader != "fabric") {
-		replace("import net\\.fabricmc\\.fabric\\.api\\.client\\.rendering\\.v1\\.hud\\.HudElement;", "import dev.diorama.compat.HudElement;", "(?!)", "never")
+		replace("import net\\.fabricmc\\.fabric\\.api\\.client\\.rendering\\.v1\\.hud\\.HudElement;", "import dev.gregedcolonies.compat.HudElement;", "(?!)", "never")
 	}
 
 	// From the 1.21.5 spelling to the 1.21.4 one.

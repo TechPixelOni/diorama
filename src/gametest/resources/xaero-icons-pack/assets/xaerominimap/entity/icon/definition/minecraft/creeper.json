@@ -8,6 +8,6 @@
 	],
 	"variantMethod": "xaero.hud.minimap.radar.icon.definition.BuiltInRadarIconDefinitions.getVariant",
 	"variants": {
-		"default": "outlined_sprite:diorama_test/heart.png"
+		"default": "outlined_sprite:gregedcolonies_test/heart.png"
 	}
 }

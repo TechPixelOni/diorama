@@ -7,11 +7,11 @@ plugins {
 // 1.21.8 can tell the 1.21.6 jar is theirs.
 version = "${property("mod_version")}+${findProperty("minecraft_label") ?: sc.current.version}"
 group = property("mod_group") as String
-base.archivesName = "diorama"
+base.archivesName = "gregedcolonies"
 
 loom {
 	mods {
-		register("diorama") {
+		register("gregedcolonies") {
 			sourceSet(sourceSets.main.get())
 		}
 	}
@@ -25,7 +25,7 @@ if (hasGameTestApi) {
 	fabricApi {
 		configureTests {
 			createSourceSet = true
-			modId = "diorama-test"
+			modId = "gregedcolonies-test"
 			enableGameTests = false
 			enableClientGameTests = true
 			eula = true
@@ -53,7 +53,7 @@ apply(from = rootProject.file("gradle/common.gradle.kts"))
 
 // The NeoForge and Forge entrypoints and metadata go in their own jars (build.neoforge.gradle.kts, build.forge.gradle.kts).
 sourceSets.configureEach {
-	java.exclude("dev/diorama/**/neoforge/**", "dev/diorama/**/forge/**")
+	java.exclude("dev/gregedcolonies/**/neoforge/**", "dev/gregedcolonies/**/forge/**")
 }
 tasks.withType<ProcessResources>().configureEach {
 	exclude("META-INF/neoforge.mods.toml", "META-INF/mods.toml")
@@ -63,10 +63,10 @@ tasks.withType<ProcessResources>().configureEach {
 // the mod's namespace on 1.21.2-1.21.4, from the minecraft namespace (by name) before.
 tasks.named<ProcessResources>("processResources") {
 	if (sc.current.parsed >= "1.21.2") {
-		exclude("assets/minecraft/shaders/core/diorama_fog.json", "assets/minecraft/shaders/core/diorama_fog_layer.json", "assets/minecraft/shaders/core/diorama_tile.json")
+		exclude("assets/minecraft/shaders/core/gregedcolonies_fog.json", "assets/minecraft/shaders/core/gregedcolonies_fog_layer.json", "assets/minecraft/shaders/core/gregedcolonies_tile.json")
 	}
 	if (sc.current.parsed < "1.21.2" || sc.current.parsed >= "1.21.5") {
-		exclude("assets/diorama/shaders/core/fog.json", "assets/diorama/shaders/core/tile.json")
+		exclude("assets/gregedcolonies/shaders/core/fog.json", "assets/gregedcolonies/shaders/core/tile.json")
 	}
 }
 
@@ -132,14 +132,14 @@ if (!hasGameTestApi) {
 	}
 	loom {
 		mods {
-			register("diorama-gameshim") { sourceSet(gameshim) }
-			register("diorama-test") { sourceSet(gametest) }
+			register("gregedcolonies-gameshim") { sourceSet(gameshim) }
+			register("gregedcolonies-test") { sourceSet(gametest) }
 		}
 		runs {
 			register("clientGameTest") {
 				client()
 				source(gametest)
-				property("diorama.gameshim", "true")
+				property("gregedcolonies.gameshim", "true")
 				runDir("build/run/clientGameTest")
 				ideConfigGenerated(false)
 			}
@@ -166,7 +166,7 @@ if (!hasGameTestApi) {
 	}
 	tasks.register<net.fabricmc.loom.task.prod.ClientProductionRunTask>("runProductionClientGameTest") {
 		mods.from(tasks.named("remapJar"), remapGameshimJar, remapGametestJar, productionMods)
-		jvmArgs.add("-Ddiorama.gameshim=true")
+		jvmArgs.add("-Dgregedcolonies.gameshim=true")
 		runDir = layout.buildDirectory.dir("run-production")
 	}
 }

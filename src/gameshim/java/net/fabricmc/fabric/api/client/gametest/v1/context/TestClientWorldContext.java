@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Modified for Diorama's test shim: the signatures in this package are derived from Fabric API's
- * fabric-client-gametest-api-v1 for Minecraft 1.21.4, trimmed to what Diorama's client game tests
+ * Modified for GregedColonies's test shim: the signatures in this package are derived from Fabric API's
+ * fabric-client-gametest-api-v1 for Minecraft 1.21.4, trimmed to what GregedColonies's client game tests
  * call, so the same tests run on Minecraft versions Fabric API doesn't ship that module for. The
- * implementation is in dev.diorama.gameshim. See NOTICE.
+ * implementation is in dev.gregedcolonies.gameshim. See NOTICE.
  */
 
 package net.fabricmc.fabric.api.client.gametest.v1.context;
