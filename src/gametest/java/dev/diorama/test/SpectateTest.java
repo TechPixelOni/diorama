@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import com.mojang.authlib.GameProfile;
+/*import com.mojang.authlib.GameProfile;
 import java.util.UUID;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-//?}
+*///?}
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.entity.Entity;
 
@@ -44,12 +44,12 @@ final class SpectateTest {
 
 	/** The report: another player on a server, walking off while this client watches through them. */
 	//? if >=1.21.4 && fabric {
-	static void onServer(ClientGameTestContext context) {
+	/*static void onServer(ClientGameTestContext context) {
 		try (TestDedicatedServerContext server = context.worldBuilder()
 			.setUseConsistentSettings(false)
 			.adjustSettings(s -> s.setSeed("diorama-spectate"))
 			.createServer(DioramaClientTest.serverProperties())) {
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				server.runCommand("time set noon");
 				server.runCommand("weather clear");
 				context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 50, 2400);
@@ -64,7 +64,7 @@ final class SpectateTest {
 		}
 	}
 
-	/** A second player as the server sees one, on a connection nobody reads. */
+	/^* A second player as the server sees one, on a connection nobody reads. ^/
 	private static void joinBob(net.minecraft.server.MinecraftServer server) {
 		GameProfile profile = new GameProfile(UUID.fromString("faa5dca3-c3d4-354b-ae1b-dde9e5a14b3b"), "Bob");
 		net.minecraft.network.Connection connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
@@ -73,7 +73,7 @@ final class SpectateTest {
 			net.minecraft.server.level.ClientInformation.createDefault());
 		server.getPlayerList().placeNewPlayer(connection, bob, net.minecraft.server.network.CommonListenerCookie.createInitial(profile, false));
 	}
-	//?}
+	*///?}
 
 	private static void follow(ClientGameTestContext context, Consumer<String> command, String target, String self, String shots) {
 		boolean coordinates = context.computeOnClient(mc -> Settings.get().coordinates);
@@ -109,18 +109,18 @@ final class SpectateTest {
 		context.takeScreenshot(shots + "-03-map");
 		context.runOnClient(mc -> {
 			Entity camera = mc.getCameraEntity();
-			MapViewport.View view = ((MapScreen) mc.gui.screen()).view();
+			MapViewport.View view = ((MapScreen) mc.screen).view();
 			if (Math.abs(view.centerU() - Projection.u(camera.getX(), camera.getZ())) > 2 || Math.abs(view.centerV() - Projection.v(camera.getX(), camera.getY(), camera.getZ())) > 2) {
 				wrong.add("The map is centred at u " + view.centerU() + ", v " + view.centerV() + ", not on the camera at x " + camera.getX() + ", u " + Projection.u(camera.getX(), camera.getZ()));
 			}
 			// Looked at directly, wherever the map stayed.
-			MapScreen screen = (MapScreen) mc.gui.screen();
+			MapScreen screen = (MapScreen) mc.screen;
 			screen.lookAt(Projection.u(camera.getX(), camera.getZ()), Projection.v(camera.getX(), camera.getY(), camera.getZ()), view.zoom(), view.layer());
 		});
 		context.waitTicks(2);
 		context.runOnClient(mc -> {
 			Entity camera = mc.getCameraEntity();
-			if (Radar.collect(((MapScreen) mc.gui.screen()).view(), 1, true).stream().anyMatch(blip -> blip.entity() == camera)) {
+			if (Radar.collect(((MapScreen) mc.screen).view(), 1, true).stream().anyMatch(blip -> blip.entity() == camera)) {
 				wrong.add("The radar shows who the map is already centred on");
 			}
 		});
@@ -152,7 +152,7 @@ final class SpectateTest {
 		context.setScreen(MapScreen::new);
 		context.waitTicks(5);
 		context.runOnClient(mc -> {
-			MapViewport.View view = ((MapScreen) mc.gui.screen()).view();
+			MapViewport.View view = ((MapScreen) mc.screen).view();
 			if (Math.abs(view.centerU() - Projection.u(mc.player.getX(), mc.player.getZ())) > 2 || Math.abs(view.centerV() - Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ())) > 2) {
 				wrong.add("After stopping, the map is centred at u " + view.centerU() + ", v " + view.centerV() + ", not on the player at u " + Projection.u(mc.player.getX(), mc.player.getZ()) + ", v " + Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ()));
 			}

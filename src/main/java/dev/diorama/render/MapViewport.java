@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -160,7 +160,7 @@ public final class MapViewport {
 		this.opacity = Math.max(0, Math.min(1, opacity));
 	}
 
-	public void draw(GuiGraphicsExtractor graphics, MapLevel level, View view) {
+	public void draw(GuiGraphics graphics, MapLevel level, View view) {
 		this.draw(graphics, level, view, 0, false, null);
 	}
 
@@ -168,7 +168,7 @@ public final class MapViewport {
 	 * Same, with these {@link dev.diorama.bake.Overlays} bits drawn over the tiles, land claims if
 	 * {@code claims}, and {@code lit} drawn over the tiles but under those and the fog.
 	 */
-	public void draw(GuiGraphicsExtractor graphics, MapLevel level, View view, int overlays, boolean claims, @Nullable Runnable lit) {
+	public void draw(GuiGraphics graphics, MapLevel level, View view, int overlays, boolean claims, @Nullable Runnable lit) {
 		graphics.enableScissor(view.x(), view.y(), view.x() + view.width(), view.y() + view.height());
 		boolean cave = view.layer() != TileKey.SURFACE;
 		// Behind the tiles, a colour from the fog that covers where there's no data, so the ragged
@@ -290,7 +290,7 @@ public final class MapViewport {
 		return Math.sqrt(du * du + dv * dv);
 	}
 
-	private void drawTiles(GuiGraphicsExtractor graphics, MapLevel level, View view, int overlays, boolean claims, @Nullable Runnable lit, float night) {
+	private void drawTiles(GuiGraphics graphics, MapLevel level, View view, int overlays, boolean claims, @Nullable Runnable lit, float night) {
 		int lod = lodFor(level, view);
 		double units = (double) Projection.TILE_UNITS * (1 << lod);
 		double u0 = view.minU();
@@ -485,7 +485,7 @@ public final class MapViewport {
 		fogHiddenForTests = hide;
 	}
 
-	private void drawFog(GuiGraphicsExtractor graphics, MapLevel level, View view, float night) {
+	private void drawFog(GuiGraphics graphics, MapLevel level, View view, float night) {
 		double viewW = view.width() / view.zoom();
 		double viewH = view.height() / view.zoom();
 		// Zoomed out past the detailed zoom, the fog's noise grows with the view so it keeps its

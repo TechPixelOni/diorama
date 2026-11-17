@@ -49,7 +49,7 @@ final class BiomeEdgeTest {
 			// Every chunk east of the player saved whole, the loaded ones and those past the view.
 			world.getServer().runCommand("execute in " + DIMENSION + " run forceload add 0 -112 255 127");
 			world.getServer().runCommand("execute in " + DIMENSION + " run tp @a 8 -40 8");
-			context.waitFor(mc -> mc.level.dimension() != Level.OVERWORLD && mc.gui.screen() == null
+			context.waitFor(mc -> mc.level.dimension() != Level.OVERWORLD && mc.screen == null
 				&& MapSession.get() != null && MapSession.get().map().chunkCount() > 20, 2400);
 			context.waitTicks(100);
 			world.getServer().runCommand("execute in " + DIMENSION + " run forceload remove all");
@@ -70,10 +70,10 @@ final class BiomeEdgeTest {
 				return chunkX;
 			});
 			context.setScreen(MapScreen::new);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(edge * 16 + 16, Projection.v(GRASS_Y, 8), 4, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(edge * 16 + 16, Projection.v(GRASS_Y, 8), 4, TileKey.SURFACE));
 			DioramaClientTest.settle(context, 40);
 			context.takeScreenshot("biome-edge-close");
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(edge * 16 + 16, Projection.v(GRASS_Y, 8), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(edge * 16 + 16, Projection.v(GRASS_Y, 8), 1, TileKey.SURFACE));
 			DioramaClientTest.settle(context, 40);
 			context.takeScreenshot("biome-edge-wide");
 			context.setScreen(() -> null);

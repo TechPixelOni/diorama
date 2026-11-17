@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -147,7 +147,7 @@ public final class Radar {
 	 * so a player standing at a waypoint shows on top of its marker and a crowd of mobs doesn't
 	 * hide one. Mobs draw batched, since a farm can put hundreds on screen.
 	 */
-	public static void draw(GuiGraphicsExtractor graphics, MapViewport.View view, List<Blip> blips, boolean fullscreen, boolean players) {
+	public static void draw(GuiGraphics graphics, MapViewport.View view, List<Blip> blips, boolean fullscreen, boolean players) {
 		graphics.enableScissor(view.x(), view.y(), view.x() + view.width(), view.y() + view.height());
 		IconBatch icons = players ? IconBatch.direct(graphics) : IconBatch.batched(graphics);
 		Settings settings = Settings.get();
@@ -272,15 +272,15 @@ public final class Radar {
 
 	/** Master's look: a player's face on a dark disc, a mob's face in a dark box framed in its kind's colour. */
 	private static void framed(IconBatch icons, Blip blip, int alpha) {
-		GuiGraphicsExtractor graphics = icons.graphics();
+		GuiGraphics graphics = icons.graphics();
 		float s = blip.size();
 		if (blip.kind() == Kind.PLAYER && blip.entity() instanceof AbstractClientPlayer player) {
 			MapIcons.dot(icons, blip.x(), blip.y(), s * 1.55F, withAlpha(0xFF101418, alpha));
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(blip.x() - s / 2, blip.y() - s / 2);
-			graphics.pose().scale(s / 8);
+			graphics.pose().pushPose();
+			graphics.pose().translate(blip.x() - s / 2, blip.y() - s / 2, 0);
+			graphics.pose().scale(s / 8, s / 8, 1);
 			icons.playerFace(player, 0, 0, 8, withAlpha(0xFFFFFFFF, alpha));
-			graphics.pose().popMatrix();
+			graphics.pose().popPose();
 			return;
 		}
 		XaeroRadarIcons.Icon icon = XaeroRadarIcons.of(blip.entity());
@@ -308,14 +308,14 @@ public final class Radar {
 	 * with a one-texel black outline and a drop shadow. Its position follows the map continuously.
 	 */
 	private static void pixelHead(IconBatch icons, Blip blip, int alpha, boolean typeOutline) {
-		GuiGraphicsExtractor graphics = icons.graphics();
+		GuiGraphics graphics = icons.graphics();
 		float s = blip.size();
 		int outline = typeOutline && blip.kind() != Kind.PLAYER ? blip.kind().color : 0xFF000000;
 		if (blip.kind() == Kind.PLAYER && blip.entity() instanceof AbstractClientPlayer player) {
 			float texel = texel(s, 8);
 			pixelFrame(icons, blip.x(), blip.y(), 8, 8, texel, withAlpha(outline, alpha), alpha);
 			icons.playerFace(player, 0, 0, 8, withAlpha(0xFFFFFFFF, alpha));
-			graphics.pose().popMatrix();
+			graphics.pose().popPose();
 			return;
 		}
 		XaeroRadarIcons.Icon icon = XaeroRadarIcons.of(blip.entity());
@@ -327,7 +327,7 @@ public final class Radar {
 			// renderer takes no colour.
 			float texel = texel(s * 1.6F, 8);
 			pixelFrame(icons, blip.x(), blip.y(), 8, 8, texel, withAlpha(outline, alpha), alpha);
-			graphics.pose().popMatrix();
+			graphics.pose().popPose();
 			icons.item(item.stack(), blip.x() - 4 * texel, blip.y() - 4 * texel, texel / 2);
 		} else if (icon == XaeroRadarIcons.Basic.DOT
 			|| !MobFaces.drawPixel(icons, blip.entity(), blip.x(), blip.y(), s * 1.6F, withAlpha(0xFFFFFFFF, alpha), withAlpha(outline, alpha), alpha)) {
@@ -360,12 +360,12 @@ public final class Radar {
 	 * (0, 0) and pops the pose.
 	 */
 	static void pixelFrame(IconBatch icons, float x, float y, int w, int h, float texel, int outline, int alpha) {
-		GuiGraphicsExtractor graphics = icons.graphics();
+		GuiGraphics graphics = icons.graphics();
 		float x0 = x - w * texel / 2;
 		float y0 = y - h * texel / 2;
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(x0, y0);
-		graphics.pose().scale(texel);
+		graphics.pose().pushPose();
+		graphics.pose().translate(x0, y0, 0);
+		graphics.pose().scale(texel, texel, 1);
 		icons.fill(0, 0, w + 2, h + 2, withAlpha(0x60000000, alpha));
 		icons.fill(-1, -1, w + 1, h + 1, outline);
 		// Dark under the face, as the framed faces had: an enderman's face has see-through rows at the
@@ -418,15 +418,15 @@ public final class Radar {
 	}
 
 	/** The player's or mob's name under its head, on the translucent dark plate vanilla puts name tags on. */
-	private static void nameTag(GuiGraphicsExtractor graphics, Blip blip, int alpha) {
+	private static void nameTag(GuiGraphics graphics, Blip blip, int alpha) {
 		Font font = Minecraft.getInstance().font;
 		String name = blip.entity().getName().getString();
 		int w = font.width(name);
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(blip.x() - w / 2.0F, blip.y() + nameOffset(blip));
+		graphics.pose().pushPose();
+		graphics.pose().translate(blip.x() - w / 2.0F, blip.y() + nameOffset(blip), 0);
 		graphics.fill(-1, -1, w, 8, withAlpha(0x40000000, alpha));
-		graphics.text(font, name, 0, 0, withAlpha(0xFFFFFFFF, alpha), false);
-		graphics.pose().popMatrix();
+		graphics.drawString(font, name, 0, 0, withAlpha(0xFFFFFFFF, alpha), false);
+		graphics.pose().popPose();
 	}
 
 	/** The blip under the cursor, if any, preferring players and then the nearest. */

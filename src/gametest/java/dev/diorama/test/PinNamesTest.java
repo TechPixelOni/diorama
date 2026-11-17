@@ -31,14 +31,14 @@ final class PinNamesTest {
 		BlockPos at = context.computeOnClient(mc -> mc.player.blockPosition());
 		IconWaypointsTest.sleep(context, world, at.offset(3, 0, 0));
 
-		world.getServer().runCommand("gamerule show_death_messages false");
-		world.getServer().runCommand("gamerule immediate_respawn true");
+		world.getServer().runCommand("gamerule showDeathMessages false");
+		world.getServer().runCommand("gamerule doImmediateRespawn true");
 		// Earlier sections leave death pins behind: wait for a new one.
 		java.util.Set<java.util.UUID> before = context.computeOnClient(mc -> WaypointStore.get().all().stream().map(w -> w.id).collect(java.util.stream.Collectors.toSet()));
 		world.getServer().runCommand("kill @a");
 		context.waitFor(mc -> WaypointStore.get().all().stream().anyMatch(w -> w.kind == Waypoint.Kind.DEATH && !before.contains(w.id)), 200);
 		context.waitFor(mc -> mc.player != null && mc.player.isAlive(), 200);
-		world.getServer().runCommand("gamerule immediate_respawn false");
+		world.getServer().runCommand("gamerule doImmediateRespawn false");
 
 		int y = world.getServer().computeOnServer(server -> server.overworld().getHeight(Heightmap.Types.WORLD_SURFACE, at.getX(), at.getZ())) + 20;
 		int x = at.getX() + 12;
@@ -71,7 +71,7 @@ final class PinNamesTest {
 		context.setScreen(() -> new WaypointEditScreen(null, bed, false));
 		context.waitTicks(5);
 		context.takeScreenshot("pin-names-3-bed-editor-ru_ru");
-		String field = context.computeOnClient(mc -> DioramaClientTest.editBoxes(mc.gui.screen()).get(0).getValue());
+		String field = context.computeOnClient(mc -> DioramaClientTest.editBoxes(mc.screen).get(0).getValue());
 		if (!field.equals("Кровать")) {
 			throw new AssertionError("The Bed pin's editor shows " + field);
 		}
@@ -128,15 +128,15 @@ final class PinNamesTest {
 			try {
 				java.nio.file.Files.createDirectories(pack.resolve("assets/diorama/lang"));
 				//? if >=1.21.9 {
-				int format = net.minecraft.SharedConstants.getCurrentVersion().packVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES).major();
+				/*int format = net.minecraft.SharedConstants.getCurrentVersion().packVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES).major();
 				String formats = "\"pack_format\": " + format + ", \"min_format\": " + format + ", \"max_format\": " + format;
-				//?} else if >=1.21.6 {
+				*///?} else if >=1.21.6 {
 				/*int format = net.minecraft.SharedConstants.getCurrentVersion().packVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES);
 				String formats = "\"pack_format\": " + format;
 				*///?} else {
-				/*int format = net.minecraft.SharedConstants.getCurrentVersion().getPackVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES);
+				int format = net.minecraft.SharedConstants.getCurrentVersion().getPackVersion(net.minecraft.server.packs.PackType.CLIENT_RESOURCES);
 				String formats = "\"pack_format\": " + format;
-				*///?}
+				//?}
 				java.nio.file.Files.writeString(pack.resolve("pack.mcmeta"), "{\"pack\": {" + formats + ", \"description\": \"Diorama test: pin names in Russian\"}}");
 				java.nio.file.Files.writeString(pack.resolve("assets/diorama/lang/ru_ru.json"),
 					"{\"diorama.waypoint.death\": \"Смерть %s\"}",

@@ -231,7 +231,7 @@ public final class WebMap {
 	/** Whether the page has no map of the dimension with this ID: one the settings keep off it, or one this world doesn't have. */
 	boolean leftOut(String id) {
 		for (ServerLevel level : this.server.getAllLevels()) {
-			if (level.dimension().identifier().toString().equals(id)) {
+			if (level.dimension().location().toString().equals(id)) {
 				return this.leftOut(level);
 			}
 		}
@@ -246,7 +246,7 @@ public final class WebMap {
 	 */
 	private boolean leftOut(ServerLevel level) {
 		ServerLocks locks = ShareServer.locks(this.server);
-		return locks.mapOffDimensions().contains(level.dimension().identifier().toString())
+		return locks.mapOffDimensions().contains(level.dimension().location().toString())
 			|| level.dimensionType().hasCeiling() && (!locks.caveMapsAllowed() || locks.caveFogOfWar());
 	}
 
@@ -330,7 +330,7 @@ public final class WebMap {
 			// file lists what's left as it is on disk.
 			List<String> out = new ArrayList<>();
 			for (ServerLevel level : this.server.getAllLevels()) {
-				String id = level.dimension().identifier().toString();
+				String id = level.dimension().location().toString();
 				if (this.leftOut(level)) {
 					out.add(id);
 					this.remove(id, progress);
@@ -396,7 +396,7 @@ public final class WebMap {
 					if (this.stopping) {
 						break;
 					}
-					String id = level.dimension().identifier().toString();
+					String id = level.dimension().location().toString();
 					if (this.leftOut(level)) {
 						// A dimension a mod added since, or pictures that couldn't be deleted before.
 						this.remove(id, progress);
@@ -481,29 +481,29 @@ public final class WebMap {
 			}
 		}
 		//? if >=1.21.5 {
-		if (net.minecraft.world.level.DryFoliageColor.get(0.5, 1.0) == 0) {
+		/*if (net.minecraft.world.level.DryFoliageColor.get(0.5, 1.0) == 0) {
 			int[] dry = this.table.colourMap(VanillaTable.DRY_FOLIAGE);
 			if (dry != null) {
 				net.minecraft.world.level.DryFoliageColor.init(dry);
 			}
 		}
-		//?}
+		*///?}
 	}
 
 	boolean serverBehind() {
 		//? if >=1.21 {
-		return this.server.getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
-		//?} else {
-		/*return this.server.getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
-		*///?}
+		/*return this.server.getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
+		*///?} else {
+		return this.server.getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
+		//?}
 	}
 
 	double averageTickMs() {
 		//? if >=1.21 {
-		return this.server.getAverageTickTimeNanos() / 1e6;
-		//?} else {
-		/*return this.server.getAverageTickTime();
-		*///?}
+		/*return this.server.getAverageTickTimeNanos() / 1e6;
+		*///?} else {
+		return this.server.getAverageTickTime();
+		//?}
 	}
 
 	boolean stopping() {
@@ -609,9 +609,9 @@ public final class WebMap {
 			this.id = id;
 			this.folder = map.folder.resolve(folderName(id));
 			this.save = ServerSave.of(level);
-			int roof = level.dimensionType().hasCeiling() ? level.getMinY() + level.dimensionType().logicalHeight() : ChunkSource.NO_ROOF;
-			int minY = level.getMinY();
-			int maxY = level.getMaxY() + 1;
+			int roof = level.dimensionType().hasCeiling() ? level.getMinBuildHeight() + level.dimensionType().logicalHeight() : ChunkSource.NO_ROOF;
+			int minY = level.getMinBuildHeight();
+			int maxY = (level.getMaxBuildHeight() - 1) + 1;
 			ChunkSource bounds = new ChunkSource() {
 				@Override
 				public @Nullable ChunkSnapshot chunk(int chunkX, int chunkZ) {
@@ -765,7 +765,7 @@ public final class WebMap {
 						if (gone != null) {
 							this.markTiles(chunkX, chunkZ, gone.top(), gone.floor(), dirty);
 						} else if (wasShown) {
-							this.markTiles(chunkX, chunkZ, this.level.getMaxY(), this.level.getMinY(), dirty);
+							this.markTiles(chunkX, chunkZ, (this.level.getMaxBuildHeight() - 1), this.level.getMinBuildHeight(), dirty);
 						}
 						continue;
 					}
@@ -781,9 +781,9 @@ public final class WebMap {
 					counted++;
 					// As high as it was before, or the world's top if that isn't known: a tower taken
 					// down leaves rows of tiles its new height doesn't reach.
-					int top = before != null ? Math.max(before.top(), summary.maxY()) : last >= 0 ? this.level.getMaxY() : summary.maxY();
+					int top = before != null ? Math.max(before.top(), summary.maxY()) : last >= 0 ? (this.level.getMaxBuildHeight() - 1) : summary.maxY();
 					// And as low: ground raised over a pit leaves rows its new floor doesn't reach.
-					int floor = before != null ? Math.min(before.floor(), summary.floorY()) : last >= 0 ? this.level.getMinY() : summary.floorY();
+					int floor = before != null ? Math.min(before.floor(), summary.floorY()) : last >= 0 ? this.level.getMinBuildHeight() : summary.floorY();
 					this.markTiles(chunkX, chunkZ, top, floor, dirty);
 				}
 				if (any) {
@@ -896,7 +896,7 @@ public final class WebMap {
 			int top = maxY + 1;
 			// Under a roof the map looks down from below it, as far as the dimension's floor; the
 			// height maps there stop at the roof.
-			int bottom = this.level.dimensionType().hasCeiling() ? this.level.getMinY() : Math.max(floorY, this.level.getMinY());
+			int bottom = this.level.dimensionType().hasCeiling() ? this.level.getMinBuildHeight() : Math.max(floorY, this.level.getMinBuildHeight());
 			double v0 = z0 * sin - (top + TileBaker.SHADOW_REACH_Y) * cos;
 			double v1 = z1 * sin - bottom * cos;
 			int u0 = Math.floorDiv(x0, Projection.TILE_UNITS);

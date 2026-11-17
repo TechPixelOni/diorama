@@ -1,6 +1,6 @@
-#version 330
+#version 150
 //? if >=26.3 {
-#extension GL_ARB_separate_shader_objects : require
+//#extension GL_ARB_separate_shader_objects : require
 //?}
 
 // Volumetric-looking fog over the parts of the map with no data.
@@ -12,22 +12,22 @@
 // like they rise off the terrain.
 
 //? if >=26.3 {
-layout(std140) uniform Globals {
-    ivec3 CameraBlockPos;
-    float GlintAlpha;
-    vec3 CameraOffset;
-    float GameTime;
-    vec2 ScreenSize;
-    int MenuBlurRadius;
-    int UseRgss;
-};
-
-layout(std140) uniform DynamicTransforms {
-    mat4 ModelViewMat;
-    mat4 TextureMat;
-    vec4 ColorModulator;
-    vec3 ModelOffset;
-};
+//layout(std140) uniform Globals {
+//    ivec3 CameraBlockPos;
+//    float GlintAlpha;
+//    vec3 CameraOffset;
+//    float GameTime;
+//    vec2 ScreenSize;
+//    int MenuBlurRadius;
+//    int UseRgss;
+//};
+//
+//layout(std140) uniform DynamicTransforms {
+//    mat4 ModelViewMat;
+//    mat4 TextureMat;
+//    vec4 ColorModulator;
+//    vec3 ModelOffset;
+//};
 //?} else if >=1.21.11 {
 /*layout(std140) uniform Globals {
     ivec3 CameraBlockPos;
@@ -46,10 +46,10 @@ layout(std140) uniform DynamicTransforms {
     mat4 TextureMat;
 };
 *///?} else if <1.21.6 {
-/*// Before 1.21.6 uniforms were set one by one, and only the ones the shader names.
+// Before 1.21.6 uniforms were set one by one, and only the ones the shader names.
 uniform float GameTime;
 uniform vec4 ColorModulator;
-*///?} else {
+//?} else {
 /*// Before 1.21.11 the globals started at the screen size, and the transforms ended with a line width.
 layout(std140) uniform Globals {
     vec2 ScreenSize;
@@ -80,23 +80,23 @@ uniform sampler2D Sampler2;
 const float SOFT_TEXELS = 256.0;
 
 //? if >=26.3 {
-layout(location = 0) in vec2 maskUv;
+//layout(location = 0) in vec2 maskUv;
 //?} else {
-/*in vec2 maskUv;
-*///?}
+in vec2 maskUv;
+//?}
 // rg: noise offset in eighths of the coarser noise period, in the top three bits of each; r's low
 // five bits: how see-through the fog is, in 31sts (0 is opaque); b: cave flag (128), fog scale steps
 // (bits 4-6) and sixteenths of a step (bits 0-3); a: mask texel size code (bits 4-7), eight more
 // fog scale steps (8), the fast quality flag (4) and the smoke flag (1).
 //? if >=26.3 {
-layout(location = 1) in vec4 params;
-
-layout(location = 0) out vec4 fragColor;
+//layout(location = 1) in vec4 params;
+//
+//layout(location = 0) out vec4 fragColor;
 //?} else {
-/*in vec4 params;
+in vec4 params;
 
 out vec4 fragColor;
-*///?}
+//?}
 
 const float MASK_TEXELS = 256.0;
 const float NOISE_PERIOD = 512.0;

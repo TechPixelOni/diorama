@@ -54,10 +54,10 @@ final class IconWaypointsTest {
 		expectBed(context, second, "after sleeping with bed pins off");
 		context.runOnClient(mc -> Settings.get().bedMarkers = true);
 		//? if >=26.3 {
-		// A straw bed leaves the respawn point alone, so the pin stays on the last real bed.
+		/*// A straw bed leaves the respawn point alone, so the pin stays on the last real bed.
 		sleep(context, world, at.offset(9, 0, 0), "straw_bed");
 		expectBed(context, second, "after sleeping in a straw bed");
-		//?}
+		*///?}
 
 		// An icon is saved with its waypoint.
 		String saved = context.computeOnClient(mc -> {
@@ -183,7 +183,7 @@ final class IconWaypointsTest {
 		// Over the title bar, so no hover box covers the map.
 		context.getInput().setCursorPos(1300, 30);
 		double v = Projection.v(base + 12, cz);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
 		settle(context, 200);
 		context.takeScreenshot("icon-wp-map");
 		String[] icons = context.computeOnClient(mc -> WaypointStore.get().all().stream().map(w -> w.icon).toArray(String[]::new));
@@ -196,7 +196,7 @@ final class IconWaypointsTest {
 				all.get(i).icon = icons[i];
 			}
 		});
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 1.6, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 1.6, TileKey.SURFACE));
 		settle(context, 60);
 		context.takeScreenshot("icon-wp-map-far");
 
@@ -208,38 +208,38 @@ final class IconWaypointsTest {
 		context.runOnClient(mc -> Settings.get().radarPassive = true);
 		world.getServer().runCommand("tp @a " + (cx + 0.5) + " " + (base + 4) + " " + (cz + 30.5) + " 180 -4");
 		context.waitTicks(40);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 4.8, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 4.8, TileKey.SURFACE));
 		settle(context, 40);
 		context.takeScreenshot("icon-wp-with-radar");
 
 		// Picking an icon: the editor's Icon button, the picker, Save, and the map again.
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
 		settle(context, 20);
 		cursor = new double[] {1300, 30};
 		frame(context);
 		hold(context, 6);
 		context.runOnClient(mc -> {
 			Waypoint keep = WaypointStore.get().all().stream().filter(w -> w.name.equals("Keep")).findFirst().orElseThrow();
-			mc.gui.setScreen(new WaypointEditScreen(mc.gui.screen(), keep, false));
+			mc.setScreen(new WaypointEditScreen(mc.screen, keep, false));
 		});
 		context.waitTicks(3);
 		hold(context, 6);
 		context.takeScreenshot("icon-wp-editor");
 		double[] button = context.computeOnClient(mc -> {
-			net.minecraft.client.gui.components.Button icon = mc.gui.screen().children().stream()
+			net.minecraft.client.gui.components.Button icon = mc.screen.children().stream()
 				.filter(child -> child instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().equals(WaypointIconScreen.name("diorama:home").getString()))
 				.map(child -> (net.minecraft.client.gui.components.Button) child).findFirst().orElseThrow();
 			double scale = mc.getWindow().getGuiScale();
 			return new double[] {(icon.getX() + icon.getWidth() / 2.0) * scale, (icon.getY() + icon.getHeight() / 2.0) * scale};
 		});
 		click(context, button[0], button[1]);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof WaypointIconScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof WaypointIconScreen)) {
 			throw new AssertionError("The Icon button didn't open the icon picker");
 		}
 		hold(context, 4);
 		context.takeScreenshot("icon-wp-picker");
 		double[] farm = context.computeOnClient(mc -> {
-			float[] at = ((WaypointIconScreen) mc.gui.screen()).cellCentre("diorama:farm");
+			float[] at = ((WaypointIconScreen) mc.screen).cellCentre("diorama:farm");
 			double scale = mc.getWindow().getGuiScale();
 			return new double[] {at[0] * scale, at[1] * scale};
 		});
@@ -247,13 +247,13 @@ final class IconWaypointsTest {
 		context.getInput().setCursorPos(farm[0], farm[1]);
 		context.getInput().pressMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		context.waitTicks(2);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof WaypointIconScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof WaypointIconScreen)) {
 			throw new AssertionError("A right click picked an icon");
 		}
 		click(context, farm[0], farm[1]);
 		hold(context, 6);
 		double[] save = context.computeOnClient(mc -> {
-			net.minecraft.client.gui.components.Button button1 = mc.gui.screen().children().stream()
+			net.minecraft.client.gui.components.Button button1 = mc.screen.children().stream()
 				.filter(child -> child instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("diorama.waypoint.save").getString()))
 				.map(child -> (net.minecraft.client.gui.components.Button) child).findFirst().orElseThrow();
 			double scale = mc.getWindow().getGuiScale();
@@ -275,7 +275,7 @@ final class IconWaypointsTest {
 		world.getServer().runCommand("tp @a " + (cx + 0.5) + " " + (base + 4) + " " + (cz + 8.5) + " 180 30");
 		context.waitTicks(40);
 		settle(context, 40);
-		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));
+		context.runOnClient(mc -> mc.gui.getChat().clearMessages(false));
 		context.takeScreenshot("icon-wp-minimap");
 	}
 

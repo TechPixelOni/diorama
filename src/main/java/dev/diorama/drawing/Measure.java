@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
@@ -142,7 +142,7 @@ public final class Measure {
 	}
 
 	/** The reading on a dark plate just above the far end, kept on screen. */
-	void drawReading(GuiGraphicsExtractor graphics, Font font, MapViewport.View view) {
+	void drawReading(GuiGraphics graphics, Font font, MapViewport.View view) {
 		if (this.to == null) {
 			return;
 		}
@@ -154,6 +154,6 @@ public final class Measure {
 		// Clear of the map screen's top and bottom bars.
 		y = Math.max(view.y() + 18, Math.min(view.y() + view.height() - 26, y));
 		graphics.fill(x - 2, y - 2, x + width + 1, y + 9, 0xC0000000);
-		graphics.text(font, text, x, y, 0xFFFFFFFF, true);
+		graphics.drawString(font, text, x, y, 0xFFFFFFFF, true);
 	}
 }

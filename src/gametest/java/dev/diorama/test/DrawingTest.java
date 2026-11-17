@@ -66,10 +66,10 @@ final class DrawingTest {
 		context.setScreen(MapScreen::new);
 		moveTo(context, 1300 / 4.0, 30 / 4.0);
 		double v = Projection.v(base + 12, cz);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
 		settle(context, 200);
 		click(context, widget(context, s -> s.drawButton()));
-		expect(context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().active()), "the pencil turns draw mode on");
+		expect(context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().active()), "the pencil turns draw mode on");
 
 		// Pen (picked first): down the road from the gate, a hand's wobble in it.
 		float[] gate = gui(context, cx, base + 1, cz + 22);
@@ -127,7 +127,7 @@ final class DrawingTest {
 		context.getInput().pressKey(InputConstants.KEY_RETURN);
 		Drawing note = last(context, dimension, before + 4);
 		expect(note.kind == Drawing.Kind.NOTE && note.text.equals("Home, cows in the yard") && note.color == Waypoint.PALETTE[9], "a white note, got " + describe(note));
-		int layer = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).view().layer());
+		int layer = context.computeOnClient(mc -> ((MapScreen) mc.screen).view().layer());
 		expect(layer == TileKey.SURFACE, "pressing C while typing a note left the map on the surface");
 		// Another, by the gate, kept by clicking the colour button half-way rather than with Enter.
 		float[] gateNote = gui(context, cx + 14, base + 1, cz + 30);
@@ -153,7 +153,7 @@ final class DrawingTest {
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		context.waitTicks(2);
-		expect(context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map && !map.drawMode().active()), "Esc mid-erase leaves draw mode and keeps the map open");
+		expect(context.computeOnClient(mc -> mc.screen instanceof MapScreen map && !map.drawMode().active()), "Esc mid-erase leaves draw mode and keeps the map open");
 		click(context, widget(context, s -> s.drawButton()));
 		click(context, widget(context, s -> s.drawMode().otherButtons().get(1)));
 		List<Drawing> after = context.computeOnClient(mc -> DrawingStore.get().in(dimension));
@@ -170,14 +170,14 @@ final class DrawingTest {
 		}
 		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		context.waitTicks(3);
-		int measured = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measured());
-		String reading = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measuredText());
+		int measured = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measured());
+		String reading = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measuredText());
 		expect(measured >= 23 && measured <= 25 && reading != null && reading.contains("east"), "about 24 blocks east across the courtyard, read " + reading);
 		frame(context);
 		context.takeScreenshot("drawing-01b-measure");
 		// The first Esc clears the reading and stays in draw mode.
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
-		expect(context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().active() && ((MapScreen) mc.gui.screen()).drawMode().measured() == -1), "the first Esc clears the measurement and stays in draw mode");
+		expect(context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().active() && ((MapScreen) mc.screen).drawMode().measured() == -1), "the first Esc clears the measurement and stays in draw mode");
 		// Then from the courtyard down to the road outside the walls: across the ground on a
 		// slant, south, and down to wherever the server's ground there is.
 		int roadY = world.getServer().computeOnServer(server -> server.overworld().getHeight(Heightmap.Types.MOTION_BLOCKING, cx + 1, cz + 40));
@@ -190,8 +190,8 @@ final class DrawingTest {
 		}
 		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		context.waitTicks(3);
-		int slant = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measured());
-		String slantReading = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measuredText());
+		int slant = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measured());
+		String slantReading = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measuredText());
 		int climb = roadY - (base + 1);
 		String expectedClimb = climb == 0 ? null : Math.abs(climb) + (climb > 0 ? " up" : " down");
 		expect(Math.abs(slant - (int) Math.round(Math.hypot(13, 32))) <= 1 && slantReading != null && slantReading.contains("13 east") && slantReading.contains("32 south")
@@ -209,13 +209,13 @@ final class DrawingTest {
 		for (int i = 1; i <= 3; i++) {
 			moveTo(context, from[0] + (partWay[0] - from[0]) * i / 3, partWay[1]);
 		}
-		double unpanned = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).view().centerU());
+		double unpanned = context.computeOnClient(mc -> ((MapScreen) mc.screen).view().centerU());
 		context.getInput().holdMouse(InputConstants.MOUSE_BUTTON_MIDDLE);
 		for (int i = 1; i <= 4; i++) {
 			moveTo(context, partWay[0] - 10 * i, partWay[1] - 5 * i);
 		}
 		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_MIDDLE);
-		double pannedU = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).view().centerU());
+		double pannedU = context.computeOnClient(mc -> ((MapScreen) mc.screen).view().centerU());
 		expect(pannedU > unpanned + 5, "the middle-button drag to pan the map east of where it was, moved " + (pannedU - unpanned));
 		float[] to = gui(context, cx + 12, base + 1, cz + 8);
 		float[] panned = {(float) partWay[0] - 40, (float) partWay[1] - 20};
@@ -223,29 +223,29 @@ final class DrawingTest {
 			moveTo(context, panned[0] + (to[0] - panned[0]) * i / 6, panned[1] + (to[1] - panned[1]) * i / 6);
 		}
 		context.waitTicks(3);
-		int held = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measured());
-		String heldReading = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measuredText());
+		int held = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measured());
+		String heldReading = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measuredText());
 		context.takeScreenshot("drawing-01d-measure-panned");
 		expect(held >= 23 && held <= 25 && heldReading != null && heldReading.contains("east"),
 			"the measurement to follow the cursor after a middle-button pan, about 24 blocks east, read " + heldReading);
 		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		moveTo(context, to[0] + 30, to[1] + 30);
 		context.waitTicks(3);
-		int letGo = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().measured());
-		boolean stillHolding = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().holding());
+		int letGo = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().measured());
+		boolean stillHolding = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().holding());
 		expect(letGo == held && !stillHolding, "letting go of the left button to end the measurement where it was, read " + letGo + " after " + held);
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
 		settle(context, 20);
 
 		// Esc leaves draw mode but not the map.
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
-		boolean stillMap = context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map && !map.drawMode().active());
+		boolean stillMap = context.computeOnClient(mc -> mc.screen instanceof MapScreen map && !map.drawMode().active());
 		expect(stillMap, "Esc leaves draw mode and keeps the map open");
 		moveTo(context, 1300 / 4.0, 30 / 4.0);
 		context.waitTicks(3);
 		context.takeScreenshot("drawing-02-map");
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 1.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 1.2, TileKey.SURFACE));
 		settle(context, 60);
 		context.takeScreenshot("drawing-03-far");
 
@@ -291,7 +291,7 @@ final class DrawingTest {
 		// What the fills broke, off the picture.
 		world.getServer().runCommand("kill @e[type=item]");
 		context.waitTicks(40);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx - 8 + 0.5, Projection.v(base + 6, z0 + 0.5), 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx - 8 + 0.5, Projection.v(base + 6, z0 + 0.5), 3.2, TileKey.SURFACE));
 		settle(context, 100);
 		click(context, widget(context, s -> s.drawButton()));
 		pickTool(context, 1);
@@ -310,7 +310,7 @@ final class DrawingTest {
 		// Leave draw mode, and hover over the line's end: the map says where that is.
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 		float[] end = context.computeOnClient(mc -> {
-			MapViewport.View view = ((MapScreen) mc.gui.screen()).view();
+			MapViewport.View view = ((MapScreen) mc.screen).view();
 			return new float[] {view.screenX(endU), view.screenY(endV)};
 		});
 		moveTo(context, end[0], end[1]);
@@ -349,7 +349,7 @@ final class DrawingTest {
 		double edgeV = edge.points[3];
 		double edgeWant = Projection.v(base + 13, z0 + 4.5);
 		float[] wallSpot = context.computeOnClient(mc -> {
-			MapViewport.View view = ((MapScreen) mc.gui.screen()).view();
+			MapViewport.View view = ((MapScreen) mc.screen).view();
 			return new float[] {view.screenX(edgeU), view.screenY(edgeV)};
 		});
 		moveTo(context, wallSpot[0], wallSpot[1]);
@@ -370,7 +370,7 @@ final class DrawingTest {
 
 	private static float[] widget(ClientGameTestContext context, WidgetOf of) {
 		return context.computeOnClient(mc -> {
-			AbstractWidget w = of.get((MapScreen) mc.gui.screen());
+			AbstractWidget w = of.get((MapScreen) mc.screen);
 			return new float[] {w.getX() + w.getWidth() / 2.0F, w.getY() + w.getHeight() / 2.0F};
 		});
 	}
@@ -381,14 +381,14 @@ final class DrawingTest {
 
 	private static void pickColour(ClientGameTestContext context, int k) {
 		click(context, widget(context, s -> s.drawMode().otherButtons().get(0)));
-		float[] swatch = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).drawMode().swatch(k));
+		float[] swatch = context.computeOnClient(mc -> ((MapScreen) mc.screen).drawMode().swatch(k));
 		click(context, swatch[0], swatch[1]);
 	}
 
 	/** Where a world point is on the map screen, in GUI pixels. */
 	private static float[] gui(ClientGameTestContext context, double x, double y, double z) {
 		return context.computeOnClient(mc -> {
-			MapViewport.View view = ((MapScreen) mc.gui.screen()).view();
+			MapViewport.View view = ((MapScreen) mc.screen).view();
 			return new float[] {view.screenX(x + 0.5), view.screenY(Projection.v(y, z + 0.5))};
 		});
 	}

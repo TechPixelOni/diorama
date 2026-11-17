@@ -59,9 +59,9 @@ public final class NightLook {
 			return 1;
 		}
 		//? if <1.21.2 {
-		/*// Until 1.21.2 the client worked this out only when a level loaded.
+		// Until 1.21.2 the client worked this out only when a level loaded.
 		level.updateSkyBrightness();
-		*///?}
+		//?}
 		float target = Mth.clamp(level.getSkyDarken() / (float) FULL_NIGHT, 0, 1);
 		long now = System.nanoTime();
 		if (shownFor != level || shown < 0) {

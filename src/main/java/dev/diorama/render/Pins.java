@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -56,12 +56,12 @@ public final class Pins {
 	}
 
 	/** A pin standing with its point on (x, y), the spot it marks. */
-	public static void standing(GuiGraphicsExtractor graphics, Waypoint waypoint, float x, float y, int size) {
+	public static void standing(GuiGraphics graphics, Waypoint waypoint, float x, float y, int size) {
 		standing(graphics, waypoint, x, y, size, 1);
 	}
 
 	/** A pin at {@link #scale}, grown or shrunk about its point, which stays on (x, y). */
-	public static void standing(GuiGraphicsExtractor graphics, Waypoint waypoint, float x, float y, int size, float scale) {
+	public static void standing(GuiGraphics graphics, Waypoint waypoint, float x, float y, int size, float scale) {
 		PinArt.Image icon = icon(waypoint);
 		if (icon != null) {
 			// Icon pins are one head size whatever the view: the head is what holds the icon.
@@ -77,7 +77,7 @@ public final class Pins {
 	}
 
 	/** A round badge centred on (x, y): the waypoint list's rows. */
-	public static void badge(GuiGraphicsExtractor graphics, Waypoint waypoint, float x, float y, int head) {
+	public static void badge(GuiGraphics graphics, Waypoint waypoint, float x, float y, int head) {
 		boolean death = waypoint.kind == Waypoint.Kind.DEATH;
 		PinArt.Image icon = icon(waypoint);
 		Sprite sprite = icon != null
@@ -91,7 +91,7 @@ public final class Pins {
 	 * A badge centred on (x, y) with a caret beside it pointing along {@code angle} (radians, screen
 	 * space, 0 is right): a waypoint pulled in to the edge of a view, showing which way it lies.
 	 */
-	public static void edge(GuiGraphicsExtractor graphics, Waypoint waypoint, float x, float y, int head, double angle, float scale) {
+	public static void edge(GuiGraphics graphics, Waypoint waypoint, float x, float y, int head, double angle, float scale) {
 		boolean death = waypoint.kind == Waypoint.Kind.DEATH;
 		int step = Math.floorMod(Math.round((float) (angle / (Math.PI * 2) * CARET_STEPS)), CARET_STEPS);
 		double snapped = step * Math.PI * 2 / CARET_STEPS;
@@ -208,13 +208,13 @@ public final class Pins {
 		return sprite;
 	}
 
-	private static void draw(GuiGraphicsExtractor graphics, Sprite sprite, Waypoint waypoint, float x, float y, float scale) {
+	private static void draw(GuiGraphics graphics, Sprite sprite, Waypoint waypoint, float x, float y, float scale) {
 		PinArt.Art art = sprite.art();
 		// Keep the body and initials on one local pixel grid, moving continuously with the map.
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(x, y);
-		graphics.pose().scale(scale);
-		graphics.pose().translate(-art.anchorX(), -art.anchorY());
+		graphics.pose().pushPose();
+		graphics.pose().translate(x, y, 0);
+		graphics.pose().scale(scale, scale, 1);
+		graphics.pose().translate(-art.anchorX(), -art.anchorY(), 0);
 		int w = art.image().width;
 		int h = art.image().height;
 		float edge = sprite.edge();
@@ -224,11 +224,11 @@ public final class Pins {
 		if (waypoint.kind != Waypoint.Kind.DEATH && art.labelX1() > art.labelX0()) {
 			label(graphics, waypoint, art.labelX0(), art.labelY0(), art.labelX1(), art.labelY1());
 		}
-		graphics.pose().popMatrix();
+		graphics.pose().popPose();
 	}
 
 	/** The initials at full size, centred on their ink in the head, which is drawn wide enough for them. */
-	private static void label(GuiGraphicsExtractor graphics, Waypoint waypoint, int x0, int y0, int x1, int y1) {
+	private static void label(GuiGraphics graphics, Waypoint waypoint, int x0, int y0, int x1, int y1) {
 		Font font = Minecraft.getInstance().font;
 		String text = waypoint.label();
 		if (text.isEmpty()) {
@@ -239,7 +239,7 @@ public final class Pins {
 		int x = PinArt.centred(x0, x1, ink(font, text));
 		// Capitals and digits are 7 pixels tall from the top of the line.
 		int y = PinArt.centred(y0, y1, 7);
-		graphics.text(font, text, x, y, light ? 0xFF000000 | PinArt.INK : 0xFFFFFFFF, !light);
+		graphics.drawString(font, text, x, y, light ? 0xFF000000 | PinArt.INK : 0xFFFFFFFF, !light);
 	}
 
 	/** Width of a string's ink: its advance less the one-pixel gap after the last glyph. */

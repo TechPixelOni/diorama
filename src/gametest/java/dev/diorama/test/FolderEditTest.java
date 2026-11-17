@@ -36,7 +36,7 @@ final class FolderEditTest {
 			for (String name : CUSTOM) {
 				store.addFolder(name);
 			}
-			Waypoint waypoint = new Waypoint("Cabin", at.getX() + 3, at.getY(), at.getZ(), mc.level.dimension().identifier().toString(), Waypoint.PALETTE[4]);
+			Waypoint waypoint = new Waypoint("Cabin", at.getX() + 3, at.getY(), at.getZ(), mc.level.dimension().location().toString(), Waypoint.PALETTE[4]);
 			store.add(waypoint);
 			return waypoint;
 		});
@@ -48,7 +48,7 @@ final class FolderEditTest {
 		context.takeScreenshot("folder-editor-01-closed");
 		DioramaClientTest.clickAt(context, folderButton(context));
 		List<String> labels = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointEditScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointEditScreen) mc.screen).folderMenu();
 			return menu == null ? List.<String>of() : menu.labels();
 		});
 		List<String> expected = new ArrayList<>(List.of("Overworld"));
@@ -71,8 +71,8 @@ final class FolderEditTest {
 
 		// A click outside the open list only closes it: Save under the mouse isn't pressed.
 		DioramaClientTest.clickAt(context, folderButton(context));
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Save")));
-		if (!(context.computeOnClient(mc -> mc.gui.screen()) instanceof WaypointEditScreen) || menu(context) != null) {
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Save")));
+		if (!(context.computeOnClient(mc -> mc.screen) instanceof WaypointEditScreen) || menu(context) != null) {
 			wrong.add("a click on Save with the list of folders open did more than close the list");
 		}
 		if (!folderButton(context).getMessage().getString().equals("Alex's base")) {
@@ -82,10 +82,10 @@ final class FolderEditTest {
 		DioramaClientTest.clickAt(context, folderButton(context));
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 		context.waitTicks(2);
-		if (!(context.computeOnClient(mc -> mc.gui.screen()) instanceof WaypointEditScreen) || menu(context) != null) {
+		if (!(context.computeOnClient(mc -> mc.screen) instanceof WaypointEditScreen) || menu(context) != null) {
 			wrong.add("Escape with the list of folders open didn't just close the list");
 		}
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Save")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Save")));
 		context.waitTicks(3);
 		if (!cabin.folder.equals("Alex's base")) {
 			wrong.add("Save left the waypoint in \"" + cabin.folder + "\"");
@@ -93,7 +93,7 @@ final class FolderEditTest {
 
 		// Without the mouse: Enter on the Folder button opens the list, the arrows and Enter pick.
 		edit(context, cabin);
-		context.runOnClient(mc -> mc.gui.screen().setFocused(((WaypointEditScreen) mc.gui.screen()).folderButton()));
+		context.runOnClient(mc -> mc.screen.setFocused(((WaypointEditScreen) mc.screen).folderButton()));
 		context.getInput().pressKey(InputConstants.KEY_RETURN);
 		context.waitTicks(2);
 		if (menu(context) == null) {
@@ -108,14 +108,14 @@ final class FolderEditTest {
 		if (menu(context) != null || !folderButton(context).getMessage().getString().equals("Villages")) {
 			wrong.add("Up twice and Enter from Alex's base left the button saying " + folderButton(context).getMessage().getString());
 		}
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Cancel")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Cancel")));
 		context.waitTicks(3);
 
 		// Picked and then cancelled, it stays where it was.
 		edit(context, cabin);
 		DioramaClientTest.clickAt(context, folderButton(context));
 		pick(context, "Mines", wrong);
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Cancel")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Cancel")));
 		context.waitTicks(3);
 		if (!cabin.folder.equals("Alex's base")) {
 			wrong.add("Cancel after picking Mines left the waypoint in \"" + cabin.folder + "\"");
@@ -126,7 +126,7 @@ final class FolderEditTest {
 		DioramaClientTest.clickAt(context, folderButton(context));
 		context.takeScreenshot("folder-editor-04-open-in-own-folder");
 		pick(context, "Overworld", wrong);
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Save")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Save")));
 		context.waitTicks(3);
 		if (!cabin.folder.isEmpty()) {
 			wrong.add("picking Overworld and Save left the waypoint in \"" + cabin.folder + "\"");
@@ -143,7 +143,7 @@ final class FolderEditTest {
 		edit(context, cabin);
 		DioramaClientTest.clickAt(context, folderButton(context));
 		int[] sizes = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointEditScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointEditScreen) mc.screen).folderMenu();
 			return new int[] {menu.shown(), menu.labels().size()};
 		});
 		if (sizes[0] >= sizes[1]) {
@@ -153,17 +153,17 @@ final class FolderEditTest {
 		for (int i = 0; i < 60; i++) {
 			context.runOnClient(mc -> {
 				//? if >=1.21 {
-				mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, 0, -1);
-				//?} else {
-				/*mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, -1);
-				*///?}
+				/*mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, 0, -1);
+				*///?} else {
+				mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, -1);
+				//?}
 			});
 		}
 		context.waitTicks(2);
 		hover(context, "Trip 40");
 		context.takeScreenshot("folder-editor-06-many-scrolled");
 		pick(context, "Trip 40", wrong);
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "Save")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "Save")));
 		context.waitTicks(3);
 		if (!cabin.folder.equals("Trip 40")) {
 			wrong.add("picking the last folder after scrolling left the waypoint in \"" + cabin.folder + "\"");
@@ -191,13 +191,13 @@ final class FolderEditTest {
 		});
 		context.waitTicks(5);
 		// Its folder: stepped to with the arrow, as many times as it takes.
-		for (int i = 0; i < 60 && context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint)) == null; i++) {
-			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "<")));
+		for (int i = 0; i < 60 && context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(waypoint)) == null; i++) {
+			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "<")));
 		}
-		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint));
+		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(waypoint));
 		DioramaClientTest.clickAtGui(context, row[0], row[1]);
 		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> {
-			for (var child : mc.gui.screen().children()) {
+			for (var child : mc.screen.children()) {
 				if (child instanceof Button button && button.visible && button.getMessage().getString().equals("Edit")) {
 					return button;
 				}
@@ -208,17 +208,17 @@ final class FolderEditTest {
 	}
 
 	private static Button folderButton(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> ((WaypointEditScreen) mc.gui.screen()).folderButton());
+		return context.computeOnClient(mc -> ((WaypointEditScreen) mc.screen).folderButton());
 	}
 
 	private static FolderMenu menu(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> ((WaypointEditScreen) mc.gui.screen()).folderMenu());
+		return context.computeOnClient(mc -> ((WaypointEditScreen) mc.screen).folderMenu());
 	}
 
 	/** Puts the mouse on a folder's line, for a picture with the line lit. */
 	private static void hover(ClientGameTestContext context, String name) {
 		float[] line = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointEditScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointEditScreen) mc.screen).folderMenu();
 			return menu == null ? null : menu.centreOf(name);
 		});
 		if (line != null) {
@@ -231,7 +231,7 @@ final class FolderEditTest {
 	/** Clicks a folder's line in the open list. */
 	private static void pick(ClientGameTestContext context, String name, List<String> wrong) {
 		float[] line = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointEditScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointEditScreen) mc.screen).folderMenu();
 			return menu == null ? null : menu.centreOf(name);
 		});
 		if (line == null) {

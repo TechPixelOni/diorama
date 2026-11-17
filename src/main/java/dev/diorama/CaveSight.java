@@ -63,8 +63,8 @@ final class CaveSight {
 		this.eyeZ = Mth.floor(eyes.z);
 		Arrays.fill(this.cells, (byte) 0);
 		int[] box = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
-		int minY = this.level.getMinY();
-		int maxY = this.level.getMaxY();
+		int minY = this.level.getMinBuildHeight();
+		int maxY = (this.level.getMaxBuildHeight() - 1);
 		int r2 = RADIUS * RADIUS;
 		int head = 0;
 		int tail = 0;

@@ -196,8 +196,8 @@ public final class VanillaTable {
 		maps[GRASS] = shrink(GrassColor::get);
 		maps[FOLIAGE] = shrink(FoliageColor::get);
 		//? if >=1.21.5 {
-		maps[DRY_FOLIAGE] = shrink(net.minecraft.world.level.DryFoliageColor::get);
-		//?}
+		/*maps[DRY_FOLIAGE] = shrink(net.minecraft.world.level.DryFoliageColor::get);
+		*///?}
 		return new VanillaTable(kept, blocks, maps);
 	}
 

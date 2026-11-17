@@ -47,32 +47,32 @@ public final class TrackedPlayers {
 			return;
 		}
 		//? if >=1.21.5 {
-		boolean removed = tag.getBooleanOr("r", false);
-		//?} else {
-		/*// Before 1.21.5 a missing value read as false, 0 or "".
+		/*boolean removed = tag.getBooleanOr("r", false);
+		*///?} else {
+		// Before 1.21.5 a missing value read as false, 0 or "".
 		boolean removed = tag.getBoolean("r");
-		*///?}
+		//?}
 		if (removed) {
 			PLAYERS.remove(id);
 			STAND_INS.remove(id);
 		} else {
 			//? if >=1.21.5 {
-			PLAYERS.put(id, new Tracked(tag.getDoubleOr("x", 0), tag.getDoubleOr("y", 0), tag.getDoubleOr("z", 0), tag.getStringOr("d", "")));
-			//?} else {
-			/*PLAYERS.put(id, new Tracked(tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z"), tag.getString("d")));
-			*///?}
+			/*PLAYERS.put(id, new Tracked(tag.getDoubleOr("x", 0), tag.getDoubleOr("y", 0), tag.getDoubleOr("z", 0), tag.getStringOr("d", "")));
+			*///?} else {
+			PLAYERS.put(id, new Tracked(tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z"), tag.getString("d")));
+			//?}
 		}
 	}
 
 	private static @Nullable UUID uuid(CompoundTag tag) {
 		//? if >=1.21.5 {
-		int[] ints = tag.getIntArray("i").orElse(new int[0]);
+		/*int[] ints = tag.getIntArray("i").orElse(new int[0]);
 		long[] longs = tag.getLongArray("i").orElse(new long[0]);
-		//?} else {
-		/*// Before 1.21.5 a missing or other-typed array read as empty.
+		*///?} else {
+		// Before 1.21.5 a missing or other-typed array read as empty.
 		int[] ints = tag.getIntArray("i");
 		long[] longs = tag.getLongArray("i");
-		*///?}
+		//?}
 		if (ints.length == 4) {
 			return UUIDUtil.uuidFromIntArray(ints);
 		}
@@ -104,7 +104,7 @@ public final class TrackedPlayers {
 			STAND_INS.clear();
 			standInLevel = level;
 		}
-		String dimension = level.dimension().identifier().toString();
+		String dimension = level.dimension().location().toString();
 		List<RemotePlayer> out = new ArrayList<>();
 		for (Map.Entry<UUID, Tracked> e : PLAYERS.entrySet()) {
 			UUID id = e.getKey();
@@ -118,11 +118,11 @@ public final class TrackedPlayers {
 			}
 			RemotePlayer standIn = STAND_INS.computeIfAbsent(id, uuid -> new RemotePlayer(level, info.getProfile()));
 			//? if >=1.21.5 {
-			standIn.snapTo(tracked.x(), tracked.y(), tracked.z());
-			//?} else {
-			/*// Sets the previous position too, as snapTo does, so the face doesn't slide from the old spot.
+			/*standIn.moveTo(tracked.x(), tracked.y(), tracked.z());
+			*///?} else {
+			// Sets the previous position too, as snapTo does, so the face doesn't slide from the old spot.
 			standIn.moveTo(tracked.x(), tracked.y(), tracked.z());
-			*///?}
+			//?}
 			out.add(standIn);
 		}
 		return out;

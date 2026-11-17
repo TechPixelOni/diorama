@@ -23,7 +23,7 @@ final class MapCoordinatesTest {
 		context.runOnClient(mc -> Settings.get().mapCoordinates = true);
 		String position = context.computeOnClient(mc -> mc.player.getBlockX() + ", " + mc.player.getBlockY() + ", " + mc.player.getBlockZ());
 		List<String> shown = hover(context, "map-coordinates-01-on");
-		String status = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).statusLine());
+		String status = context.computeOnClient(mc -> ((MapScreen) mc.screen).statusLine());
 		if (!status.contains(position)) {
 			throw new AssertionError("The map's status line doesn't give the player's position " + position + ": " + status);
 		}
@@ -32,7 +32,7 @@ final class MapCoordinatesTest {
 		}
 
 		context.setScreen(() -> new SettingsScreen(null));
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(2));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(2));
 		context.waitTicks(5);
 		DioramaClientTest.click(context, "Cursor coordinates");
 		if (context.computeOnClient(mc -> Settings.get().mapCoordinates)) {
@@ -43,7 +43,7 @@ final class MapCoordinatesTest {
 		context.takeScreenshot("map-coordinates-02-setting");
 
 		List<String> hidden = hover(context, "map-coordinates-03-off");
-		status = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).statusLine());
+		status = context.computeOnClient(mc -> ((MapScreen) mc.screen).statusLine());
 		if (!status.contains(position)) {
 			throw new AssertionError("The map's status line lost the player's position " + position + " with Cursor coordinates off: " + status);
 		}
@@ -64,11 +64,11 @@ final class MapCoordinatesTest {
 		context.waitTicks(20);
 		double[] at = context.computeOnClient(mc -> {
 			double scale = mc.getWindow().getGuiScale();
-			return new double[] {(mc.gui.screen().width / 2.0 + 40) * scale, (mc.gui.screen().height / 2.0 + 30) * scale};
+			return new double[] {(mc.screen.width / 2.0 + 40) * scale, (mc.screen.height / 2.0 + 30) * scale};
 		});
 		context.getInput().setCursorPos(at[0], at[1]);
 		context.waitTicks(20);
 		context.takeScreenshot(picture);
-		return context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).tooltipText());
+		return context.computeOnClient(mc -> ((MapScreen) mc.screen).tooltipText());
 	}
 }

@@ -3,7 +3,7 @@ package dev.diorama.bake;
 import dev.diorama.data.ChunkSnapshot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -23,11 +23,11 @@ public final class BiomeTints {
 		Biome::getGrassColor,
 		(biome, x, z) -> biome.getFoliageColor(),
 		//? if >=1.21.5 {
-		(biome, x, z) -> biome.getDryFoliageColor(),
-		//?} else {
-		/*// Dry foliage (leaf litter) came in 1.21.5; nothing reads this slot before.
+		/*(biome, x, z) -> biome.getDryFoliageColor(),
+		*///?} else {
+		// Dry foliage (leaf litter) came in 1.21.5; nothing reads this slot before.
 		(biome, x, z) -> biome.getFoliageColor(),
-		*///?}
+		//?}
 		(biome, x, z) -> biome.getWaterColor(),
 	};
 	private static final int WATER = 3;
@@ -113,9 +113,9 @@ public final class BiomeTints {
 							count++;
 							for (int r = 0; r < RESOLVERS.length; r++) {
 								int color = sampled[r][cell];
-								red[r] += ARGB.red(color);
-								green[r] += ARGB.green(color);
-								blue[r] += ARGB.blue(color);
+								red[r] += FastColor.ARGB32.red(color);
+								green[r] += FastColor.ARGB32.green(color);
+								blue[r] += FastColor.ARGB32.blue(color);
 							}
 						}
 					}
@@ -127,19 +127,19 @@ public final class BiomeTints {
 					count = 1;
 					for (int r = 0; r < RESOLVERS.length; r++) {
 						int color = RESOLVERS[r].getColor(own, bx, bz);
-						red[r] = ARGB.red(color);
-						green[r] = ARGB.green(color);
-						blue[r] = ARGB.blue(color);
+						red[r] = FastColor.ARGB32.red(color);
+						green[r] = FastColor.ARGB32.green(color);
+						blue[r] = FastColor.ARGB32.blue(color);
 					}
 				}
 				int i = (z << 4) | x;
 				for (int r = 0; r < RESOLVERS.length; r++) {
 					//? if >=1.21 {
-					colors[r][i] = ARGB.color(red[r] / count, green[r] / count, blue[r] / count) & 0xFFFFFF;
-					//?} else {
-					/*// There was no colour without alpha yet; the alpha is masked off anyway.
-					colors[r][i] = ARGB.color(255, red[r] / count, green[r] / count, blue[r] / count) & 0xFFFFFF;
-					*///?}
+					/*colors[r][i] = FastColor.ARGB32.color(red[r] / count, green[r] / count, blue[r] / count) & 0xFFFFFF;
+					*///?} else {
+					// There was no colour without alpha yet; the alpha is masked off anyway.
+					colors[r][i] = FastColor.ARGB32.color(255, red[r] / count, green[r] / count, blue[r] / count) & 0xFFFFFF;
+					//?}
 				}
 			}
 		}

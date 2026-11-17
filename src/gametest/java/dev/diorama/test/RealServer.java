@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.gui.screens.GenericMessageScreen;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -163,26 +163,26 @@ final class RealServer implements AutoCloseable {
 		ServerAddress address = new ServerAddress("127.0.0.1", this.port);
 		context.runOnClient(mc -> {
 			//? if >=1.21 {
-			ServerData data = new ServerData("Real server", address.getHost() + ":" + address.getPort(), ServerData.Type.OTHER);
+			/*ServerData data = new ServerData("Real server", address.getHost() + ":" + address.getPort(), ServerData.Type.OTHER);
 			ConnectScreen.startConnecting(new TitleScreen(), mc, address, data, false, null);
-			//?} else {
-			/*ServerData data = new ServerData("Real server", address.getHost() + ":" + address.getPort(), false);
+			*///?} else {
+			ServerData data = new ServerData("Real server", address.getHost() + ":" + address.getPort(), false);
 			ConnectScreen.startConnecting(new TitleScreen(), mc, address, data, false);
-			*///?}
+			//?}
 		});
-		context.waitFor(mc -> mc.level != null && mc.player != null && mc.gui.screen() == null, 6000);
+		context.waitFor(mc -> mc.level != null && mc.player != null && mc.screen == null, 6000);
 	}
 
 	/** Leaves the server for the title screen. */
 	static void leave(ClientGameTestContext context) {
 		context.runOnClient(mc -> {
 			//? if >=1.21.6 {
-			mc.level.disconnect(Component.literal("Leaving the real server"));
-			mc.disconnect(new GenericMessageScreen(Component.literal("Leaving the real server")), false);
-			//?} else {
-			/*mc.level.disconnect();
-			mc.disconnect(new GenericMessageScreen(Component.literal("Leaving the real server")));
-			*///?}
+			/*mc.level.disconnect(Component.literal("Leaving the real server"));
+			mc.clearLevel(new GenericDirtMessageScreen(Component.literal("Leaving the real server")), false);
+			*///?} else {
+			mc.level.disconnect();
+			mc.clearLevel(new GenericDirtMessageScreen(Component.literal("Leaving the real server")));
+			//?}
 		});
 		context.waitFor(mc -> mc.level == null, 1200);
 		context.setScreen(TitleScreen::new);

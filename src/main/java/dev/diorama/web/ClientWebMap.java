@@ -94,10 +94,10 @@ public final class ClientWebMap {
 			Component message = http != null ? Component.translatable("diorama.web_map.ready", link(address())) : failure;
 			if (message != null) {
 				//? if >=26.1 {
-				mc.gui.hud.getChat().addClientSystemMessage(message);
-				//?} else {
-				/*mc.gui.getChat().addMessage(message);
-				*///?}
+				/*mc.gui.getChat().addClientSystemMessage(message);
+				*///?} else {
+				mc.gui.getChat().addMessage(message);
+				//?}
 			}
 		}
 	}
@@ -179,15 +179,15 @@ public final class ClientWebMap {
 
 	private static Component link(String address) {
 		//? if >=1.21.5 {
-		ClickEvent open = new ClickEvent.OpenUrl(java.net.URI.create(address));
-		//?} else {
-		/*ClickEvent open = new ClickEvent(ClickEvent.Action.OPEN_URL, address);
-		*///?}
+		/*ClickEvent open = new ClickEvent.OpenUrl(java.net.URI.create(address));
+		*///?} else {
+		ClickEvent open = new ClickEvent(ClickEvent.Action.OPEN_URL, address);
+		//?}
 		return Component.literal(address).withStyle(style -> style
 			.withColor(ChatFormatting.GREEN)
 			.withUnderlined(true)
 			.withClickEvent(open)
-			.withHoverEvent(new HoverEvent.ShowText(Component.translatable("diorama.web_map.open"))));
+			.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("diorama.web_map.open"))));
 	}
 
 	/** What the page shows now: the map the player is on, or null outside a world or where the server allows no map. */
@@ -201,7 +201,7 @@ public final class ClientWebMap {
 		if (store == null) {
 			return null;
 		}
-		String dimension = mc.level.dimension().identifier().toString();
+		String dimension = mc.level.dimension().location().toString();
 		Facing facing = Projection.facing();
 		// Which way the viewer looks, across the picture: yaw 0 is south, turning clockwise from above.
 		double yaw = Math.toRadians(viewer.getYRot());

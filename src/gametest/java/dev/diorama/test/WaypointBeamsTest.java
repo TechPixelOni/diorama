@@ -208,7 +208,7 @@ final class WaypointBeamsTest {
 
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(3);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(3));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(3));
 		// Off the buttons, so no tooltip covers them.
 		context.getInput().setCursorPos(1500, 880);
 		context.waitTicks(5);

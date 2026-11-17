@@ -147,7 +147,7 @@ public final class SharedChunks implements ChunkSave {
 
 	private SharedChunks(ClientLevel level) {
 		this.level = level;
-		this.dimension = level.dimension().identifier().toString();
+		this.dimension = level.dimension().location().toString();
 		this.tags = new ChunkTags(level, false);
 	}
 
@@ -481,10 +481,10 @@ public final class SharedChunks implements ChunkSave {
 		try (DataInputStream in = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(packed)))) {
 			// A server's message, so the NBT it holds is held to what a chunk could be.
 			//? if >=1.21 {
-			CompoundTag tag = NbtIo.read(in, net.minecraft.nbt.NbtAccounter.create(NBT_QUOTA));
-			//?} else {
-			/*CompoundTag tag = NbtIo.read(in, new net.minecraft.nbt.NbtAccounter(NBT_QUOTA));
-			*///?}
+			/*CompoundTag tag = NbtIo.read(in, net.minecraft.nbt.NbtAccounter.create(NBT_QUOTA));
+			*///?} else {
+			CompoundTag tag = NbtIo.read(in, new net.minecraft.nbt.NbtAccounter(NBT_QUOTA));
+			//?}
 			return this.tags.read(chunkX, chunkZ, tag);
 		} catch (IOException | RuntimeException e) {
 			Diorama.LOGGER.warn("Couldn't read shared chunk {}, {}", chunkX, chunkZ, e);

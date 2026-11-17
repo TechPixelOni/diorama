@@ -5,14 +5,14 @@ import io.netty.buffer.Unpooled;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 //? if >=1.21 {
-import java.util.ArrayDeque;
-//?}
+/*import java.util.ArrayDeque;
+*///?}
 import java.util.List;
 //? if >=1.21 {
-import java.util.Map;
+/*import java.util.Map;
 import java.util.Queue;
 import java.util.WeakHashMap;
-//?}
+*///?}
 import net.minecraft.client.Minecraft;
 //? if fabric {
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -36,25 +36,25 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.event.EventNetworkChannel;
 *///?}
 //? if fabric && >=1.21 {
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-//?} else if fabric {
-/*import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-*///?}
+/*import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+*///?} else if fabric {
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+//?}
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 //? if >=1.21 {
-import net.minecraft.network.codec.StreamCodec;
+/*import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-//?}
+*///?}
 //? if >=1.21.9 {
-import net.minecraft.network.PacketProcessor;
+/*import net.minecraft.network.PacketProcessor;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.CommonPacketTypes;
-//?}
-import net.minecraft.resources.Identifier;
+*///?}
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -93,15 +93,15 @@ public final class XaeroChannels {
 	private static final int PROTOCOL = 3;
 
 	/** The channels, public for tests that send on them. */
-	public static final CustomPacketPayload.Type<Message> MINIMAP = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("xaerominimap", "main"));
-	public static final CustomPacketPayload.Type<Message> WORLD_MAP = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("xaeroworldmap", "main"));
+	public static final CustomPacketPayload.Type<Message> MINIMAP = new CustomPacketPayload.Type<>(new net.minecraft.resources.ResourceLocation("xaerominimap", "main"));
+	public static final CustomPacketPayload.Type<Message> WORLD_MAP = new CustomPacketPayload.Type<>(new net.minecraft.resources.ResourceLocation("xaeroworldmap", "main"));
 	/** VoxelMap's and JourneyMap's world ID channel, which MapModCompanion also listens on. */
-	private static final Identifier WORLD_INFO = Identifier.fromNamespaceAndPath("worldinfo", "world_id");
+	private static final ResourceLocation WORLD_INFO = new net.minecraft.resources.ResourceLocation("worldinfo", "world_id");
 
 	/** The channels a Xaero mod has, whose level IDs Diorama reads in {@link #peek}. */
-	private static final List<Identifier> CLAIMED = new ArrayList<>(2);
+	private static final List<ResourceLocation> CLAIMED = new ArrayList<>(2);
 	/** The channels another mod got to first, whose messages Diorama reads in {@link #peek}. */
-	private static final List<Identifier> TAKEN = new ArrayList<>(2);
+	private static final List<ResourceLocation> TAKEN = new ArrayList<>(2);
 	/** The channel tracked players come on: the first Diorama answered on, the minimap's over the World Map's. */
 	private static CustomPacketPayload.@Nullable Type<Message> trackerChannel;
 
@@ -109,14 +109,14 @@ public final class XaeroChannels {
 	}
 
 	//? if <1.21 {
-	/*// Payload types came after 1.20.1. There a channel is only its id, and its messages are read
+	// Payload types came after 1.20.1. There a channel is only its id, and its messages are read
 	// and written by hand (see read and write). This stands in for the game's payload interface,
 	// so the rest of the class is the same on every version.
 	public interface CustomPacketPayload {
 		record Type<T>(ResourceLocation id) {
 		}
 	}
-	*///?}
+	//?}
 
 	/** One message: its kind, then its body as sent. */
 	public record Message(CustomPacketPayload.Type<Message> type, int kind, byte[] body) implements CustomPacketPayload {
@@ -127,12 +127,12 @@ public final class XaeroChannels {
 	}
 
 	//? if fabric && >=1.21 {
-	/** Listens on the channels no Xaero mod has. Call once, at startup. */
+	/*/^* Listens on the channels no Xaero mod has. Call once, at startup. ^/
 	public static void register() {
 		for (CustomPacketPayload.Type<Message> type : unclaimed()) {
 			try {
-				PayloadTypeRegistry.clientboundPlay().register(type, codec(type));
-				PayloadTypeRegistry.serverboundPlay().register(type, codec(type));
+				PayloadTypeRegistry.playS2C().register(type, codec(type));
+				PayloadTypeRegistry.playC2S().register(type, codec(type));
 			} catch (IllegalArgumentException e) {
 				taken(type);
 				continue;
@@ -143,20 +143,20 @@ public final class XaeroChannels {
 		}
 	}
 
-	/**
+	/^*
 	 * For tests: Diorama leaves the channels as if Xaero's mods had them (true), keeping only what
 	 * {@link #peek} reads, or takes them back (false). Call while not on a server.
-	 */
+	 ^/
 	public static void handOverForTests(boolean toXaero) {
 		handOver(CLAIMED, toXaero);
 	}
 
-	/** For tests: as {@link #handOverForTests}, as if another mod had taken the channels. */
+	/^* For tests: as {@link #handOverForTests}, as if another mod had taken the channels. ^/
 	public static void leaveToAnotherModForTests(boolean leave) {
 		handOver(TAKEN, leave);
 	}
 
-	private static void handOver(List<Identifier> holder, boolean leave) {
+	private static void handOver(List<ResourceLocation> holder, boolean leave) {
 		for (CustomPacketPayload.Type<Message> type : List.of(MINIMAP, WORLD_MAP)) {
 			if (leave) {
 				ClientPlayNetworking.unregisterGlobalReceiver(type.id());
@@ -167,8 +167,8 @@ public final class XaeroChannels {
 			}
 		}
 	}
-	//?} else if fabric {
-	/*// Listens on the channels no Xaero mod has. Call once, at startup.
+	*///?} else if fabric {
+	// Listens on the channels no Xaero mod has. Call once, at startup.
 	public static void register() {
 		for (CustomPacketPayload.Type<Message> type : unclaimed()) {
 			// Registering a handler also tells the server Diorama listens here. Plugins need that:
@@ -190,7 +190,7 @@ public final class XaeroChannels {
 			}
 		}
 	}
-	*///?} else if forge {
+	//?} else if forge {
 	/*// Listens on the channels no Xaero mod has. Call once, at startup.
 	public static void register() {
 		for (CustomPacketPayload.Type<Message> type : unclaimed()) {
@@ -311,11 +311,11 @@ public final class XaeroChannels {
 	}
 
 	//? if >=1.21 {
-	/** Public for tests. */
+	/*/^* Public for tests. ^/
 	public static StreamCodec<FriendlyByteBuf, Message> codec(CustomPacketPayload.Type<Message> type) {
 		return StreamCodec.of(XaeroChannels::write, buf -> read(type, buf));
 	}
-	//?}
+	*///?}
 
 	/** Public for tests. */
 	public static void write(FriendlyByteBuf buf, Message message) {
@@ -377,12 +377,12 @@ public final class XaeroChannels {
 		}
 		Message answer = new Message(channel, HANDSHAKE, ByteBuffer.allocate(4).putInt(PROTOCOL).array());
 		//? if fabric && >=1.21 {
-		ClientPlayNetworking.send(answer);
-		//?} else if fabric {
-		/*FriendlyByteBuf buf = PacketByteBufs.create();
+		/*ClientPlayNetworking.send(answer);
+		*///?} else if fabric {
+		FriendlyByteBuf buf = PacketByteBufs.create();
 		write(buf, answer);
 		ClientPlayNetworking.send(channel.id(), buf);
-		*///?} else if neoforge {
+		//?} else if neoforge {
 		/*connection.send(answer);
 		*///?} else {
 		/*FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
@@ -410,7 +410,7 @@ public final class XaeroChannels {
 	 * one for Diorama: anything on a channel another mod took, a level ID on a Xaero mod's, else
 	 * null. The body is left as it was. Called on the network thread, by a mixin.
 	 */
-	public static @Nullable Message peek(Identifier channel, ByteBuf body) {
+	public static @Nullable Message peek(ResourceLocation channel, ByteBuf body) {
 		boolean levelId = CLAIMED.contains(channel) && body.readableBytes() >= 5 && body.getByte(body.readerIndex()) == LEVEL_ID;
 		if (!levelId && !TAKEN.contains(channel)) {
 			return null;
@@ -419,7 +419,7 @@ public final class XaeroChannels {
 	}
 
 	//? if >=1.21 {
-	/**
+	/*/^*
 	 * Messages {@link #peek} read, by the payload they came in. The codec reads messages both ways,
 	 * and a LAN guest's aren't for the client, so a message waits here until the client handles it
 	 * as one from the server. From 1.21.9 the client also handles packets in a queue of their own,
@@ -427,20 +427,20 @@ public final class XaeroChannels {
 	 * server sent after it, and name the wrong world. {@link #queuePeeked} puts it where its
 	 * payload is. A queue each, as another mod's codec may return equal payloads for different
 	 * messages, or one payload for all it ignores.
-	 */
+	 ^/
 	private static final Map<Object, Queue<Message>> PEEKED = new WeakHashMap<>();
 
-	/** {@code payload} carries {@code message}. Network thread, by a mixin. */
+	/^* {@code payload} carries {@code message}. Network thread, by a mixin. ^/
 	public static void peeked(Object payload, Message message) {
 		synchronized (PEEKED) {
 			PEEKED.computeIfAbsent(payload, key -> new ArrayDeque<>()).add(message);
 		}
 	}
 
-	/**
+	/^*
 	 * The client is handling {@code payload}: on the network thread, before the loader hands it to
 	 * the client thread, or on the client thread for a payload in a bundle. By a mixin.
-	 */
+	 ^/
 	public static void queuePeeked(CustomPacketPayload payload, ClientCommonPacketListener listener) {
 		Message message;
 		synchronized (PEEKED) {
@@ -455,10 +455,10 @@ public final class XaeroChannels {
 		}
 		queue(message, listener);
 	}
-	//?}
+	*///?}
 
 	//? if >=1.21.9 {
-	private static void queue(Message message, ClientCommonPacketListener listener) {
+	/*private static void queue(Message message, ClientCommonPacketListener listener) {
 		PacketProcessor packets = Minecraft.getInstance().packetProcessor();
 		if (packets.isSameThread()) {
 			// The client thread handles a bundle's packets one after another, so this is the message's place.
@@ -468,7 +468,7 @@ public final class XaeroChannels {
 		}
 	}
 
-	/** A message from the server in the client's packet queue. */
+	/^* A message from the server in the client's packet queue. ^/
 	private record PeekedMessage(Message message) implements Packet<ClientCommonPacketListener> {
 		@Override
 		public PacketType<ClientboundCustomPayloadPacket> type() {
@@ -480,7 +480,7 @@ public final class XaeroChannels {
 			receivePeeked(this.message);
 		}
 	}
-	//?} else if >=1.21 {
+	*///?} else if >=1.21 {
 	/*// Packets and tasks share the client's one queue, so a task keeps the message's place.
 	private static void queue(Message message, ClientCommonPacketListener listener) {
 		Minecraft mc = Minecraft.getInstance();
@@ -491,12 +491,12 @@ public final class XaeroChannels {
 		}
 	}
 	*///?} else {
-	/*// The server's packet carrying message arrived. Packets and tasks share the client's one queue,
+	// The server's packet carrying message arrived. Packets and tasks share the client's one queue,
 	// so a task keeps the message's place among the packets around it. Network thread, by a mixin.
 	public static void peeked(Object packet, Message message) {
 		Minecraft.getInstance().execute(() -> receivePeeked(message));
 	}
-	*///?}
+	//?}
 
 	/** A message read off a channel another mod has, unless the player left before the client got to it. */
 	private static void receivePeeked(Message message) {
@@ -520,13 +520,13 @@ public final class XaeroChannels {
 	}
 
 	//? if neoforge {
-	/*private static boolean hasChannel(ClientPacketListener connection, Identifier channel) {
+	/*private static boolean hasChannel(ClientPacketListener connection, ResourceLocation channel) {
 		return connection.hasChannel(channel);
 	}
 	*///?} else if forge {
 	/*// Whether the server said it listens on the channel: a Forge server in the mod list it sends as
 	// the player logs in, any other server with minecraft:register. Forge's own channels check the same.
-	private static boolean hasChannel(ClientPacketListener connection, Identifier channel) {
+	private static boolean hasChannel(ClientPacketListener connection, ResourceLocation channel) {
 		Connection network = connection.getConnection();
 		ConnectionData forge = NetworkHooks.getConnectionData(network);
 		MCRegisterPacketHandler.ChannelList other = NetworkHooks.getChannelList(network);

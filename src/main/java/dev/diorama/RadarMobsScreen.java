@@ -3,7 +3,7 @@ package dev.diorama;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -157,22 +157,22 @@ public final class RadarMobsScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
-		graphics.centeredText(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
 		// The game's own hint goes while the box has focus, which this one always starts with.
 		if (this.search != null && this.search.getValue().isEmpty()) {
-			graphics.text(this.font, Component.translatable("diorama.radar_mobs.search"), this.search.getX() + 4, this.search.getY() + 6, 0xFF707070, false);
+			graphics.drawString(this.font, Component.translatable("diorama.radar_mobs.search"), this.search.getX() + 4, this.search.getY() + 6, 0xFF707070, false);
 		}
 	}
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

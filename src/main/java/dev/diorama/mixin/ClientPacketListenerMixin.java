@@ -25,16 +25,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ClientPacketListenerMixin {
 	@Inject(method = "applyLightData", at = @At("TAIL"))
 	//? if >=1.21.2 {
-	private void diorama$onLightApplied(int x, int z, ClientboundLightUpdatePacketData lightData, boolean scheduleRebuild, CallbackInfo ci) {
-	//?} else {
-	/*// There was no scheduleRebuild parameter.
+	/*private void diorama$onLightApplied(int x, int z, ClientboundLightUpdatePacketData lightData, boolean scheduleRebuild, CallbackInfo ci) {
+	*///?} else {
+	// There was no scheduleRebuild parameter.
 	private void diorama$onLightApplied(int x, int z, ClientboundLightUpdatePacketData lightData, CallbackInfo ci) {
-	*///?}
+	//?}
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.level != null) {
 			// The sections whose block light the server sent, or emptied.
-			java.util.BitSet blockLight = (java.util.BitSet) lightData.blockYMask().clone();
-			blockLight.or(lightData.emptyBlockYMask());
+			java.util.BitSet blockLight = (java.util.BitSet) lightData.getBlockYMask().clone();
+			blockLight.or(lightData.getEmptyBlockYMask());
 			MapSession.lightUpdated(mc.level, x, z, blockLight);
 		}
 	}

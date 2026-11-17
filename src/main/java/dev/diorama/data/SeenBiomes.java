@@ -93,8 +93,8 @@ public final class SeenBiomes {
 
 	/** Takes the surface biomes of a chunk the client has. */
 	public void record(LevelChunk chunk) {
-		int chunkX = chunk.getPos().x();
-		int chunkZ = chunk.getPos().z();
+		int chunkX = chunk.getPos().x;
+		int chunkZ = chunk.getPos().z;
 		Region region = this.region(chunkX >> 5, chunkZ >> 5);
 		for (int z = 0; z < 4; z++) {
 			for (int x = 0; x < 4; x++) {
@@ -102,7 +102,7 @@ public final class SeenBiomes {
 				int y = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x * 4 + 2, z * 4 + 2) - 1;
 				int quartX = chunkX * 4 + x;
 				int quartZ = chunkZ * 4 + z;
-				String name = chunk.getNoiseBiome(quartX, y >> 2, quartZ).unwrapKey().map(key -> key.identifier().toString()).orElse(null);
+				String name = chunk.getNoiseBiome(quartX, y >> 2, quartZ).unwrapKey().map(key -> key.location().toString()).orElse(null);
 				short number = name == null ? 0 : region.number(name);
 				int cell = cell(quartX, quartZ);
 				if (number != 0 && region.cells[cell] != number) {

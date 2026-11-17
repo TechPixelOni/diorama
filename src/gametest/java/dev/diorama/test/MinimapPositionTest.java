@@ -293,8 +293,8 @@ final class MinimapPositionTest {
 		DioramaClientTest.click(context, "Done");
 		context.runOnClient(mc -> {
 			Settings s = Settings.reload();
-			if (!(mc.gui.screen() instanceof SettingsScreen) || s.minimapOffsetX != placed[0] || s.minimapOffsetY != placed[1] || s.minimapCorner != Settings.Corner.TOP_RIGHT) {
-				throw new AssertionError("Done should save the place and go back to the settings, got " + mc.gui.screen() + " " + s.minimapCorner + " " + s.minimapOffsetX + "," + s.minimapOffsetY);
+			if (!(mc.screen instanceof SettingsScreen) || s.minimapOffsetX != placed[0] || s.minimapOffsetY != placed[1] || s.minimapCorner != Settings.Corner.TOP_RIGHT) {
+				throw new AssertionError("Done should save the place and go back to the settings, got " + mc.screen + " " + s.minimapCorner + " " + s.minimapOffsetX + "," + s.minimapOffsetY);
 			}
 		});
 		context.waitTicks(3);
@@ -306,9 +306,9 @@ final class MinimapPositionTest {
 		context.waitTicks(3);
 		context.runOnClient(mc -> {
 			Settings s = Settings.get();
-			boolean screen = toSettings ? mc.gui.screen() instanceof SettingsScreen : mc.gui.screen() == null;
+			boolean screen = toSettings ? mc.screen instanceof SettingsScreen : mc.screen == null;
 			if (!screen || s.minimapCorner != Settings.Corner.TOP_RIGHT || s.minimapOffsetX != MARGIN || s.minimapOffsetY != MARGIN || s.minimapCentered) {
-				throw new AssertionError(what + " should leave the minimap where it was, got " + mc.gui.screen() + " " + s.minimapCorner + " " + s.minimapOffsetX + "," + s.minimapOffsetY);
+				throw new AssertionError(what + " should leave the minimap where it was, got " + mc.screen + " " + s.minimapCorner + " " + s.minimapOffsetX + "," + s.minimapOffsetY);
 			}
 		});
 	}
@@ -323,7 +323,7 @@ final class MinimapPositionTest {
 				throw new AssertionError("The Corner button should put the minimap in the " + corner + " corner, got " + Arrays.toString(box) + " kept as " + s.minimapCorner + " " + s.minimapOffsetX + "," + s.minimapOffsetY);
 			}
 			boolean labelled = false;
-			java.util.List<net.minecraft.client.gui.components.events.GuiEventListener> children = new java.util.ArrayList<>(mc.gui.screen().children());
+			java.util.List<net.minecraft.client.gui.components.events.GuiEventListener> children = new java.util.ArrayList<>(mc.screen.children());
 			for (var child : children) {
 				labelled |= child instanceof net.minecraft.client.gui.components.AbstractWidget widget && widget.getMessage().getString().equals(label);
 			}
@@ -335,7 +335,7 @@ final class MinimapPositionTest {
 
 	private static void expectPositionScreen(ClientGameTestContext context, String what) {
 		context.waitTicks(3);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof MinimapPositionScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof MinimapPositionScreen)) {
 			throw new AssertionError(what + " didn't open the position screen");
 		}
 	}

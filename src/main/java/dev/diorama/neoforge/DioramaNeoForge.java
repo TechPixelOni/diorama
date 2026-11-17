@@ -17,8 +17,8 @@ import dev.diorama.bake.BlockLooks;
 import dev.diorama.render.XaeroRadarIcons;
 import dev.diorama.share.ShareClient;
 //? if >=1.21.6 {
-import dev.diorama.render.DioramaPipelines;
-//?}
+/*import dev.diorama.render.DioramaPipelines;
+*///?}
 import dev.diorama.waypoint.WaypointHud;
 import dev.diorama.waypoint.WaypointShare;
 import dev.diorama.waypoint.WaypointStore;
@@ -40,8 +40,8 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 //? if >=1.21.6 {
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
-//?}
+/*import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+*///?}
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.GameShuttingDownEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
@@ -71,26 +71,26 @@ public final class DioramaNeoForge {
 		modBus.addListener(FMLClientSetupEvent.class, event -> event.enqueueWork(Settings::get));
 		modBus.addListener(RegisterKeyMappingsEvent.class, event -> {
 			//? if >=1.21.9 {
-			event.registerCategory(DioramaClient.CATEGORY);
-			//?}
+			/*event.registerCategory(DioramaClient.CATEGORY);
+			*///?}
 			DioramaClient.KEY_MAPPINGS.forEach(event::register);
 		});
 		//? if >=1.21.6 {
-		modBus.addListener(RegisterRenderPipelinesEvent.class, event -> {
+		/*modBus.addListener(RegisterRenderPipelinesEvent.class, event -> {
 			event.registerPipeline(DioramaPipelines.FOG);
 			event.registerPipeline(DioramaPipelines.FOG_LAYER);
 			event.registerPipeline(DioramaPipelines.TILE);
 			event.registerPipeline(DioramaPipelines.TILE_NIGHT);
 		});
-		//?}
+		*///?}
 		// As on Fabric: waypoints in the world under the whole vanilla HUD and every screen, as part
 		// of the picture of the world, and the minimap above the HUD. Each layer already sits 200
 		// deeper than the one before, which the Fabric jars before 1.21.6 have to make up for themselves.
 		modBus.addListener(RegisterGuiLayersEvent.class, event -> {
 			WaypointHud waypoints = new WaypointHud();
 			MinimapHud minimap = new MinimapHud();
-			event.registerBelowAll(Diorama.id("waypoints"), (graphics, deltaTracker) -> waypoints.extractRenderState(graphics, deltaTracker));
-			event.registerAboveAll(Diorama.id("minimap"), (graphics, deltaTracker) -> minimap.extractRenderState(graphics, deltaTracker));
+			event.registerBelowAll(Diorama.id("waypoints"), (graphics, deltaTracker) -> waypoints.render(graphics, deltaTracker));
+			event.registerAboveAll(Diorama.id("minimap"), (graphics, deltaTracker) -> minimap.render(graphics, deltaTracker));
 		});
 
 		// Fired for the integrated server's chunks too, on its own thread.
@@ -136,10 +136,10 @@ public final class DioramaNeoForge {
 		modBus.addListener(EventPriority.LOWEST, false, RegisterPayloadHandlersEvent.class, XaeroChannels::register);
 		// Radar icons from Xaero's Minimap's icon files, read again on every resource reload.
 		//? if >=1.21.4 {
-		modBus.addListener(net.neoforged.neoforge.client.event.AddClientReloadListenersEvent.class, event -> event.addListener(XaeroRadarIcons.ID, XaeroRadarIcons.LISTENER));
-		//?} else {
-		/*modBus.addListener(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent.class, event -> event.registerReloadListener(XaeroRadarIcons.LISTENER));
-		*///?}
+		/*modBus.addListener(net.neoforged.neoforge.client.event.AddClientReloadListenersEvent.class, event -> event.addListener(XaeroRadarIcons.ID, XaeroRadarIcons.LISTENER));
+		*///?} else {
+		modBus.addListener(net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent.class, event -> event.registerReloadListener(XaeroRadarIcons.LISTENER));
+		//?}
 		// Leaving a world saves the map on the next tick, but closing the window stops ticking. This
 		// fires as the window is asked to close, before the last frame, so from then on nothing may
 		// start the map again (Minecraft.isRunning() is false).

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -17,7 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.Nullable;
 
@@ -60,7 +60,7 @@ public final class WorldBorderOverlay {
 	private boolean chunkRead;
 
 	/** Draws the border of {@code level}, the dimension the player is in, where it's in {@code view}. */
-	public void draw(GuiGraphicsExtractor graphics, Font font, MapViewport.View view, ClientLevel level, Entity viewer) {
+	public void draw(GuiGraphics graphics, Font font, MapViewport.View view, ClientLevel level, Entity viewer) {
 		List<Drawing> sides = this.sides(view, level, viewer);
 		if (!sides.isEmpty()) {
 			this.lines.draw(graphics, font, view, sides, null, null, false);
@@ -74,19 +74,19 @@ public final class WorldBorderOverlay {
 		Facing facing = Projection.facing();
 		// Turned space, where the map's u is x: the border is a rectangle there too.
 		//? if >=1.21.11 {
-		// A moving border is where the game draws its wall this frame, between two ticks.
+		/*// A moving border is where the game draws its wall this frame, between two ticks.
 		float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
 		double minX = border.getMinX(partialTick);
 		double minZ = border.getMinZ(partialTick);
 		double maxX = border.getMaxX(partialTick);
 		double maxZ = border.getMaxZ(partialTick);
-		//?} else {
-		/*// Before 1.21.11 a moving border goes by the clock, so these are this frame's already.
+		*///?} else {
+		// Before 1.21.11 a moving border goes by the clock, so these are this frame's already.
 		double minX = border.getMinX();
 		double minZ = border.getMinZ();
 		double maxX = border.getMaxX();
 		double maxZ = border.getMaxZ();
-		*///?}
+		//?}
 		double ax = facing.x(minX, minZ);
 		double bx = facing.x(maxX, maxZ);
 		double az = facing.z(minX, minZ);
@@ -105,8 +105,8 @@ public final class WorldBorderOverlay {
 			return this.shown;
 		}
 		// Whatever the ground does, it's between the world's floor and its ceiling.
-		int floor = level.getMinY();
-		int ceiling = level.getMaxY() + 1;
+		int floor = level.getMinBuildHeight();
+		int ceiling = (level.getMaxBuildHeight() - 1) + 1;
 		if (Projection.v(floor, south) < top || Projection.v(ceiling, north) > bottom) {
 			return this.shown;
 		}
@@ -259,7 +259,7 @@ public final class WorldBorderOverlay {
 			return Float.NaN;
 		}
 		int top = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15);
-		int lowest = Math.max(level.getMinY(), top - TREE_REACH);
+		int lowest = Math.max(level.getMinBuildHeight(), top - TREE_REACH);
 		for (int y = top; y >= lowest; y--) {
 			BlockState state = chunk.getBlockState(this.pos.set(x, y, z));
 			if (!state.isAir() && !state.is(BlockTags.LEAVES) && !state.is(BlockTags.LOGS)) {

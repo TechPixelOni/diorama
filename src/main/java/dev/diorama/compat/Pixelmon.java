@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 //?} else {
 /*import net.neoforged.fml.ModList;
 *///?}
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +29,7 @@ public final class Pixelmon {
 	}
 
 	/** Called on the render thread. Where this Pokémon's sprite is, or null for any other entity. */
-	public static @Nullable Identifier sprite(Entity entity) {
+	public static @Nullable ResourceLocation sprite(Entity entity) {
 		if (!started) {
 			started = true;
 			if (installed()) {
@@ -47,7 +47,7 @@ public final class Pixelmon {
 			return null;
 		}
 		try {
-			return sprite.invoke(entity) instanceof Identifier location ? location : null;
+			return sprite.invoke(entity) instanceof ResourceLocation location ? location : null;
 		} catch (ReflectiveOperationException | RuntimeException e) {
 			Diorama.LOGGER.warn("Couldn't read a Pokémon's sprite; Pokémon will be dots on the radar", e);
 			sprite = null;

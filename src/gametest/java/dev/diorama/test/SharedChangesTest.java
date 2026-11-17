@@ -31,7 +31,7 @@ final class SharedChangesTest {
 	static void run(ClientGameTestContext context) {
 		try (RealServer server = RealServer.start(true)) {
 			server.command("time set noon");
-			server.command("gamerule advance_time false");
+			server.command("gamerule doDaylightCycle false");
 			server.command("weather clear");
 			server.vanillaPlayerJoins("Alice");
 			// The land north of the platform too: the map looks past the platform onto it, and once
@@ -53,7 +53,7 @@ final class SharedChangesTest {
 			context.waitFor(mc -> ShareClient.sharing() && MapSession.get() != null && MapSession.get().savedChunks() != null, 1200);
 			context.setScreen(MapScreen::new);
 			int ground = context.computeOnClient(mc -> mc.player.blockPosition().getY());
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, ground, Z), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, ground, Z), 1, TileKey.SURFACE));
 			context.waitFor(mc -> MapSession.get().savedChunks().drewChunk(X >> 4, Z >> 4) && MapSession.get().savedChunks().idle(), 36000);
 			context.waitTicks(40);
 			if (red(context)) {
@@ -79,7 +79,7 @@ final class SharedChangesTest {
 			Diorama.LOGGER.info("The server's autosave wrote the build's chunk {} s after it was built", Math.round((System.nanoTime() - built) / 1e9));
 
 			context.setScreen(MapScreen::new);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, BUILD_Y, Z), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, BUILD_Y, Z), 1, TileKey.SURFACE));
 			long opened = System.nanoTime();
 			// Well inside the open map's once-a-minute check: opening it is what brings the change.
 			context.waitFor(mc -> red(), 600);
@@ -105,7 +105,7 @@ final class SharedChangesTest {
 				context.waitTicks(20);
 			}
 			context.setScreen(MapScreen::new);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, BUILD_Y, Z), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, BUILD_Y, Z), 1, TileKey.SURFACE));
 			long reopened = System.nanoTime();
 			context.waitFor(mc -> groundInstead(), 600);
 			Diorama.LOGGER.info("Alice's platform left this player's map {} s after the map opened, {} s after she took it down",

@@ -51,7 +51,7 @@ final class ImageExportTest {
 		double[] drawn = context.computeOnClient(mc -> {
 			double u = mc.player.getX();
 			double v = Projection.v(mc.player.getY(), mc.player.getZ());
-			String dimension = mc.level.dimension().identifier().toString();
+			String dimension = mc.level.dimension().location().toString();
 			made.add(new Drawing(Drawing.Kind.STROKE, dimension, 0xFF000000 | LINE, new double[] {u - 20, v, u + 20, v}, ""));
 			made.add(new Drawing(Drawing.Kind.NOTE, dimension, 0xFF000000 | NOTE, new double[] {u, v + 30}, "Hi"));
 			made.add(new Drawing(Drawing.Kind.NOTE, dimension, 0xFF000000 | CJK, new double[] {u, v - 30}, "\u5730\u56fe"));
@@ -59,21 +59,21 @@ final class ImageExportTest {
 			return new double[] {u, v};
 		});
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), 1.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), 1.0, TileKey.SURFACE));
 		settle(context);
 
 		// The Export button above the draw and zoom buttons, with its tooltip, opens the export screen.
 		double[] button = context.computeOnClient(mc -> {
-			double[] c = centre(((MapScreen) mc.gui.screen()).exportButton());
+			double[] c = centre(((MapScreen) mc.screen).exportButton());
 			double scale = mc.getWindow().getGuiScale();
 			return new double[] {c[0] * scale, c[1] * scale};
 		});
 		context.getInput().setCursorPos(button[0], button[1]);
 		context.waitTicks(10);
 		context.takeScreenshot("image-export-00-button");
-		click(context, mc -> centre(((MapScreen) mc.gui.screen()).exportButton()), false);
+		click(context, mc -> centre(((MapScreen) mc.screen).exportButton()), false);
 		context.waitTicks(3);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof ExportScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof ExportScreen)) {
 			throw new AssertionError("The Export button didn't open the export screen");
 		}
 		settle(context);
@@ -86,11 +86,11 @@ final class ImageExportTest {
 		if (!(grown[2] > before[2] + 30 && grown[3] > before[3] + 20 && Math.abs(grown[0] - before[0]) < 1)) {
 			throw new AssertionError("Dragging the box's corner didn't resize it: " + List.of(before[2], before[3]) + " -> " + List.of(grown[2], grown[3]));
 		}
-		ImageExport.Area beforePan = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		ImageExport.Area beforePan = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		double[] outside = {grown[2] + 20, grown[1] + 10};
 		drag(context, outside[0], outside[1], -30, 0);
 		double[] panned = box(context);
-		ImageExport.Area afterPan = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		ImageExport.Area afterPan = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		if (!(Math.abs(panned[0] - (grown[0] - 30)) < 2)) {
 			throw new AssertionError("Dragging beside the box didn't pan the map under it");
 		}
@@ -100,8 +100,8 @@ final class ImageExportTest {
 		}
 
 		// 1 px per block, then Save image.
-		click(context, mc -> centre(((ExportScreen) mc.gui.screen()).detailButton(2)), false);
-		ImageExport.Area area = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		click(context, mc -> centre(((ExportScreen) mc.screen).detailButton(2)), false);
+		ImageExport.Area area = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		if (area == null || area.lod() != 2) {
 			throw new AssertionError("The 1 px per block button didn't choose that detail: " + area);
 		}
@@ -124,18 +124,18 @@ final class ImageExportTest {
 		}
 
 		// Whole map: everything explored, boxed with fog round it.
-		click(context, mc -> centre(((MapScreen) mc.gui.screen()).exportButton()), false);
+		click(context, mc -> centre(((MapScreen) mc.screen).exportButton()), false);
 		context.waitTicks(3);
 		click(context, mc -> {
-			int[] tab = ((ExportScreen) mc.gui.screen()).tabCenter(1);
+			int[] tab = ((ExportScreen) mc.screen).tabCenter(1);
 			return new double[] {tab[0], tab[1]};
 		}, false);
-		context.waitFor(mc -> mc.gui.screen() instanceof ExportScreen screen && screen.plannedArea() != null, 600);
+		context.waitFor(mc -> mc.screen instanceof ExportScreen screen && screen.plannedArea() != null, 600);
 		// Untick Drawings: this one is the ground alone.
 		click(context, mc -> new double[] {16, 114}, false);
 		settle(context);
 		context.takeScreenshot("image-export-03-whole");
-		ImageExport.Area whole = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		ImageExport.Area whole = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		coversMappedChunks(context, world, whole);
 		Path wholeFile = save(context);
 		checkImage(wholeFile, whole);
@@ -165,27 +165,27 @@ final class ImageExportTest {
 		// On whole map pixels, so the screen's and the image's line up.
 		double[] at = context.computeOnClient(mc -> new double[] {Math.floor(mc.player.getX()), Math.round(Projection.v(layer - 6, mc.player.getZ()) * 4) / 4.0});
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(at[0], at[1], 2.0, layer));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(at[0], at[1], 2.0, layer));
 		context.getInput().setCursorPos(0, 0);
 		settle(context);
 		BufferedImage map = read(context.takeScreenshot("image-export-05-cave-map"));
-		if (!context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).exportButton().visible)) {
+		if (!context.computeOnClient(mc -> ((MapScreen) mc.screen).exportButton().visible)) {
 			throw new AssertionError("The cave view has no Export button");
 		}
 		int[] middle = context.computeOnClient(mc -> {
-			var view = ((MapScreen) mc.gui.screen()).view();
+			var view = ((MapScreen) mc.screen).view();
 			double g = mc.getWindow().getGuiScale();
 			return new int[] {(int) Math.round(view.screenX(at[0]) * g), (int) Math.round(view.screenY(at[1]) * g)};
 		});
 
-		click(context, mc -> centre(((MapScreen) mc.gui.screen()).exportButton()), false);
+		click(context, mc -> centre(((MapScreen) mc.screen).exportButton()), false);
 		context.waitTicks(3);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof ExportScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof ExportScreen)) {
 			throw new AssertionError("The Export button didn't open the export screen from the cave view");
 		}
 		settle(context);
 		context.takeScreenshot("image-export-06-cave-area");
-		ImageExport.Area area = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		ImageExport.Area area = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		if (area == null || area.lod() != 0) {
 			throw new AssertionError("The cave export didn't start at 4 px per block: " + area);
 		}
@@ -223,17 +223,17 @@ final class ImageExportTest {
 		}
 
 		// Whole map: as much of the slice as the map's chunks cover, at 1 px per block.
-		click(context, mc -> centre(((MapScreen) mc.gui.screen()).exportButton()), false);
+		click(context, mc -> centre(((MapScreen) mc.screen).exportButton()), false);
 		context.waitTicks(3);
 		click(context, mc -> {
-			int[] tab = ((ExportScreen) mc.gui.screen()).tabCenter(1);
+			int[] tab = ((ExportScreen) mc.screen).tabCenter(1);
 			return new double[] {tab[0], tab[1]};
 		}, false);
-		context.waitFor(mc -> mc.gui.screen() instanceof ExportScreen screen && screen.plannedArea() != null, 600);
-		click(context, mc -> centre(((ExportScreen) mc.gui.screen()).detailButton(2)), false);
+		context.waitFor(mc -> mc.screen instanceof ExportScreen screen && screen.plannedArea() != null, 600);
+		click(context, mc -> centre(((ExportScreen) mc.screen).detailButton(2)), false);
 		settle(context);
 		context.takeScreenshot("image-export-07-cave-whole");
-		ImageExport.Area whole = context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).plannedArea());
+		ImageExport.Area whole = context.computeOnClient(mc -> ((ExportScreen) mc.screen).plannedArea());
 		double[] units = whole.units();
 		if (whole.lod() != 2 || !(units[0] < at[0] - 64 && units[2] > at[0] + 64 && units[1] < at[1] - 48 && units[3] > at[1] + 48)) {
 			throw new AssertionError("Whole map of the cave slice is " + whole + ", not the chunks around the player at 1 px per block");
@@ -289,7 +289,7 @@ final class ImageExportTest {
 		double u = at[0];
 		double v = at[1] + 60;
 		Drawing note = context.computeOnClient(mc -> {
-			Drawing made = new Drawing(Drawing.Kind.NOTE, mc.level.dimension().identifier().toString(), 0xFF000000 | ARABIC, new double[] {u, v},
+			Drawing made = new Drawing(Drawing.Kind.NOTE, mc.level.dimension().location().toString(), 0xFF000000 | ARABIC, new double[] {u, v},
 				"\u0645\u0631\u062d\u0628\u0627 Diorama");
 			DrawingStore.get().add(made);
 			return made;
@@ -298,11 +298,11 @@ final class ImageExportTest {
 		boolean radar = context.computeOnClient(mc -> Settings.get().radarOnMap);
 		context.runOnClient(mc -> Settings.get().radarOnMap = false);
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(u, v, 1.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(u, v, 1.0, TileKey.SURFACE));
 		context.getInput().setCursorPos(0, 0);
 		settle(context);
 		double[] onScreen = context.computeOnClient(mc -> {
-			var view = ((MapScreen) mc.gui.screen()).view();
+			var view = ((MapScreen) mc.screen).view();
 			double g = mc.getWindow().getGuiScale();
 			return new double[] {view.screenX(u) * g, view.screenY(v) * g};
 		});
@@ -383,9 +383,9 @@ final class ImageExportTest {
 	/** Presses Save image, waits for the file, and returns it. */
 	private static Path save(ClientGameTestContext context) {
 		Set<Path> old = new HashSet<>(exports(context));
-		click(context, mc -> centre(((ExportScreen) mc.gui.screen()).saveButton()), false);
+		click(context, mc -> centre(((ExportScreen) mc.screen).saveButton()), false);
 		context.waitTicks(2);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof MapScreen)) {
 			throw new AssertionError("Save image didn't go back to the map");
 		}
 		// A cave slice is drawn for its export, which takes a while without a graphics card.
@@ -579,7 +579,7 @@ final class ImageExportTest {
 	}
 
 	private static double[] box(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> ((ExportScreen) mc.gui.screen()).boxOnScreen());
+		return context.computeOnClient(mc -> ((ExportScreen) mc.screen).boxOnScreen());
 	}
 
 	private static double[] centre(Button button) {

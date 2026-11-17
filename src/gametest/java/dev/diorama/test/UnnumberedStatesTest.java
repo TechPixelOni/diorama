@@ -53,7 +53,7 @@ final class UnnumberedStatesTest {
 		// The cave map a few blocks down: its depth gauge reads the column under the player.
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(40.5, Projection.v(top - 8, 40.5), 3.0, MapSession.caveLayerFor(top - 8));
 			}
 		});

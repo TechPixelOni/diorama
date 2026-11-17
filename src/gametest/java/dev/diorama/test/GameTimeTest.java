@@ -7,9 +7,9 @@ import dev.diorama.Settings.GameTime;
 import dev.diorama.SettingsScreen;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+/*import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-//?}
+*///?}
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.level.Level;
 
@@ -47,27 +47,27 @@ final class GameTimeTest {
 		context.setScreen(() -> null);
 
 		// Either side of when beds start and stop working. The daylight cycle stands still to stay there.
-		world.getServer().runCommand("gamerule advance_time false");
+		world.getServer().runCommand("gamerule doDaylightCycle false");
 		long[][] times = {{6000, 0}, {12000, 0}, {12800, 1}, {18000, 1}, {23200, 1}, {23800, 0}};
 		for (long[] time : times) {
 			world.getServer().runCommand("time set " + time[0]);
 			boolean dark = time[1] == 1;
 			// Not every test harness ticks the client in step with the server.
-			context.waitFor(mc -> mc.level.getOverworldClockTime() == time[0] && mc.level.isDarkOutside() == dark, 100);
+			context.waitFor(mc -> mc.level.getDayTime() == time[0] && mc.level.isNight() == dark, 100);
 			assertBedTime(context, world, dark, "at tick " + time[0]);
 			context.takeScreenshot("game-time-02-tick-" + time[0]);
 		}
-		world.getServer().runCommand("gamerule advance_time true");
+		world.getServer().runCommand("gamerule doDaylightCycle true");
 
 		// A thunderstorm makes it dark enough at noon.
 		world.getServer().runCommand("time set noon");
 		world.getServer().runCommand("weather thunder");
 		context.waitFor(mc -> mc.level.isThundering(), 200);
-		context.waitFor(mc -> mc.level.isDarkOutside(), 400);
+		context.waitFor(mc -> mc.level.isNight(), 400);
 		assertBedTime(context, world, true, "at noon in a thunderstorm");
 		context.takeScreenshot("game-time-03-thunder");
 		world.getServer().runCommand("weather clear");
-		context.waitFor(mc -> !mc.level.isDarkOutside(), 400);
+		context.waitFor(mc -> !mc.level.isNight(), 400);
 
 		for (GameTime format : GameTime.values()) {
 			context.runOnClient(mc -> Settings.get().gameTime = format);
@@ -78,7 +78,7 @@ final class GameTimeTest {
 
 		// With the daylight cycle off the clock stands at what the sky shows, and older servers send
 		// that time as a negative number.
-		world.getServer().runCommand("gamerule advance_time false");
+		world.getServer().runCommand("gamerule doDaylightCycle false");
 		world.getServer().runCommand("time set 14000");
 		context.waitTicks(40);
 		long frozen = clock(context);
@@ -87,7 +87,7 @@ final class GameTimeTest {
 			throw new AssertionError("With the daylight cycle off the clock read " + frozen + ", then " + clock(context));
 		}
 		context.takeScreenshot("game-time-05-frozen");
-		world.getServer().runCommand("gamerule advance_time true");
+		world.getServer().runCommand("gamerule doDaylightCycle true");
 
 		// The Nether and the End have no day of their own: the Overworld's clock keeps running there.
 		world.getServer().runCommand("time set 13000");
@@ -106,7 +106,7 @@ final class GameTimeTest {
 				context.waitTick();
 				after = clock(context);
 			}
-			long server = world.getServer().computeOnServer(s -> s.overworld().getOverworldClockTime());
+			long server = world.getServer().computeOnServer(s -> s.overworld().getDayTime());
 			if (after < before + 20 || Math.abs(server - after) > 200) {
 				throw new AssertionError("In the " + dimension + " the clock went from " + before + " to " + after + "; the Overworld's is at " + server);
 			}
@@ -124,32 +124,32 @@ final class GameTimeTest {
 
 	/** The same clock on a dedicated server, where /skipnight lives: sent over the network, stopped and started by the server. */
 	//? if >=1.21.4 && fabric {
-	static void onServer(ClientGameTestContext context) {
+	/*static void onServer(ClientGameTestContext context) {
 		try (TestDedicatedServerContext server = context.worldBuilder()
 			.setUseConsistentSettings(false)
 			.adjustSettings(s -> s.setSeed("diorama-game-time"))
 			.createServer(DioramaClientTest.serverProperties())) {
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 50, 2400);
 				context.runOnClient(mc -> Settings.get().gameTime = GameTime.DAY_24H);
-				server.runCommand("gamerule advance_time false");
+				server.runCommand("gamerule doDaylightCycle false");
 				server.runCommand("time set 14000");
-				context.waitFor(mc -> mc.level.getOverworldClockTime() == 14000 && mc.level.isDarkOutside(), 200);
+				context.waitFor(mc -> mc.level.getDayTime() == 14000 && mc.level.isNight(), 200);
 				context.waitTicks(40);
 				if (clock(context) != 14000) {
 					throw new AssertionError("On a server with the daylight cycle off the clock moved to " + clock(context));
 				}
 				context.takeScreenshot("game-time-07-server-frozen-night");
 				server.runCommand("time set 6000");
-				context.waitFor(mc -> mc.level.getOverworldClockTime() == 6000 && !mc.level.isDarkOutside(), 200);
+				context.waitFor(mc -> mc.level.getDayTime() == 6000 && !mc.level.isNight(), 200);
 				context.takeScreenshot("game-time-07-server-frozen-noon");
-				server.runCommand("gamerule advance_time true");
-				context.waitFor(mc -> mc.level.getOverworldClockTime() > 6040, 200);
+				server.runCommand("gamerule doDaylightCycle true");
+				context.waitFor(mc -> mc.level.getDayTime() > 6040, 200);
 			}
 		}
 		context.runOnClient(mc -> Settings.get().gameTime = GameTime.OFF);
 	}
-	//?}
+	*///?}
 
 	private static void formats() {
 		String[][] expected = {
@@ -176,14 +176,14 @@ final class GameTimeTest {
 
 	/** The client turns the line by its own copy of this; a bed asks the server's. */
 	private static void assertBedTime(ClientGameTestContext context, TestSingleplayerContext world, boolean expected, String when) {
-		boolean client = context.computeOnClient(mc -> mc.level.isDarkOutside());
-		boolean server = world.getServer().computeOnServer(s -> s.overworld().isDarkOutside());
+		boolean client = context.computeOnClient(mc -> mc.level.isNight());
+		boolean server = world.getServer().computeOnServer(s -> s.overworld().isNight());
 		if (client != expected || server != expected) {
 			throw new AssertionError("Dark enough for a bed " + when + ": client " + client + ", server " + server + ", expected " + expected);
 		}
 	}
 
 	private static long clock(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> mc.level.getOverworldClockTime());
+		return context.computeOnClient(mc -> mc.level.getDayTime());
 	}
 }

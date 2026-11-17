@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
-import net.minecraft.client.gui.screens.GenericMessageScreen;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -51,18 +51,18 @@ final class ShimSingleplayer implements TestSingleplayerContext {
 				throw new IllegalStateException("Exited the world before closing singleplayer context");
 			}
 			//? if >=1.21.6 {
-			minecraft.level.disconnect(Component.translatable("menu.savingLevel"));
-			minecraft.disconnect(new GenericMessageScreen(Component.translatable("menu.savingLevel")), false);
-			//?} else {
-			/*minecraft.level.disconnect();
-			minecraft.disconnect(new GenericMessageScreen(Component.translatable("menu.savingLevel")));
-			*///?}
+			/*minecraft.level.disconnect(Component.translatable("menu.savingLevel"));
+			minecraft.clearLevel(new GenericDirtMessageScreen(Component.translatable("menu.savingLevel")), false);
+			*///?} else {
+			minecraft.level.disconnect();
+			minecraft.clearLevel(new GenericDirtMessageScreen(Component.translatable("menu.savingLevel")));
+			//?}
 		});
 		context.waitFor(minecraft -> minecraft.level == null && server.isShutdown(), SHUTDOWN_TIMEOUT_TICKS);
 		//? if >=26.1 {
-		// As Fabric's runner does from 26.1, before the title screen replaces the saving screen.
+		/*// As Fabric's runner does from 26.1, before the title screen replaces the saving screen.
 		context.waitTicks(2);
-		//?}
+		*///?}
 		context.setScreen(TitleScreen::new);
 	}
 }

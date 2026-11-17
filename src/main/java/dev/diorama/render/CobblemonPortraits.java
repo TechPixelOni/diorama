@@ -8,17 +8,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 //? if <1.21.2 {
-/*import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import org.joml.Matrix4f;
-*///?}
+//?}
 
 /**
  * Radar pictures for Cobblemon's Pokémon and NPCs (#344). Cobblemon has no flat picture of a
@@ -71,7 +71,7 @@ final class CobblemonPortraits {
 			// Between frames: the portrait is drawn through the game's own buffers, which hold the
 			// screen's half-drawn batches while the radar is being drawn.
 			Minecraft mc = Minecraft.getInstance();
-			mc.schedule(CobblemonPortraits::drawWaiting);
+			mc.tell(CobblemonPortraits::drawWaiting);
 		}
 		return null;
 	}
@@ -124,23 +124,23 @@ final class CobblemonPortraits {
 	}
 
 	/** The picture's name in logs and tests: {@code cobblemon:gengar/male.shiny}. */
-	private static Identifier name(Cobblemon.Subject subject) {
+	private static ResourceLocation name(Cobblemon.Subject subject) {
 		StringBuilder path = new StringBuilder(subject.id().getPath());
 		char separator = '/';
 		for (String aspect : subject.aspects()) {
 			path.append(separator).append(aspect.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_"));
 			separator = '.';
 		}
-		Identifier name = Identifier.tryBuild(subject.id().getNamespace(), path.toString());
+		ResourceLocation name = ResourceLocation.tryBuild(subject.id().getNamespace(), path.toString());
 		return name == null ? subject.id() : name;
 	}
 
 	//? if >=1.21.2 {
-	private static XaeroRadarIcons.@Nullable Sprite draw(Cobblemon.Subject subject) throws ReflectiveOperationException {
+	/*private static XaeroRadarIcons.@Nullable Sprite draw(Cobblemon.Subject subject) throws ReflectiveOperationException {
 		return null;
 	}
-	//?} else {
-	/*private static XaeroRadarIcons.@Nullable Sprite draw(Cobblemon.Subject subject) throws ReflectiveOperationException {
+	*///?} else {
+	private static XaeroRadarIcons.@Nullable Sprite draw(Cobblemon.Subject subject) throws ReflectiveOperationException {
 		Minecraft mc = Minecraft.getInstance();
 		int size = BOX * DETAIL;
 		TextureTarget target = new TextureTarget(size, size, true, Minecraft.ON_OSX);
@@ -182,7 +182,7 @@ final class CobblemonPortraits {
 			mc.getMainRenderTarget().bindWrite(true);
 		}
 	}
-	*///?}
+	//?}
 
 	//? if >=1.20.5 && <1.21.2 {
 	/*private static void pushModelView() {
@@ -196,7 +196,7 @@ final class CobblemonPortraits {
 	}
 	*///?}
 	//? if <1.20.5 {
-	/*private static void pushModelView() {
+	private static void pushModelView() {
 		RenderSystem.getModelViewStack().pushPose();
 		RenderSystem.getModelViewStack().setIdentity();
 		RenderSystem.applyModelViewMatrix();
@@ -206,5 +206,5 @@ final class CobblemonPortraits {
 		RenderSystem.getModelViewStack().popPose();
 		RenderSystem.applyModelViewMatrix();
 	}
-	*///?}
+	//?}
 }

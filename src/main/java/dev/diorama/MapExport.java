@@ -108,10 +108,10 @@ public final class MapExport {
 		}
 		// 1.20.1 has no Japanese glyph variants.
 		//? if >=1.21 {
-		if (mc.options.japaneseGlyphVariants().get()) {
+		/*if (mc.options.japaneseGlyphVariants().get()) {
 			fontOptions.add("jp");
 		}
-		//?}
+		*///?}
 		Thread thread = new Thread(() -> export.run(source, area, look, night, copied, fontOptions), "diorama-export");
 		thread.setDaemon(true);
 		thread.setPriority(Thread.MIN_PRIORITY + 1);
@@ -135,7 +135,7 @@ public final class MapExport {
 			Path absolute = this.file.toAbsolutePath();
 			Component link = Component.literal(absolute.getFileName().toString())
 				.withStyle(ChatFormatting.UNDERLINE)
-				.withStyle(style -> style.withClickEvent(new ClickEvent.OpenFile(absolute.toString())));
+				.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, absolute.toString())));
 			message = Component.translatable("diorama.export.done", link);
 		} catch (Exception e) {
 			Diorama.LOGGER.error("Couldn't export the map to {}", this.file, e);
@@ -148,10 +148,10 @@ public final class MapExport {
 		Minecraft mc = Minecraft.getInstance();
 		mc.execute(() -> {
 			//? if >=26.1 {
-			mc.gui.hud.getChat().addClientSystemMessage(shown);
-			//?} else {
-			/*mc.gui.getChat().addMessage(shown);
-			*///?}
+			/*mc.gui.getChat().addClientSystemMessage(shown);
+			*///?} else {
+			mc.gui.getChat().addMessage(shown);
+			//?}
 		});
 	}
 }

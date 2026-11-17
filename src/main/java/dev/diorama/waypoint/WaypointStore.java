@@ -279,7 +279,7 @@ public final class WaypointStore {
 	 */
 	public double coordinateScale(String dimension) {
 		Minecraft mc = Minecraft.getInstance();
-		if (mc.level != null && mc.level.dimension().identifier().toString().equals(dimension)) {
+		if (mc.level != null && mc.level.dimension().location().toString().equals(dimension)) {
 			double scale = mc.level.dimensionType().coordinateScale();
 			this.scales.put(dimension, scale);
 			return scale;
@@ -296,19 +296,19 @@ public final class WaypointStore {
 		var server = mc.getSingleplayerServer();
 		if (server != null) {
 			for (ServerLevel level : server.getAllLevels()) {
-				if (level.dimension().identifier().toString().equals(dimension)) {
+				if (level.dimension().location().toString().equals(dimension)) {
 					return level.dimensionType().coordinateScale();
 				}
 			}
 		}
 		if (mc.level != null) {
 			//? if >=1.21.2 {
-			Registry<DimensionType> types = mc.level.registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE);
-			//?} else {
-			/*Registry<DimensionType> types = mc.level.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE);
-			*///?}
+			/*Registry<DimensionType> types = mc.level.registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE);
+			*///?} else {
+			Registry<DimensionType> types = mc.level.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE);
+			//?}
 			for (Map.Entry<ResourceKey<DimensionType>, DimensionType> type : types.entrySet()) {
-				if (type.getKey().identifier().toString().equals(dimension)) {
+				if (type.getKey().location().toString().equals(dimension)) {
 					return type.getValue().coordinateScale();
 				}
 			}

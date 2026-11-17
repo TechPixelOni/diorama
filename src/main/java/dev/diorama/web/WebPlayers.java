@@ -130,7 +130,7 @@ final class WebPlayers {
 			double heading = Math.atan2(facing.z(lookX, lookZ) * Projection.sin(), facing.x(lookX, lookZ));
 			json.append(i == 0 ? "" : ",").append(String.format(Locale.ROOT,
 				"{\"name\":\"%s\",\"dimension\":\"%s\",\"x\":%d,\"y\":%d,\"z\":%d,\"u\":%.1f,\"v\":%.1f,\"heading\":%.2f}",
-				escape(player.getScoreboardName()), escape(player.level().dimension().identifier().toString()),
+				escape(player.getScoreboardName()), escape(player.level().dimension().location().toString()),
 				player.blockPosition().getX(), player.blockPosition().getY(), player.blockPosition().getZ(),
 				Projection.u(player.getX(), player.getZ()), Projection.v(player.getX(), player.getY(), player.getZ()), heading));
 		}

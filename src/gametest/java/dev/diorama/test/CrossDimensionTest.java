@@ -54,7 +54,7 @@ final class CrossDimensionTest {
 		});
 		context.waitTicks(5);
 		context.takeScreenshot("cross-dimension-1-list-off");
-		DioramaClientTest.clickWidget(context, context.computeOnClient(mc -> showHere(mc.gui.screen(), false)));
+		DioramaClientTest.clickWidget(context, context.computeOnClient(mc -> showHere(mc.screen, false)));
 		context.waitTicks(5);
 		context.getInput().setCursorPos(0, 0);
 		context.waitTicks(2);
@@ -81,7 +81,7 @@ final class CrossDimensionTest {
 		context.takeScreenshot("cross-dimension-4-nether-map");
 		DioramaClientTest.rightClickPin(context, new int[] {netherX, base.y, netherZ});
 		context.takeScreenshot("cross-dimension-5-nether-menu");
-		List<String> labels = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).menu().labels());
+		List<String> labels = context.computeOnClient(mc -> ((MapScreen) mc.screen).menu().labels());
 		if (labels.isEmpty() || !labels.get(0).equals("Base (Overworld)")) {
 			throw new AssertionError("The menu of the Overworld's pin should be titled Base (Overworld): " + labels);
 		}
@@ -92,7 +92,7 @@ final class CrossDimensionTest {
 
 		// The other way: back home in the Overworld, the Nether's Hub at eight times its x and z.
 		world.getServer().runCommand("tp @a " + home.getX() + " " + home.getY() + " " + home.getZ());
-		context.waitFor(mc -> mc.gui.screen() == null && MapSession.get() != null && mc.player.blockPosition().closerThan(home, 4)
+		context.waitFor(mc -> mc.screen == null && MapSession.get() != null && mc.player.blockPosition().closerThan(home, 4)
 			&& MapSession.get().map().chunkCount() > 400, 2400);
 		DioramaClientTest.settle(context, 60);
 		context.setScreen(() -> {
@@ -101,7 +101,7 @@ final class CrossDimensionTest {
 			return list;
 		});
 		context.waitTicks(5);
-		DioramaClientTest.clickWidget(context, context.computeOnClient(mc -> showHere(mc.gui.screen(), false)));
+		DioramaClientTest.clickWidget(context, context.computeOnClient(mc -> showHere(mc.screen, false)));
 		context.waitTicks(5);
 		context.setScreen(() -> null);
 		int overworldX = hub.x * 8;
@@ -153,7 +153,7 @@ final class CrossDimensionTest {
 	/** Checks the open map draws a pin at a spot that stands in for {@code original}. */
 	private static void pinAt(ClientGameTestContext context, int x, int y, int z, Waypoint original) {
 		boolean found = context.computeOnClient(mc -> {
-			for (WaypointOverlay.Pin pin : ((MapScreen) mc.gui.screen()).pins()) {
+			for (WaypointOverlay.Pin pin : ((MapScreen) mc.screen).pins()) {
 				Waypoint w = pin.waypoint();
 				if (w.x == x && w.y == y && w.z == z && w.source() == original && !pin.clamped()) {
 					return true;
@@ -170,7 +170,7 @@ final class CrossDimensionTest {
 	private static void hoverPin(ClientGameTestContext context, int x, int y, int z) {
 		double[] at = context.computeOnClient(mc -> {
 			double scale = mc.getWindow().getGuiScale();
-			for (WaypointOverlay.Pin pin : ((MapScreen) mc.gui.screen()).pins()) {
+			for (WaypointOverlay.Pin pin : ((MapScreen) mc.screen).pins()) {
 				if (pin.waypoint().x == x && pin.waypoint().y == y && pin.waypoint().z == z) {
 					return new double[] {pin.x() * scale, pin.headY() * scale};
 				}

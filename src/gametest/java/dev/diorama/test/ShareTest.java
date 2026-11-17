@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Locale;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import java.io.IOException;
+/*import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
 import net.fabricmc.loader.api.FabricLoader;
-//?}
+*///?}
 
 /**
  * Diorama's server half (#289): a server with Diorama tells players with Diorama what it shares of
@@ -97,11 +97,11 @@ final class ShareTest {
 	}
 
 	//? if >=1.21.4 && fabric {
-	/**
+	/*/^*
 	 * The test API's dedicated server: the settings file is written with the defaults the first
 	 * time, the client hears them as it joins, an owner's change to the file is what the next start
 	 * sends, and leaving forgets them.
-	 */
+	 ^/
 	static void settings(ClientGameTestContext context) {
 		Path file = FabricLoader.getInstance().getConfigDir().resolve(ShareSettings.FILE);
 		try {
@@ -129,7 +129,7 @@ final class ShareTest {
 			.setUseConsistentSettings(false)
 			.createServer(DioramaClientTest.serverProperties())) {
 			ShareSettings settings;
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				context.waitFor(mc -> ShareClient.settings() != null, 1200);
 				settings = context.computeOnClient(mc -> ShareClient.settings());
 			}
@@ -139,5 +139,5 @@ final class ShareTest {
 			return settings;
 		}
 	}
-	//?}
+	*///?}
 }

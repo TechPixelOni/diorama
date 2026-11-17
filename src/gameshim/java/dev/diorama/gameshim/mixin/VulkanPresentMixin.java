@@ -1,10 +1,10 @@
 //? if >=26.2 {
-package dev.diorama.gameshim.mixin;
+/*package dev.diorama.gameshim.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import org.lwjgl.vulkan.VkImageBlit;
 import org.lwjgl.vulkan.VkOffset3D;
 
@@ -19,10 +19,10 @@ import net.minecraft.client.Minecraft;
 // test's size is stretched over the real window. Only applied from 26.2 (see ShimMixinPlugin);
 // the whole file is a Stonecutter block, so no block comments in it.
 //? if >=26.3 {
-@Mixin(targets = "com.mojang.renderpearl.backend.vulkan.VulkanGpuSurface")
-//?} else {
-/*@Mixin(targets = "com.mojang.blaze3d.vulkan.VulkanGpuSurface")
-*///?}
+/^@Mixin(targets = "com.mojang.renderpearl.backend.vulkan.VulkanGpuSurface")
+^///?} else {
+@Mixin(targets = "com.mojang.blaze3d.vulkan.VulkanGpuSurface")
+//?}
 public abstract class VulkanPresentMixin {
 	@WrapOperation(method = "blitFromTexture", at = @At(value = "INVOKE", target = "Lorg/lwjgl/vulkan/VkImageBlit$Buffer;dstOffsets(Lorg/lwjgl/vulkan/VkOffset3D$Buffer;)Lorg/lwjgl/vulkan/VkImageBlit$Buffer;"))
 	private VkImageBlit.Buffer diorama$showAtRealSize(VkImageBlit.Buffer region, VkOffset3D.Buffer dstOffsets, Operation<VkImageBlit.Buffer> original,
@@ -40,4 +40,4 @@ public abstract class VulkanPresentMixin {
 		return original.call(region, dstOffsets);
 	}
 }
-//?}
+*///?}

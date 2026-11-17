@@ -157,9 +157,9 @@ final class CaveDepthTest {
 		context.setScreen(MapScreen::new);
 		DioramaClientTest.settle(context, 60);
 		context.takeScreenshot("cave-" + where + "-map");
-		int layer = context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map ? (Integer) field(map, "layer") : TileKey.SURFACE);
+		int layer = context.computeOnClient(mc -> mc.screen instanceof MapScreen map ? (Integer) field(map, "layer") : TileKey.SURFACE);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), 4.0, layer);
 			}
 		});

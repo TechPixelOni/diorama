@@ -4,17 +4,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 //? if >=1.21.2 {
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-//?}
-import net.minecraft.resources.Identifier;
+/*import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+*///?}
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import org.jspecify.annotations.Nullable;
 
@@ -74,7 +74,7 @@ public final class MobFaces {
 	private static final int REFRESH_TICKS = 40;
 
 	/** {@code modelFace} is the face {@link ModelFaces} read off the model the entity is drawn with. */
-	private record Looked(@Nullable Identifier texture, MobFaces.@Nullable Face modelFace, int age, boolean baby) {
+	private record Looked(@Nullable ResourceLocation texture, MobFaces.@Nullable Face modelFace, int age, boolean baby) {
 	}
 
 	private static final Piece HUMANOID_HAT = new Piece(40, 8, 8, 8, 0, 0);
@@ -83,92 +83,92 @@ public final class MobFaces {
 	/** Villager-style noses stick out from the lower middle of a 10-pixel-tall face. */
 	private static final Piece VILLAGER_NOSE = new Piece(26, 2, 2, 3, 3, 7);
 	//? if >=1.21.5 {
-	private static final Face COW = new Face(64, 64, 6, 6, 8, 8, null, new Piece(2, 34, 6, 3, 1, 5));
-	//?} else {
-	/*// The cow model before 1.21.5: head box at texOffs(0, 0), 8 x 8 x 6, no muzzle, in a 64 x 32 texture.
+	/*private static final Face COW = new Face(64, 64, 6, 6, 8, 8, null, new Piece(2, 34, 6, 3, 1, 5));
+	*///?} else {
+	// The cow model before 1.21.5: head box at texOffs(0, 0), 8 x 8 x 6, no muzzle, in a 64 x 32 texture.
 	private static final Face COW = new Face(64, 32, 6, 6, 8, 8);
-	*///?}
+	//?}
 	/** Cold cows keep their muzzle elsewhere in the texture: their model moves its texture origin. */
 	private static final Face COLD_COW = new Face(64, 64, 6, 6, 8, 8, null, new Piece(10, 34, 6, 3, 1, 5));
 
 	static {
 		Face zombie = new Face(64, 64, 8, 8, 8, 8, HUMANOID_HAT, null);
 		Face babyZombie = new Face(64, 64, 9, 9, 6, 6, BABY_ZOMBIE_HAT, null);
-		for (EntityType<?> type : new EntityType<?>[] {EntityTypes.ZOMBIE, EntityTypes.HUSK, EntityTypes.DROWNED}) {
+		for (EntityType<?> type : new EntityType<?>[] {EntityType.ZOMBIE, EntityType.HUSK, EntityType.DROWNED}) {
 			FACES.put(type, new Faces(zombie, babyZombie));
 		}
-		FACES.put(EntityTypes.ZOMBIE_VILLAGER, new Faces(
+		FACES.put(EntityType.ZOMBIE_VILLAGER, new Faces(
 			new Face(64, 64, 8, 8, 8, 10, VILLAGER_HAT, VILLAGER_NOSE),
 			new Face(64, 64, 7, 7, 8, 8, new Piece(7, 38, 8, 8, 0, 0), null)));
 		Face skeleton = new Face(64, 32, 8, 8, 8, 8, HUMANOID_HAT, null);
 		//? if >=1.21 {
-		for (EntityType<?> type : new EntityType<?>[] {EntityTypes.SKELETON, EntityTypes.STRAY, EntityTypes.WITHER_SKELETON, EntityTypes.BOGGED}) {
-		//?} else {
-		/*// The bogged came in 1.21.
-		for (EntityType<?> type : new EntityType<?>[] {EntityTypes.SKELETON, EntityTypes.STRAY, EntityTypes.WITHER_SKELETON}) {
-		*///?}
+		/*for (EntityType<?> type : new EntityType<?>[] {EntityType.SKELETON, EntityType.STRAY, EntityType.WITHER_SKELETON, EntityType.BOGGED}) {
+		*///?} else {
+		// The bogged came in 1.21.
+		for (EntityType<?> type : new EntityType<?>[] {EntityType.SKELETON, EntityType.STRAY, EntityType.WITHER_SKELETON}) {
+		//?}
 			FACES.put(type, new Faces(skeleton, null));
 		}
-		FACES.put(EntityTypes.CREEPER, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
+		FACES.put(EntityType.CREEPER, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
 		Face spider = new Face(64, 32, 40, 12, 8, 8);
-		FACES.put(EntityTypes.SPIDER, new Faces(spider, null));
-		FACES.put(EntityTypes.CAVE_SPIDER, new Faces(spider, null));
-		FACES.put(EntityTypes.ENDERMAN, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
-		FACES.put(EntityTypes.WITCH, new Faces(new Face(64, 128, 8, 8, 8, 10, null, VILLAGER_NOSE), null));
-		FACES.put(EntityTypes.BLAZE, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
+		FACES.put(EntityType.SPIDER, new Faces(spider, null));
+		FACES.put(EntityType.CAVE_SPIDER, new Faces(spider, null));
+		FACES.put(EntityType.ENDERMAN, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
+		FACES.put(EntityType.WITCH, new Faces(new Face(64, 128, 8, 8, 8, 10, null, VILLAGER_NOSE), null));
+		FACES.put(EntityType.BLAZE, new Faces(new Face(64, 32, 8, 8, 8, 8), null));
 		// Piglin snouts: a 4x4 box from the face's middle, rows 4 to 8 of 8.
 		Face piglin = new Face(64, 64, 8, 8, 10, 8, null, new Piece(32, 2, 4, 4, 3, 4));
 		Face babyPiglin = new Face(64, 64, 7, 7, 9, 6, null, new Piece(22, 31, 3, 3, 3, 3));
-		FACES.put(EntityTypes.PIGLIN, new Faces(piglin, babyPiglin));
-		FACES.put(EntityTypes.PIGLIN_BRUTE, new Faces(piglin, null));
-		FACES.put(EntityTypes.ZOMBIFIED_PIGLIN, new Faces(piglin, babyPiglin));
+		FACES.put(EntityType.PIGLIN, new Faces(piglin, babyPiglin));
+		FACES.put(EntityType.PIGLIN_BRUTE, new Faces(piglin, null));
+		FACES.put(EntityType.ZOMBIFIED_PIGLIN, new Faces(piglin, babyPiglin));
 		Face illager = new Face(64, 64, 8, 8, 8, 10, null, VILLAGER_NOSE);
-		for (EntityType<?> type : new EntityType<?>[] {EntityTypes.PILLAGER, EntityTypes.VINDICATOR, EntityTypes.EVOKER}) {
+		for (EntityType<?> type : new EntityType<?>[] {EntityType.PILLAGER, EntityType.VINDICATOR, EntityType.EVOKER}) {
 			FACES.put(type, new Faces(illager, null));
 		}
-		FACES.put(EntityTypes.RAVAGER, new Faces(new Face(128, 128, 16, 16, 16, 20), null));
-		FACES.put(EntityTypes.VILLAGER, new Faces(
+		FACES.put(EntityType.RAVAGER, new Faces(new Face(128, 128, 16, 16, 16, 20), null));
+		FACES.put(EntityType.VILLAGER, new Faces(
 			new Face(64, 64, 8, 8, 8, 10, VILLAGER_HAT, VILLAGER_NOSE),
 			new Face(64, 64, 7, 7, 8, 8, new Piece(7, 37, 8, 8, 0, 0), null)));
-		FACES.put(EntityTypes.WANDERING_TRADER, new Faces(new Face(64, 64, 8, 8, 8, 10, VILLAGER_HAT, VILLAGER_NOSE), null));
-		FACES.put(EntityTypes.IRON_GOLEM, new Faces(new Face(128, 128, 8, 8, 8, 10, null, VILLAGER_NOSE), null));
+		FACES.put(EntityType.WANDERING_TRADER, new Faces(new Face(64, 64, 8, 8, 8, 10, VILLAGER_HAT, VILLAGER_NOSE), null));
+		FACES.put(EntityType.IRON_GOLEM, new Faces(new Face(128, 128, 8, 8, 8, 10, null, VILLAGER_NOSE), null));
 		// Cow muzzles sit under the eyes, rows 5 to 8 of 8; a calf's at rows 3 to 6 of 6.
 		Faces cow = new Faces(COW, new Face(64, 64, 5, 23, 6, 6, null, new Piece(13, 30, 4, 3, 1, 3)));
-		FACES.put(EntityTypes.COW, cow);
-		FACES.put(EntityTypes.MOOSHROOM, cow);
+		FACES.put(EntityType.COW, cow);
+		FACES.put(EntityType.MOOSHROOM, cow);
 		// The pig's snout covers the middle of its face, rows 4 to 7 of 8.
 		//? if >=1.21.5 {
-		FACES.put(EntityTypes.PIG, new Faces(new Face(64, 64, 8, 8, 8, 8, null, new Piece(17, 17, 4, 3, 2, 4)), new Face(32, 32, 6, 21, 7, 6)));
-		//?} else {
-		/*// The pig model before 1.21.5: the same head and snout boxes in a 64 x 32 texture.
-		FACES.put(EntityTypes.PIG, new Faces(new Face(64, 32, 8, 8, 8, 8, null, new Piece(17, 17, 4, 3, 2, 4)), null));
-		*///?}
-		FACES.put(EntityTypes.SHEEP, new Faces(new Face(64, 32, 8, 8, 6, 6), new Face(64, 32, 5, 5, 5, 5)));
+		/*FACES.put(EntityType.PIG, new Faces(new Face(64, 64, 8, 8, 8, 8, null, new Piece(17, 17, 4, 3, 2, 4)), new Face(32, 32, 6, 21, 7, 6)));
+		*///?} else {
+		// The pig model before 1.21.5: the same head and snout boxes in a 64 x 32 texture.
+		FACES.put(EntityType.PIG, new Faces(new Face(64, 32, 8, 8, 8, 8, null, new Piece(17, 17, 4, 3, 2, 4)), null));
+		//?}
+		FACES.put(EntityType.SHEEP, new Faces(new Face(64, 32, 8, 8, 6, 6), new Face(64, 32, 5, 5, 5, 5)));
 		// The chicken's beak is across rows 2 to 4 of its 6-pixel-tall face.
-		FACES.put(EntityTypes.CHICKEN, new Faces(new Face(64, 32, 3, 3, 4, 6, null, new Piece(16, 2, 4, 2, 0, 2)), new Face(16, 16, 4, 4, 4, 4)));
-		FACES.put(EntityTypes.WOLF, new Faces(new Face(64, 32, 4, 4, 6, 6), new Face(32, 32, 5, 17, 6, 5)));
-		FACES.put(EntityTypes.CAT, new Faces(new Face(64, 32, 5, 5, 5, 4), new Face(32, 32, 4, 4, 5, 4)));
-		FACES.put(EntityTypes.FOX, new Faces(new Face(48, 32, 7, 11, 8, 6, null, new Piece(9, 21, 4, 2, 2, 4)), new Face(32, 32, 5, 5, 6, 5)));
+		FACES.put(EntityType.CHICKEN, new Faces(new Face(64, 32, 3, 3, 4, 6, null, new Piece(16, 2, 4, 2, 0, 2)), new Face(16, 16, 4, 4, 4, 4)));
+		FACES.put(EntityType.WOLF, new Faces(new Face(64, 32, 4, 4, 6, 6), new Face(32, 32, 5, 17, 6, 5)));
+		FACES.put(EntityType.CAT, new Faces(new Face(64, 32, 5, 5, 5, 4), new Face(32, 32, 4, 4, 5, 4)));
+		FACES.put(EntityType.FOX, new Faces(new Face(48, 32, 7, 11, 8, 6, null, new Piece(9, 21, 4, 2, 2, 4)), new Face(32, 32, 5, 5, 6, 5)));
 		//? if >=26.1 {
-		FACES.put(EntityTypes.RABBIT, new Faces(new Face(64, 64, 5, 21, 5, 5), new Face(32, 32, 4, 4, 5, 4)));
-		//?} else {
-		/*// The rabbit model before 26.1: head box at texOffs(32, 0), 5 x 4 x 5, in a 64 x 32 texture.
+		/*FACES.put(EntityType.RABBIT, new Faces(new Face(64, 64, 5, 21, 5, 5), new Face(32, 32, 4, 4, 5, 4)));
+		*///?} else {
+		// The rabbit model before 26.1: head box at texOffs(32, 0), 5 x 4 x 5, in a 64 x 32 texture.
 		FACES.put(EntityType.RABBIT, new Faces(new Face(64, 32, 37, 5, 5, 4), null));
-		*///?}
-		FACES.put(EntityTypes.POLAR_BEAR, new Faces(new Face(128, 64, 7, 7, 7, 7), new Face(64, 64, 4, 4, 6, 5)));
-		FACES.put(EntityTypes.PANDA, new Faces(new Face(64, 64, 9, 15, 13, 10, null, new Piece(47, 18, 7, 5, 3, 5)), new Face(64, 64, 5, 5, 7, 6)));
-		FACES.put(EntityTypes.ALLAY, new Faces(new Face(32, 32, 5, 5, 5, 5), null));
+		//?}
+		FACES.put(EntityType.POLAR_BEAR, new Faces(new Face(128, 64, 7, 7, 7, 7), new Face(64, 64, 4, 4, 6, 5)));
+		FACES.put(EntityType.PANDA, new Faces(new Face(64, 64, 9, 15, 13, 10, null, new Piece(47, 18, 7, 5, 3, 5)), new Face(64, 64, 5, 5, 7, 6)));
+		FACES.put(EntityType.ALLAY, new Faces(new Face(32, 32, 5, 5, 5, 5), null));
 		// The breeze came in 1.21.
 		//? if >=1.21 {
-		FACES.put(EntityTypes.BREEZE, new Faces(new Face(32, 32, 8, 8, 8, 8), null));
-		//?}
+		/*FACES.put(EntityType.BREEZE, new Faces(new Face(32, 32, 8, 8, 8, 8), null));
+		*///?}
 		//? if >=1.21.2 {
-		FACES.put(EntityTypes.CREAKING, new Faces(new Face(64, 64, 6, 6, 6, 10), null));
-		//?}
-		FACES.put(EntityTypes.DOLPHIN, new Faces(new Face(64, 64, 6, 6, 8, 7), new Face(64, 64, 4, 4, 6, 5)));
-		FACES.put(EntityTypes.BEE, new Faces(new Face(64, 64, 10, 10, 7, 7), new Face(32, 32, 5, 5, 4, 4)));
-		FACES.put(EntityTypes.AXOLOTL, new Faces(new Face(64, 64, 5, 6, 8, 5), new Face(32, 32, 4, 12, 6, 3)));
-		FACES.put(EntityTypes.STRIDER, new Faces(new Face(64, 128, 16, 16, 16, 14), new Face(32, 32, 8, 8, 7, 7)));
+		/*FACES.put(EntityType.CREAKING, new Faces(new Face(64, 64, 6, 6, 6, 10), null));
+		*///?}
+		FACES.put(EntityType.DOLPHIN, new Faces(new Face(64, 64, 6, 6, 8, 7), new Face(64, 64, 4, 4, 6, 5)));
+		FACES.put(EntityType.BEE, new Faces(new Face(64, 64, 10, 10, 7, 7), new Face(32, 32, 5, 5, 4, 4)));
+		FACES.put(EntityType.AXOLOTL, new Faces(new Face(64, 64, 5, 6, 8, 5), new Face(32, 32, 4, 12, 6, 3)));
+		FACES.put(EntityType.STRIDER, new Faces(new Face(64, 128, 16, 16, 16, 14), new Face(32, 32, 8, 8, 7, 7)));
 	}
 
 	private MobFaces() {
@@ -220,12 +220,12 @@ public final class MobFaces {
 			return fromModels ? looked(entity).modelFace() : null;
 		}
 		//? if >=26.1 {
-		Face face = entity instanceof LivingEntity living && living.isBaby() ? faces.baby() : faces.adult();
-		//?} else {
-		/*// Before 26.1 a baby is its adult model scaled down, drawn with the adult texture, so it
+		/*Face face = entity instanceof LivingEntity living && living.isBaby() ? faces.baby() : faces.adult();
+		*///?} else {
+		// Before 26.1 a baby is its adult model scaled down, drawn with the adult texture, so it
 		// has the adult's face.
 		Face face = faces.adult();
-		*///?}
+		//?}
 		return face == COW && coldCow(entity) ? COLD_COW : face;
 	}
 
@@ -235,19 +235,19 @@ public final class MobFaces {
 	 */
 	public static boolean draw(IconBatch icons, Entity entity, float x, float y, float size, int color) {
 		Face face = face(entity);
-		Identifier texture = face == null ? null : looked(entity).texture();
+		ResourceLocation texture = face == null ? null : looked(entity).texture();
 		if (face == null || texture == null) {
 			return false;
 		}
 		float scale = size / Math.max(face.w(), face.h());
 		float w = face.w() * scale;
 		float h = face.h() * scale;
-		GuiGraphicsExtractor graphics = icons.graphics();
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(x - w / 2, y - h / 2);
-		graphics.pose().scale(scale);
+		GuiGraphics graphics = icons.graphics();
+		graphics.pose().pushPose();
+		graphics.pose().translate(x - w / 2, y - h / 2, 0);
+		graphics.pose().scale(scale, scale, 1);
 		blitFace(icons, texture, face, color);
-		graphics.pose().popMatrix();
+		graphics.pose().popPose();
 		return true;
 	}
 
@@ -258,19 +258,19 @@ public final class MobFaces {
 	 */
 	public static boolean drawPixel(IconBatch icons, Entity entity, float x, float y, float size, int color, int outline, int alpha) {
 		Face face = face(entity);
-		Identifier texture = face == null ? null : looked(entity).texture();
+		ResourceLocation texture = face == null ? null : looked(entity).texture();
 		if (face == null || texture == null) {
 			return false;
 		}
 		float texel = Radar.texel(size, Math.max(face.w(), face.h()));
 		Radar.pixelFrame(icons, x, y, face.w(), face.h(), texel, outline, alpha);
 		blitFace(icons, texture, face, color);
-		GuiGraphicsExtractor graphics = icons.graphics();
-		graphics.pose().popMatrix();
+		GuiGraphics graphics = icons.graphics();
+		graphics.pose().popPose();
 		return true;
 	}
 
-	private static void blitFace(IconBatch icons, Identifier texture, Face face, int color) {
+	private static void blitFace(IconBatch icons, ResourceLocation texture, Face face, int color) {
 		for (Piece p : face.pieces()) {
 			icons.blit(texture, p.dx(), p.dy(), p.u(), p.v(), p.w(), p.h(), face.texW(), face.texH(), color);
 		}
@@ -279,19 +279,19 @@ public final class MobFaces {
 	/** Cold cows use a different model, with the muzzle elsewhere in the texture. */
 	private static boolean coldCow(Entity entity) {
 		//? if >=1.21.5 {
-		return entity instanceof net.minecraft.world.entity.animal.cow.Cow cow
-			&& cow.getVariant().value().modelAndTexture().model() == net.minecraft.world.entity.animal.cow.CowVariant.ModelType.COLD;
-		//?} else {
-		/*// Cow variants came in 1.21.5.
+		/*return entity instanceof net.minecraft.world.entity.animal.Cow cow
+			&& cow.getVariant().value().modelAndTexture().model() == net.minecraft.world.entity.animal.CowVariant.ModelType.COLD;
+		*///?} else {
+		// Cow variants came in 1.21.5.
 		return false;
-		*///?}
+		//?}
 	}
 
 	/**
 	 * The texture the game draws this entity with, from its renderer. Also what Xaero's icon files
 	 * name a mob's variants by ({@link XaeroRadarIcons}).
 	 */
-	static @Nullable Identifier texture(Entity entity) {
+	static @Nullable ResourceLocation texture(Entity entity) {
 		return looked(entity).texture();
 	}
 
@@ -308,15 +308,15 @@ public final class MobFaces {
 	}
 
 	//? if >=1.21.2 {
-	/** AgeableMobRenderer's adult and baby models, or null if they can't be read. */
+	/*/^* AgeableMobRenderer's adult and baby models, or null if they can't be read. ^/
 	private static java.lang.reflect.@Nullable Field @Nullable [] ageableModels;
 	private static boolean ageableModelsLooked;
 
-	/**
+	/^*
 	 * The model an ageable mob's renderer draws it with. Renderers that keep an adult's and a
 	 * baby's model only switch between them as they draw, so their current model is whichever
 	 * they drew last.
-	 */
+	 ^/
 	@SuppressWarnings("rawtypes")
 	private static @Nullable Model ageableModel(LivingEntityRenderer renderer, boolean baby) {
 		if (!ageableModelsLooked) {
@@ -347,7 +347,7 @@ public final class MobFaces {
 			return null;
 		}
 	}
-	//?}
+	*///?}
 
 	/** Each renderer class's own model fields, beyond the one every living-entity renderer has. */
 	private static final Map<Class<?>, List<java.lang.reflect.Field>> MODEL_FIELDS = new java.util.concurrent.ConcurrentHashMap<>();
@@ -361,11 +361,11 @@ public final class MobFaces {
 	@SuppressWarnings("rawtypes")
 	private static @Nullable Face modelFace(LivingEntityRenderer renderer, boolean baby, @Nullable Object state) {
 		//? if >=1.21.2 {
-		if (renderer instanceof net.minecraft.client.renderer.entity.AgeableMobRenderer) {
+		/*if (renderer instanceof net.minecraft.client.renderer.entity.AgeableMobRenderer) {
 			Model model = ageableModel(renderer, baby);
 			return model == null ? null : ModelFaces.of(model, state);
 		}
-		//?}
+		*///?}
 		Model current = renderer.getModel();
 		List<Model> models = new java.util.ArrayList<>(List.of(current));
 		List<Boolean> forBabies = new java.util.ArrayList<>(List.of(babyName(current.getClass().getSimpleName())));
@@ -430,7 +430,7 @@ public final class MobFaces {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static Looked lookUp(Entity entity, int age, boolean baby) {
 		//? if >=1.21.2 {
-		// Only living-entity renderers say which texture they use; others, such as GeckoLib's, don't.
+		/*// Only living-entity renderers say which texture they use; others, such as GeckoLib's, don't.
 		EntityRenderer<?, ?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
 		if (!(renderer instanceof LivingEntityRenderer living)) {
 			return new Looked(null, null, age, baby);
@@ -441,17 +441,17 @@ public final class MobFaces {
 		} catch (RuntimeException e) {
 			return new Looked(null, null, age, baby);
 		}
-		//?} else {
-		/*// Renderers had no render state yet, and every one, GeckoLib's too, said which texture it
+		*///?} else {
+		// Renderers had no render state yet, and every one, GeckoLib's too, said which texture it
 		// draws an entity with. Only living-entity renderers have a model to read a face off.
 		EntityRenderer<?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
 		try {
-			Identifier texture = ((EntityRenderer) renderer).getTextureLocation(entity);
+			ResourceLocation texture = ((EntityRenderer) renderer).getTextureLocation(entity);
 			Face face = renderer instanceof LivingEntityRenderer living ? modelFace(living, baby, null) : null;
 			return new Looked(texture, face, age, baby);
 		} catch (RuntimeException e) {
 			return new Looked(null, null, age, baby);
 		}
-		*///?}
+		//?}
 	}
 }

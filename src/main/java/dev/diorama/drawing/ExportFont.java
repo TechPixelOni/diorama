@@ -22,7 +22,7 @@ import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
 import com.ibm.icu.text.Bidi;
 import net.minecraft.locale.Language;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -65,7 +65,7 @@ final class ExportFont {
 			shaped(text).codePoints().forEach(wanted::add);
 		}
 		ExportFont font = new ExportFont(wanted, options);
-		font.read(manager, Identifier.withDefaultNamespace("default"), new HashSet<>());
+		font.read(manager, new net.minecraft.resources.ResourceLocation("default"), new HashSet<>());
 		return font;
 	}
 
@@ -87,11 +87,11 @@ final class ExportFont {
 	}
 
 	/** A font file from every resource pack, the highest first, each one's providers in order. */
-	private void read(ResourceManager manager, Identifier id, Set<Identifier> seen) {
+	private void read(ResourceManager manager, ResourceLocation id, Set<ResourceLocation> seen) {
 		if (!seen.add(id)) {
 			return;
 		}
-		Identifier file = Identifier.fromNamespaceAndPath(id.getNamespace(), "font/" + id.getPath() + ".json");
+		ResourceLocation file = new net.minecraft.resources.ResourceLocation(id.getNamespace(), "font/" + id.getPath() + ".json");
 		List<Resource> stack = manager.getResourceStack(file);
 		for (int i = stack.size() - 1; i >= 0; i--) {
 			try (InputStream in = stack.get(i).open()) {
@@ -106,7 +106,7 @@ final class ExportFont {
 		}
 	}
 
-	private void provider(ResourceManager manager, JsonElement element, Set<Identifier> seen) {
+	private void provider(ResourceManager manager, JsonElement element, Set<ResourceLocation> seen) {
 		try {
 			JsonObject provider = element.getAsJsonObject();
 			if (!this.passes(provider)) {
@@ -115,7 +115,7 @@ final class ExportFont {
 			}
 			switch (provider.get("type").getAsString()) {
 				case "reference" -> {
-					Identifier ref = Identifier.tryParse(provider.get("id").getAsString());
+					ResourceLocation ref = ResourceLocation.tryParse(provider.get("id").getAsString());
 					if (ref != null) {
 						this.read(manager, ref, seen);
 					}
@@ -144,14 +144,14 @@ final class ExportFont {
 	}
 
 	private void bitmap(ResourceManager manager, JsonObject provider) throws IOException {
-		Identifier sheet = Identifier.tryParse(provider.get("file").getAsString());
+		ResourceLocation sheet = ResourceLocation.tryParse(provider.get("file").getAsString());
 		if (sheet == null) {
 			return;
 		}
 		int height = provider.has("height") ? provider.get("height").getAsInt() : 8;
 		int ascent = provider.get("ascent").getAsInt();
 		com.google.gson.JsonArray rows = provider.getAsJsonArray("chars");
-		Optional<Resource> resource = manager.getResource(Identifier.fromNamespaceAndPath(sheet.getNamespace(), "textures/" + sheet.getPath()));
+		Optional<Resource> resource = manager.getResource(new net.minecraft.resources.ResourceLocation(sheet.getNamespace(), "textures/" + sheet.getPath()));
 		if (resource.isEmpty() || rows.isEmpty()) {
 			return;
 		}
@@ -199,7 +199,7 @@ final class ExportFont {
 				missing.add(c);
 			}
 		}
-		Identifier hex = Identifier.tryParse(provider.get("hex_file").getAsString());
+		ResourceLocation hex = ResourceLocation.tryParse(provider.get("hex_file").getAsString());
 		Optional<Resource> resource = hex == null ? Optional.empty() : manager.getResource(hex);
 		if (missing.isEmpty() || resource.isEmpty()) {
 			return;
@@ -302,10 +302,10 @@ final class ExportFont {
 
 	private static int alpha(NativeImage image, int x, int y) {
 		//? if >=1.21.2 {
-		return image.getPixel(x, y) >>> 24;
-		//?} else {
-		/*return image.getPixelRGBA(x, y) >>> 24;
-		*///?}
+		/*return image.getPixel(x, y) >>> 24;
+		*///?} else {
+		return image.getPixelRGBA(x, y) >>> 24;
+		//?}
 	}
 
 	private Glyph glyph(int c) {

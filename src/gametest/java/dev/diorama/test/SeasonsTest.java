@@ -43,7 +43,7 @@ final class SeasonsTest {
 
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(x, Projection.v(70, z), 3.0, TileKey.SURFACE);
 			}
 		});
@@ -53,17 +53,17 @@ final class SeasonsTest {
 
 		// The game itself, straight down, facing north as the map does.
 		//? if >=26.2 {
-		context.runOnClient(mc -> mc.gui.hud.toggle());
-		//?} else {
-		/*context.runOnClient(mc -> mc.options.hideGui = true);
-		*///?}
+		/*context.runOnClient(mc -> mc.gui.toggle());
+		*///?} else {
+		context.runOnClient(mc -> mc.options.hideGui = true);
+		//?}
 		context.waitTicks(40);
 		context.takeScreenshot("seasons-02-world");
 		//? if >=26.2 {
-		context.runOnClient(mc -> mc.gui.hud.toggle());
-		//?} else {
-		/*context.runOnClient(mc -> mc.options.hideGui = false);
-		*///?}
+		/*context.runOnClient(mc -> mc.gui.toggle());
+		*///?} else {
+		context.runOnClient(mc -> mc.options.hideGui = false);
+		//?}
 
 		DioramaClientTest.assertTintsMatchGame(context);
 		world.getServer().runCommand("gamemode creative @a");

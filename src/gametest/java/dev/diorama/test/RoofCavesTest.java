@@ -185,7 +185,7 @@ final class RoofCavesTest {
 			BlockPos eye = BlockPos.containing(mc.player.getEyePosition());
 			int sky = mc.level.getBrightness(LightLayer.SKY, eye);
 			int auto = session.autoLayer(mc.player);
-			String screen = mc.gui.screen() instanceof MapScreen map ? layerName(field(map, "layer")) : "closed";
+			String screen = mc.screen instanceof MapScreen map ? layerName(field(map, "layer")) : "closed";
 			return String.format("%s: feet y %d, eye sky light %d, underground %s, auto layer %s, map layer %s",
 				where, mc.player.blockPosition().getY(), sky, session.isUnderground(), layerName(auto), screen);
 		});

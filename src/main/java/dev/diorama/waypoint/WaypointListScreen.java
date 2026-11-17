@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.KeyEvent;
+/*import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+*///?}
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -384,7 +384,7 @@ public final class WaypointListScreen extends Screen {
 		this.others.clear();
 		WaypointStore store = WaypointStore.get();
 		Entity viewer = MapSession.viewer();
-		String here = this.minecraft.level == null ? null : this.minecraft.level.dimension().identifier().toString();
+		String here = this.minecraft.level == null ? null : this.minecraft.level.dimension().location().toString();
 		this.collectFolders(store, here);
 		if (store != null && viewer != null && here != null) {
 			String key = this.folder().key();
@@ -429,12 +429,12 @@ public final class WaypointListScreen extends Screen {
 			above -= 24;
 			this.addRenderableWidget(importButton);
 			//? if >=1.21 {
-			importButton.setRectangle(204, 20, cx - 102, above);
-			//?} else {
-			/*// No setRectangle on 1.20.1; the button is already 20 tall.
+			/*importButton.setRectangle(204, 20, cx - 102, above);
+			*///?} else {
+			// No setRectangle on 1.20.1; the button is already 20 tall.
 			importButton.setWidth(204);
 			importButton.setPosition(cx - 102, above);
-			*///?}
+			//?}
 		}
 		if (this.imported != null) {
 			above -= 12;
@@ -495,7 +495,7 @@ public final class WaypointListScreen extends Screen {
 		String custom = folder.custom();
 		if (custom != null) {
 			this.folderActions.add(this.action(Component.translatable("diorama.folder.rename"),
-				() -> this.minecraft.gui.setScreen(new WaypointFolderScreen(this, custom))));
+				() -> this.minecraft.setScreen(new WaypointFolderScreen(this, custom))));
 			this.folderActions.add(this.action(Component.translatable("diorama.waypoint.delete").withStyle(ChatFormatting.RED), () -> {
 				this.folderArmed = true;
 				this.placeFolderButtons();
@@ -524,7 +524,7 @@ public final class WaypointListScreen extends Screen {
 		int x = left + LIST_WIDTH - newWidth;
 		this.addRenderableWidget(Button.builder(newWaypoint, b -> this.newWaypoint()).bounds(x, SEARCH_Y, newWidth, 20).build());
 		x -= 4 + newFolderWidth;
-		this.addRenderableWidget(Button.builder(newFolder, b -> this.minecraft.gui.setScreen(new WaypointFolderScreen(this, null)))
+		this.addRenderableWidget(Button.builder(newFolder, b -> this.minecraft.setScreen(new WaypointFolderScreen(this, null)))
 			.bounds(x, SEARCH_Y, newFolderWidth, 20).build());
 		x -= 4 + ARROW;
 		this.sortDirection = this.addRenderableWidget(Button.builder(Component.empty(), b -> this.changeSort(false))
@@ -590,7 +590,7 @@ public final class WaypointListScreen extends Screen {
 	private void resort(WaypointStore store) {
 		Entity viewer = MapSession.viewer();
 		if (viewer != null && this.minecraft.level != null) {
-			String here = this.minecraft.level.dimension().identifier().toString();
+			String here = this.minecraft.level.dimension().location().toString();
 			java.util.Comparator<Waypoint> order = store.sort().comparator(store.sortReversed(), w -> this.distance(store, here, viewer, w));
 			this.all.sort(order);
 			this.others.sort(order);
@@ -636,7 +636,7 @@ public final class WaypointListScreen extends Screen {
 	}
 
 	/** The direction button's caret, drawn over the button as {@code MapScreen} draws its slice buttons'. */
-	private void drawSortCaret(GuiGraphicsExtractor graphics) {
+	private void drawSortCaret(GuiGraphics graphics) {
 		Button button = this.sortDirection;
 		if (button == null || !button.visible) {
 			return;
@@ -795,11 +795,11 @@ public final class WaypointListScreen extends Screen {
 			confirm.setMessage(ask);
 			int wide = several ? Math.max(span, this.font.width(ask) + 10) : span;
 			//? if >=1.21 {
-			confirm.setRectangle(wide, 20, right - wide, y);
-			//?} else {
-			/*confirm.setWidth(wide);
+			/*confirm.setRectangle(wide, 20, right - wide, y);
+			*///?} else {
+			confirm.setWidth(wide);
 			confirm.setPosition(right - wide, y);
-			*///?}
+			//?}
 		}
 	}
 
@@ -832,11 +832,11 @@ public final class WaypointListScreen extends Screen {
 			Button confirm = this.folderActions.get(this.folderActions.size() - 1);
 			show(confirm, this.folderArmed);
 			//? if >=1.21 {
-			confirm.setRectangle(span, 20, right - span, FOLDER_Y);
-			//?} else {
-			/*confirm.setWidth(span);
+			/*confirm.setRectangle(span, 20, right - span, FOLDER_Y);
+			*///?} else {
+			confirm.setWidth(span);
 			confirm.setPosition(right - span, FOLDER_Y);
-			*///?}
+			//?}
 		}
 	}
 
@@ -916,11 +916,11 @@ public final class WaypointListScreen extends Screen {
 	}
 
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		super.extractBackground(graphics, mouseX, mouseY, a);
-	//?} else {
-	/*// A 1.20.1 screen draws its own background, and its render method draws only the widgets.
+	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+		super.renderBackground(graphics, mouseX, mouseY, a);
+	*///?} else {
+	// A 1.20.1 screen draws its own background, and its render method draws only the widgets.
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		this.drawBackground(graphics, mouseX, mouseY);
@@ -932,12 +932,12 @@ public final class WaypointListScreen extends Screen {
 
 	private void drawBackground(GuiGraphics graphics, int mouseX, int mouseY) {
 		this.renderBackground(graphics);
-	*///?}
+	//?}
 		// Drawn with the background, so the buttons go on top of it: before 1.21.6 a screen's own
 		// drawing comes after its background, and the rows have to be under their buttons.
 		//? if >=1.21.6 {
-		graphics.nextStratum();
-		//?}
+		/*graphics.nextStratum();
+		*///?}
 		if (this.empty) {
 			this.drawEmpty(graphics);
 		} else {
@@ -945,11 +945,11 @@ public final class WaypointListScreen extends Screen {
 		}
 	}
 
-	private void drawList(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	private void drawList(GuiGraphics graphics, int mouseX, int mouseY) {
 		int cx = this.width / 2;
 		int left = cx - LIST_WIDTH / 2;
 		int right = left + LIST_WIDTH;
-		graphics.centeredText(this.font, this.title, cx, 8, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, this.title, cx, 8, 0xFFFFFFFF);
 		// The folder's name between its arrows, with how many waypoints it holds; dimmed when hidden.
 		int nameLeft = folderNameLeft(left);
 		int nameRight = nameLeft + this.folderNameWidth;
@@ -958,7 +958,7 @@ public final class WaypointListScreen extends Screen {
 		Folder folder = this.folder();
 		boolean folderHidden = store != null && store.folderHidden(folder.key());
 		String label = this.fit(folder.name().getString() + " (" + this.all.size() + ")", nameRight - nameLeft - 28);
-		graphics.centeredText(this.font, Component.literal(label), (nameLeft + nameRight) / 2, FOLDER_Y + 6, folderHidden ? HIDDEN : 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, Component.literal(label), (nameLeft + nameRight) / 2, FOLDER_Y + 6, folderHidden ? HIDDEN : 0xFFFFFFFF);
 		// A caret at the name's right end: a click on the name opens the list of folders.
 		for (int row = 0; row < 3; row++) {
 			graphics.fill(nameRight - 12 + row, FOLDER_Y + 9 + row, nameRight - 7 - row, FOLDER_Y + 10 + row, DETAIL);
@@ -969,15 +969,15 @@ public final class WaypointListScreen extends Screen {
 			ScreenArt.sprite(graphics, ScreenArt.SEARCH, left + 4, SEARCH_Y + 4, 12, 12);
 			if (box.getValue().isEmpty()) {
 				// Cut short in a language whose button labels leave the box narrower.
-				graphics.text(this.font, this.fit(Component.translatable("diorama.waypoints.search").getString(), this.searchWidth - 24), left + 20, SEARCH_Y + 6, SEARCH_HINT, false);
+				graphics.drawString(this.font, this.fit(Component.translatable("diorama.waypoints.search").getString(), this.searchWidth - 24), left + 20, SEARCH_Y + 6, SEARCH_HINT, false);
 			}
 		}
 		ScreenArt.list(graphics, 0, LIST_TOP, this.width, this.listBottom);
 		Entity viewer = MapSession.viewer();
 		if (this.rows.isEmpty()) {
-			graphics.centeredText(this.font, Component.translatable(this.all.isEmpty() && this.query().isEmpty() ? "diorama.folder.empty" : "diorama.waypoints.no_match"), cx, LIST_TOP + 20, HINT);
+			graphics.drawCenteredString(this.font, Component.translatable(this.all.isEmpty() && this.query().isEmpty() ? "diorama.folder.empty" : "diorama.waypoints.no_match"), cx, LIST_TOP + 20, HINT);
 		}
-		String here = this.minecraft.level == null ? "" : this.minecraft.level.dimension().identifier().toString();
+		String here = this.minecraft.level == null ? "" : this.minecraft.level.dimension().location().toString();
 		// Names start clear of the widest badge showing: initials of three or four letters widen it.
 		int textLeft = TEXT_LEFT;
 		for (int i = 0; i < this.visibleRows && this.scroll + i < this.lines(); i++) {
@@ -991,7 +991,7 @@ public final class WaypointListScreen extends Screen {
 			int y = this.rowY(i);
 			if (row < 0) {
 				// What the search found in the other folders goes under this, each row saying which folder.
-				graphics.centeredText(this.font, Component.translatable("diorama.waypoints.other_folders"), cx, y + 8, HINT);
+				graphics.drawCenteredString(this.font, Component.translatable("diorama.waypoints.other_folders"), cx, y + 8, HINT);
 				graphics.fill(left, y + ROW - 3, right, y + ROW - 2, 0xFF606060);
 				continue;
 			}
@@ -1008,7 +1008,7 @@ public final class WaypointListScreen extends Screen {
 			int room = right - (selected ? this.actionsWidth() + 4 : 6) - (left + textLeft);
 			String full = waypoint.shownName();
 			String name = this.fit(full, room);
-			graphics.text(this.font, name, left + textLeft, y + 4, waypoint.visible && !inHidden ? 0xFFFFFFFF : HIDDEN, true);
+			graphics.drawString(this.font, name, left + textLeft, y + 4, waypoint.visible && !inHidden ? 0xFFFFFFFF : HIDDEN, true);
 			String detail = waypoint.x + ", " + waypoint.y + ", " + waypoint.z;
 			if (!waypoint.dimension.equals(here)) {
 				detail = Waypoints.dimensionName(waypoint.dimension).getString() + " · " + detail;
@@ -1031,15 +1031,15 @@ public final class WaypointListScreen extends Screen {
 				detail += "  ·  " + Component.translatable("diorama.waypoint.hidden").getString();
 			}
 			String shownDetail = this.fit(detail, room);
-			graphics.text(this.font, shownDetail, left + textLeft, y + 14, DETAIL, true);
+			graphics.drawString(this.font, shownDetail, left + textLeft, y + 14, DETAIL, true);
 			boolean overText = mouseX >= left + textLeft && mouseX < left + textLeft + room && mouseY >= y && mouseY < y + ROW;
 			if (overText && this.folderMenu == null && (!name.equals(full) || !shownDetail.equals(detail))) {
 				//? if >=1.21.6 {
-				graphics.setComponentTooltipForNextFrame(this.font, List.of(Component.literal(full), Component.literal(detail)), mouseX, mouseY);
-				//?} else {
-				/*// The screen draws this tooltip after everything else.
+				/*graphics.setComponentTooltipForNextFrame(this.font, List.of(Component.literal(full), Component.literal(detail)), mouseX, mouseY);
+				*///?} else {
+				// The screen draws this tooltip after everything else.
 				this.setTooltipForNextRenderPass(List.of(Component.literal(full).getVisualOrderText(), Component.literal(detail).getVisualOrderText()));
-				*///?}
+				//?}
 			}
 		}
 		if (this.maxScroll() > 0) {
@@ -1047,11 +1047,11 @@ public final class WaypointListScreen extends Screen {
 			ScreenArt.scrollbar(graphics, bar[0], LIST_TOP, this.listBottom, bar[1], bar[2]);
 		}
 		if (this.imported != null) {
-			graphics.centeredText(this.font, this.imported, cx, this.importedY, 0xFFA0E0A0);
+			graphics.drawCenteredString(this.font, this.imported, cx, this.importedY, 0xFFA0E0A0);
 		}
 		// Under the list, like the line under the map: nothing else says several rows can be selected.
 		String hint = Component.translatable("diorama.waypoints.select_hint", MAC ? "Cmd" : "Ctrl").getString();
-		graphics.centeredText(this.font, Component.literal(this.fit(hint, this.width - 8)), cx, this.hintY, HINT);
+		graphics.drawCenteredString(this.font, Component.literal(this.fit(hint, this.width - 8)), cx, this.hintY, HINT);
 	}
 
 	/** The scrollbar: its x, the handle's height and how far down the track it sits. */
@@ -1066,27 +1066,27 @@ public final class WaypointListScreen extends Screen {
 	 * The empty list: a pin standing on a piece of the map around the player, then what's
 	 * missing and the two ways to add a waypoint.
 	 */
-	private void drawEmpty(GuiGraphicsExtractor graphics) {
+	private void drawEmpty(GuiGraphics graphics) {
 		int cx = this.width / 2;
 		int top = this.emptyTop;
-		graphics.centeredText(this.font, this.title, cx, 16 + Math.max(top, -8), 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, this.title, cx, 16 + Math.max(top, -8), 0xFFFFFFFF);
 		int pieceX = cx - this.piece.outerWidth() / 2;
 		int pieceY = 52 + top;
 		this.piece.draw(graphics, pieceX, pieceY);
 		// The map's standing pin at twice its size, its tip on the middle of the piece's top.
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(pieceX + this.piece.tipX(), pieceY + this.piece.tipY());
-		graphics.pose().scale(2);
+		graphics.pose().pushPose();
+		graphics.pose().translate(pieceX + this.piece.tipX(), pieceY + this.piece.tipY(), 0);
+		graphics.pose().scale(2, 2, 1);
 		Pins.standing(graphics, this.sample, 0, 0, Pins.LARGE);
-		graphics.pose().popMatrix();
-		graphics.centeredText(this.font, Component.translatable("diorama.waypoints.empty_title"), cx, 142 + top, 0xFFFFFFFF);
+		graphics.pose().popPose();
+		graphics.drawCenteredString(this.font, Component.translatable("diorama.waypoints.empty_title"), cx, 142 + top, 0xFFFFFFFF);
 		Component how = DioramaClient.NEW_WAYPOINT.isUnbound()
 			? Component.translatable("diorama.waypoints.empty_unbound")
 			: Component.translatable("diorama.waypoints.empty", DioramaClient.NEW_WAYPOINT.getTranslatedKeyMessage());
-		graphics.centeredText(this.font, how, cx, 158 + top, HINT);
-		graphics.centeredText(this.font, Component.translatable("diorama.waypoints.empty_map", Component.translatable("diorama.menu.add_waypoint")), cx, 168 + top, HINT);
+		graphics.drawCenteredString(this.font, how, cx, 158 + top, HINT);
+		graphics.drawCenteredString(this.font, Component.translatable("diorama.waypoints.empty_map", Component.translatable("diorama.menu.add_waypoint")), cx, 168 + top, HINT);
 		if (this.imported != null) {
-			graphics.centeredText(this.font, this.imported, cx, this.importedY, 0xFFA0E0A0);
+			graphics.drawCenteredString(this.font, this.imported, cx, this.importedY, 0xFFA0E0A0);
 		}
 	}
 
@@ -1112,7 +1112,7 @@ public final class WaypointListScreen extends Screen {
 			return null;
 		}
 		return Button.builder(Component.translatable("diorama.xaero.import_pick"), b ->
-			this.minecraft.gui.setScreen(new XaeroWorldScreen(this, found.worlds()))).build();
+			this.minecraft.setScreen(new XaeroWorldScreen(this, found.worlds()))).build();
 	}
 
 	/** What the last import brought in, or null before one. */
@@ -1127,7 +1127,7 @@ public final class WaypointListScreen extends Screen {
 			return;
 		}
 		List<Waypoint> added = XaeroImport.importInto(world, store);
-		String here = this.minecraft.level.dimension().identifier().toString();
+		String here = this.minecraft.level.dimension().location().toString();
 		long elsewhere = added.stream().filter(w -> !w.dimension.equals(here)).count();
 		Component count = added.size() == 1
 			? Component.translatable("diorama.xaero.count_one")
@@ -1149,10 +1149,10 @@ public final class WaypointListScreen extends Screen {
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
-	*///?}
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+	//?}
 		if (this.folderMenu != null) {
 			this.folderMenu.scroll(scrollY);
 			return true;
@@ -1174,7 +1174,7 @@ public final class WaypointListScreen extends Screen {
 	// Mouse and key events came as separate numbers before 1.21.9. Each override hands them to a
 	// method below that both versions share.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean keyPressed(KeyEvent event) {
 		if (this.folderMenu != null) {
 			this.keyFolderMenu(event.key());
@@ -1197,10 +1197,10 @@ public final class WaypointListScreen extends Screen {
 		net.minecraft.client.Minecraft held = net.minecraft.client.Minecraft.getInstance();
 		this.shiftClick = event.hasShiftDown() || held.hasShiftDown();
 		//? if >=1.21.11 {
-		this.controlClick = event.hasControlDownWithQuirk() || !MAC && held.hasControlDown();
-		//?} else {
-		/*this.controlClick = event.hasControlDown() || !MAC && held.hasControlDown();
-		*///?}
+		/^this.controlClick = event.hasControlDownWithQuirk() || !MAC && held.hasControlDown();
+		^///?} else {
+		this.controlClick = event.hasControlDown() || !MAC && held.hasControlDown();
+		//?}
 		this.disarmUnless(event.x(), event.y());
 		if (!usedByList(event.button()) && DioramaClient.NEW_WAYPOINT.matchesMouse(event)) {
 			this.newWaypointPressed = true;
@@ -1226,8 +1226,8 @@ public final class WaypointListScreen extends Screen {
 		this.draggingScrollbar = false;
 		return super.mouseReleased(event);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean keyPressed(int key, int scancode, int modifiers) {
 		if (this.folderMenu != null) {
 			this.keyFolderMenu(key);
@@ -1273,7 +1273,7 @@ public final class WaypointListScreen extends Screen {
 		this.draggingScrollbar = false;
 		return super.mouseReleased(x, y, button);
 	}
-	*///?}
+	//?}
 
 	/** A click anywhere but on Click again to delete puts the row's buttons back. */
 	private void disarmUnless(double x, double y) {
@@ -1420,13 +1420,13 @@ public final class WaypointListScreen extends Screen {
 			if (custom != null) {
 				fresh.folder = custom;
 			}
-			this.minecraft.gui.setScreen(new WaypointEditScreen(this, fresh, true));
+			this.minecraft.setScreen(new WaypointEditScreen(this, fresh, true));
 		}
 	}
 
 	private void edit(@Nullable Waypoint waypoint) {
 		if (waypoint != null && waypoint.editable()) {
-			this.minecraft.gui.setScreen(new WaypointEditScreen(this, waypoint, false));
+			this.minecraft.setScreen(new WaypointEditScreen(this, waypoint, false));
 		}
 	}
 
@@ -1478,37 +1478,37 @@ public final class WaypointListScreen extends Screen {
 		if (waypoint != null) {
 			Waypoints.teleport(waypoint.dimension, waypoint.x, waypoint.y, waypoint.z);
 		}
-		this.minecraft.gui.setScreen(null);
+		this.minecraft.setScreen(null);
 	}
 
 	//? if >=1.21 {
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	/*@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// The buttons under the open list of folders don't light up as the mouse goes over them.
 		boolean overMenu = this.folderMenu != null && this.folderMenu.contains(mouseX, mouseY);
-		super.extractRenderState(graphics, overMenu ? -1 : mouseX, overMenu ? -1 : mouseY, a);
+		super.render(graphics, overMenu ? -1 : mouseX, overMenu ? -1 : mouseY, a);
 		this.drawSortCaret(graphics);
 		this.drawFolderMenu(graphics, mouseX, mouseY);
 	}
-	//?}
+	*///?}
 
 	/** The open list of folders, over everything drawn so far, text included. */
-	private void drawFolderMenu(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	private void drawFolderMenu(GuiGraphics graphics, int mouseX, int mouseY) {
 		FolderMenu menu = this.folderMenu;
 		if (menu == null) {
 			return;
 		}
 		//? if >=1.21.6 {
-		graphics.nextStratum();
+		/*graphics.nextStratum();
 		menu.draw(graphics, mouseX, mouseY);
-		//?} else {
-		/*graphics.flush();
+		*///?} else {
+		graphics.flush();
 		var pose = graphics.pose();
 		pose.pushPose();
 		pose.translate(0, 0, 400);
 		menu.draw(graphics, mouseX, mouseY);
 		pose.popPose();
-		*///?}
+		//?}
 	}
 
 	/** The open list of folders, or null. For tests. */
@@ -1569,7 +1569,7 @@ public final class WaypointListScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

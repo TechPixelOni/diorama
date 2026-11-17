@@ -33,7 +33,7 @@ final class FolderListTest {
 		List<Waypoint> added = context.computeOnClient(mc -> {
 			WaypointStore store = WaypointStore.get();
 			store.setSort(WaypointSort.DISTANCE, false);
-			String here = mc.level.dimension().identifier().toString();
+			String here = mc.level.dimension().location().toString();
 			List<Waypoint> made = new ArrayList<>();
 			int n = 0;
 			for (String name : new String[] {"Home", "Harbour", "Lighthouse"}) {
@@ -63,7 +63,7 @@ final class FolderListTest {
 		// A click on the folder's name opens every folder, with how many waypoints each holds.
 		clickName(context);
 		List<String> labels = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return menu == null ? List.<String>of() : menu.labels();
 		});
 		for (int f = 0; f < CUSTOM.length; f++) {
@@ -91,14 +91,14 @@ final class FolderListTest {
 		clickName(context);
 		context.takeScreenshot("folder-list-04-open-again");
 		DioramaClientTest.clickButton(context, "diorama.waypoint.new");
-		if (menu(context) != null || !(context.computeOnClient(mc -> mc.gui.screen()) instanceof WaypointListScreen)) {
+		if (menu(context) != null || !(context.computeOnClient(mc -> mc.screen) instanceof WaypointListScreen)) {
 			wrong.add("a click on New waypoint with the list of folders open did more than close the list");
 		}
 		// Escape closes the list and leaves the screen open; the next Escape closes the screen.
 		clickName(context);
 		context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 		context.waitTicks(2);
-		if (menu(context) != null || !(context.computeOnClient(mc -> mc.gui.screen()) instanceof WaypointListScreen)) {
+		if (menu(context) != null || !(context.computeOnClient(mc -> mc.screen) instanceof WaypointListScreen)) {
 			wrong.add("Escape with the list of folders open didn't just close the list");
 		}
 
@@ -118,12 +118,12 @@ final class FolderListTest {
 		pick(context, "Alex's base", wrong);
 
 		// The arrows step as before.
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), ">")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, ">")));
 		if (!folder(context).equals("Portals")) {
 			wrong.add("> from Alex's base showed " + folder(context));
 		}
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "<")));
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), "<")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "<")));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, "<")));
 		if (!folder(context).equals("Mines")) {
 			wrong.add("< twice from Portals showed " + folder(context));
 		}
@@ -140,23 +140,23 @@ final class FolderListTest {
 		context.waitTicks(5);
 		clickName(context);
 		int[] sizes = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return new int[] {menu.shown(), menu.labels().size()};
 		});
 		if (sizes[0] >= sizes[1]) {
 			wrong.add("49 folders all fit in the list (" + sizes[0] + " lines), so scrolling wasn't checked");
 		}
-		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderMenu().centreOf("Trip 40")) != null) {
+		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderMenu().centreOf("Trip 40")) != null) {
 			wrong.add("the last folder was in view before scrolling");
 		}
 		context.takeScreenshot("folder-list-05-many");
 		for (int i = 0; i < 60; i++) {
 			context.runOnClient(mc -> {
 				//? if >=1.21 {
-				mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, 0, -1);
-				//?} else {
-				/*mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, -1);
-				*///?}
+				/*mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, 0, -1);
+				*///?} else {
+				mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, -1);
+				//?}
 			});
 		}
 		context.waitTicks(2);
@@ -190,26 +190,26 @@ final class FolderListTest {
 	}
 
 	private static FolderMenu menu(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderMenu());
+		return context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderMenu());
 	}
 
 	private static String folder(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderName());
+		return context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderName());
 	}
 
 	private static List<String> shownNames(ClientGameTestContext context, List<Waypoint> added) {
-		return context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).shown().stream().filter(added::contains).map(w -> w.name).toList());
+		return context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).shown().stream().filter(added::contains).map(w -> w.name).toList());
 	}
 
 	/** Clicks the folder's name in the folder bar. */
 	private static void clickName(ClientGameTestContext context) {
-		int[] name = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderNameCentre());
+		int[] name = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderNameCentre());
 		DioramaClientTest.clickAtGui(context, name[0], name[1]);
 	}
 
 	/** Puts the mouse on a folder's line, for a picture with the line lit. */
 	private static void hover(ClientGameTestContext context, String name) {
-		float[] line = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderMenu().centreOf(name));
+		float[] line = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderMenu().centreOf(name));
 		if (line != null) {
 			double scale = context.computeOnClient(mc -> (double) mc.getWindow().getGuiScale());
 			context.getInput().setCursorPos(line[0] * scale, line[1] * scale);
@@ -220,7 +220,7 @@ final class FolderListTest {
 	/** Clicks a folder's line in the open list. */
 	private static void pick(ClientGameTestContext context, String name, List<String> wrong) {
 		float[] line = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return menu == null ? null : menu.centreOf(name);
 		});
 		if (line == null) {

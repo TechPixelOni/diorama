@@ -115,11 +115,11 @@ public final class XaeroImport {
 				return null;
 			}
 			//? if >=1.21.9 {
-			BlockPos spawn = mc.level.getRespawnData().pos();
-			//?} else {
-			/*// The spawn had a getter of its own.
+			/*BlockPos spawn = mc.level.getRespawnData().pos();
+			*///?} else {
+			// The spawn had a getter of its own.
 			BlockPos spawn = mc.level.getSharedSpawnPos();
-			*///?}
+			//?}
 			String spawnId = "mw" + (spawn.getX() >> 6) + "," + (spawn.getY() >> 6) + "," + (spawn.getZ() >> 6);
 			int height = mc.player != null ? mc.player.getBlockY() : 64;
 			return find(base, roots, server != null, spawnId, height);

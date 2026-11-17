@@ -164,7 +164,7 @@ final class WorldBorderTest {
 
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(3);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(2));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(2));
 		context.waitTicks(5);
 		context.takeScreenshot("border-settings");
 		context.setScreen(() -> null);
@@ -198,7 +198,7 @@ final class WorldBorderTest {
 		context.setScreen(MapScreen::new);
 		// Over the hint bar at the bottom, so no hover box covers the map.
 		context.getInput().setCursorPos(1500, 890);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(at.getX(), at.getZ()), Projection.v(at.getX(), at.getY(), at.getZ()), zoom, layer));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(at.getX(), at.getZ()), Projection.v(at.getX(), at.getY(), at.getZ()), zoom, layer));
 		DioramaClientTest.settle(context, 30);
 		return read(context.takeScreenshot(name));
 	}

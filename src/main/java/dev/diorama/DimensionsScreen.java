@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
@@ -46,7 +46,7 @@ public final class DimensionsScreen extends Screen {
 		ClientPacketListener connection = Minecraft.getInstance().getConnection();
 		Set<String> others = new TreeSet<>();
 		if (connection != null) {
-			connection.levels().forEach(level -> others.add(level.identifier().toString()));
+			connection.levels().forEach(level -> others.add(level.location().toString()));
 			// A world can lack one of Minecraft's three, and then it isn't offered.
 			dimensions.retainAll(others);
 		}
@@ -63,7 +63,7 @@ public final class DimensionsScreen extends Screen {
 		ClientPacketListener connection = Minecraft.getInstance().getConnection();
 		if (connection != null) {
 			connection.levels().forEach(level -> {
-				String id = level.identifier().toString();
+				String id = level.location().toString();
 				if (ServerRules.mapOffByServer(id)) {
 					set.add(id);
 				}
@@ -143,18 +143,18 @@ public final class DimensionsScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
-		graphics.centeredText(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
 	}
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

@@ -57,7 +57,7 @@ final class MapMouseKeysTest {
 		moveTo(context, spot(context));
 		context.getInput().pressMouse(RIGHT);
 		context.waitTicks(3);
-		check(wrong, context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map && map.menu() != null), "Right-click didn't open the menu");
+		check(wrong, context.computeOnClient(mc -> mc.screen instanceof MapScreen map && map.menu() != null), "Right-click didn't open the menu");
 		context.getInput().pressMouse(MOUSE_5);
 		context.waitTicks(5);
 		check(wrong, closed(context), "Mouse 5 with the menu open didn't close the map");
@@ -67,11 +67,11 @@ final class MapMouseKeysTest {
 		openMap(context);
 		context.getInput().pressMouse(MOUSE_4);
 		context.waitTicks(5);
-		check(wrong, context.computeOnClient(mc -> mc.gui.screen() instanceof WaypointListScreen), "Mouse 4 didn't open the waypoint list from the map");
+		check(wrong, context.computeOnClient(mc -> mc.screen instanceof WaypointListScreen), "Mouse 4 didn't open the waypoint list from the map");
 		context.setScreen(() -> null);
 
 		// A half-typed note survives the map closing under it.
-		String dimension = context.computeOnClient(mc -> mc.level.dimension().identifier().toString());
+		String dimension = context.computeOnClient(mc -> mc.level.dimension().location().toString());
 		openMap(context);
 		click(context, widget(context, MapScreen::drawButton));
 		click(context, widget(context, map -> map.drawMode().toolButtons().get(3)));
@@ -112,14 +112,14 @@ final class MapMouseKeysTest {
 		check(wrong, onMap(context), "A left click closed the map with Open map on the left button");
 		check(wrong, panned(context, LEFT, spot(context)), "The left button didn't pan with Open map on it");
 		click(context, widget(context, MapScreen::drawButton));
-		check(wrong, context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map && map.drawMode().active()), "The pencil didn't take a left click with Open map on the left button");
+		check(wrong, context.computeOnClient(mc -> mc.screen instanceof MapScreen map && map.drawMode().active()), "The pencil didn't take a left click with Open map on the left button");
 		context.setScreen(() -> null);
 		bind(context, RIGHT, MOUSE_4);
 		openMap(context);
 		moveTo(context, spot(context));
 		context.getInput().pressMouse(RIGHT);
 		context.waitTicks(3);
-		check(wrong, context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen map && map.menu() != null), "A right click didn't open the menu with Open map on the right button");
+		check(wrong, context.computeOnClient(mc -> mc.screen instanceof MapScreen map && map.menu() != null), "A right click didn't open the menu with Open map on the right button");
 		context.setScreen(() -> null);
 
 		context.runOnClient(mc -> {
@@ -152,11 +152,11 @@ final class MapMouseKeysTest {
 	}
 
 	private static boolean onMap(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> mc.gui.screen() instanceof MapScreen);
+		return context.computeOnClient(mc -> mc.screen instanceof MapScreen);
 	}
 
 	private static boolean closed(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> mc.gui.screen() == null);
+		return context.computeOnClient(mc -> mc.screen == null);
 	}
 
 	/** Dragging with a button moves the map's centre. */
@@ -174,19 +174,19 @@ final class MapMouseKeysTest {
 
 	private static double centre(ClientGameTestContext context) {
 		return context.computeOnClient(mc -> {
-			MapViewport.View view = mc.gui.screen() instanceof MapScreen map ? map.view() : null;
+			MapViewport.View view = mc.screen instanceof MapScreen map ? map.view() : null;
 			return view == null ? Double.NaN : view.centerU();
 		});
 	}
 
 	/** Open map beside the middle of the screen, in GUI pixels: away from the controls and the player. */
 	private static double[] spot(ClientGameTestContext context) {
-		return context.computeOnClient(mc -> new double[] {mc.gui.screen().width / 2.0 + 40, mc.gui.screen().height / 2.0});
+		return context.computeOnClient(mc -> new double[] {mc.screen.width / 2.0 + 40, mc.screen.height / 2.0});
 	}
 
 	private static double[] widget(ClientGameTestContext context, WidgetOf of) {
 		return context.computeOnClient(mc -> {
-			AbstractWidget widget = of.get((MapScreen) mc.gui.screen());
+			AbstractWidget widget = of.get((MapScreen) mc.screen);
 			return new double[] {widget.getX() + widget.getWidth() / 2.0, widget.getY() + widget.getHeight() / 2.0};
 		});
 	}

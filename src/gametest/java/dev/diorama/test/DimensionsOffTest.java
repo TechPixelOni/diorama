@@ -45,12 +45,12 @@ final class DimensionsOffTest {
 		// Settings, Look: the button, then the list with the Nether ticked by a click.
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(5);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(LOOK_TAB));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(LOOK_TAB));
 		context.waitTicks(5);
 		context.takeScreenshot("dimensions-off-2-settings-none");
 		DioramaClientTest.clickWidget(context, widget(context, "Map off in dimensions: None"));
 		context.waitTicks(5);
-		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof DimensionsScreen)) {
+		if (!context.computeOnClient(mc -> mc.screen instanceof DimensionsScreen)) {
 			throw new AssertionError("The Map off in dimensions button didn't open the list");
 		}
 		for (String name : new String[] {"Overworld", "Nether", "End"}) {
@@ -218,7 +218,7 @@ final class DimensionsOffTest {
 			int count = Integer.parseInt(before.substring(0, before.indexOf(':')));
 			context.getInput().pressKey(key);
 			context.waitTicks(3);
-			String screen = context.computeOnClient(mc -> mc.gui.screen() == null ? null : mc.gui.screen().getClass().getSimpleName());
+			String screen = context.computeOnClient(mc -> mc.screen == null ? null : mc.screen.getClass().getSimpleName());
 			if (screen != null) {
 				throw new AssertionError("A map key opened " + screen + " where the map is off");
 			}
@@ -238,7 +238,7 @@ final class DimensionsOffTest {
 			try {
 				java.lang.reflect.Method method = dev.diorama.MapScreen.class.getDeclaredMethod("dimensions");
 				method.setAccessible(true);
-				return (java.util.List<String>) method.invoke(mc.gui.screen());
+				return (java.util.List<String>) method.invoke(mc.screen);
 			} catch (ReflectiveOperationException e) {
 				throw new AssertionError(e);
 			}
@@ -252,9 +252,9 @@ final class DimensionsOffTest {
 				java.lang.reflect.Field field = dev.diorama.MapScreen.class.getDeclaredField("otherDimension");
 				field.setAccessible(true);
 				if (show != null) {
-					field.set(mc.gui.screen(), show);
+					field.set(mc.screen, show);
 				}
-				return (String) field.get(mc.gui.screen());
+				return (String) field.get(mc.screen);
 			} catch (ReflectiveOperationException e) {
 				throw new AssertionError(e);
 			}
@@ -265,7 +265,7 @@ final class DimensionsOffTest {
 	private static AbstractWidget widget(ClientGameTestContext context, String label) {
 		return context.computeOnClient(mc -> {
 			StringBuilder seen = new StringBuilder();
-			for (GuiEventListener child : mc.gui.screen().children()) {
+			for (GuiEventListener child : mc.screen.children()) {
 				if (child instanceof AbstractWidget widget && widget.visible) {
 					if (widget.getMessage().getString().equals(label)) {
 						return widget;
@@ -273,7 +273,7 @@ final class DimensionsOffTest {
 					seen.append(widget.getMessage().getString()).append(" | ");
 				}
 			}
-			throw new AssertionError("No \"" + label + "\" on " + mc.gui.screen().getClass().getSimpleName() + ": " + seen);
+			throw new AssertionError("No \"" + label + "\" on " + mc.screen.getClass().getSimpleName() + ": " + seen);
 		});
 	}
 

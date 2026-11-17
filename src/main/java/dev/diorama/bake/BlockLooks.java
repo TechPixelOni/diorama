@@ -1,6 +1,6 @@
 package dev.diorama.bake;
 
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.NaturalSpawner;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.diorama.Diorama;
@@ -19,23 +19,23 @@ import java.util.function.IntSupplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 //? if >=26.1 {
-import net.minecraft.client.color.block.BlockTintSource;
+/*import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-//?} else if >=1.21.5 {
+*///?} else if >=1.21.5 {
 /*import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 *///?} else {
-/*import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
-*///?}
+//?}
 //? if <26.1 && fabric {
-/*import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-*///?} else if <26.1 && >=1.21.9 {
+//?} else if <26.1 && >=1.21.9 {
 /*import net.minecraft.data.AtlasIds;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 *///?} else if <26.1 {
@@ -47,10 +47,10 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //? if >=26.1 {
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-//?} else {
-/*import net.minecraft.client.renderer.block.model.BakedQuad;
-*///?}
+/*import net.minecraft.client.resources.model.geometry.BakedQuad;
+*///?} else {
+import net.minecraft.client.renderer.block.model.BakedQuad;
+//?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -102,10 +102,10 @@ public final class BlockLooks extends Looks {
 	// What working a look out reads, all of it taken on the client thread as the table is made and
 	// used under MAKING only.
 	//? if >=26.1 {
-	private final BlockStateModelSet models;
-	//?} else {
-	/*private final BlockModelShaper models;
-	*///?}
+	/*private final BlockStateModelSet models;
+	*///?} else {
+	private final BlockModelShaper models;
+	//?}
 	private final BlockColors colors;
 	/** The block atlas as the table was made, for textures a reload freed (see {@link #currentSprite}). */
 	private final @Nullable TextureAtlas atlas;
@@ -114,8 +114,8 @@ public final class BlockLooks extends Looks {
 	private final TintProbe probe = new TintProbe();
 	private final Map<Fluid, FluidLook> fluidLooks = new IdentityHashMap<>();
 	//? if >=26.1 {
-	private final List<BlockStateModelPart> parts = new ArrayList<>();
-	//?} else if >=1.21.5 {
+	/*private final List<BlockStateModelPart> parts = new ArrayList<>();
+	*///?} else if >=1.21.5 {
 	/*private final List<BlockModelPart> parts = new ArrayList<>();
 	*///?}
 	private boolean warnedModel;
@@ -131,10 +131,10 @@ public final class BlockLooks extends Looks {
 	private long makingNanos;
 
 	//? if >=26.1 {
-	private BlockLooks(int registrySize, int size, BlockStateModelSet models, BlockColors colors, @Nullable TextureAtlas atlas) {
-	//?} else {
-	/*private BlockLooks(int registrySize, int size, BlockModelShaper models, BlockColors colors, @Nullable TextureAtlas atlas) {
-	*///?}
+	/*private BlockLooks(int registrySize, int size, BlockStateModelSet models, BlockColors colors, @Nullable TextureAtlas atlas) {
+	*///?} else {
+	private BlockLooks(int registrySize, int size, BlockModelShaper models, BlockColors colors, @Nullable TextureAtlas atlas) {
+	//?}
 		super(registrySize, size);
 		this.models = models;
 		this.colors = colors;
@@ -174,10 +174,10 @@ public final class BlockLooks extends Looks {
 			return true;
 		}
 		//? if >=26.1 {
-		return builtFrom != Minecraft.getInstance().getModelManager().getBlockStateModelSet();
-		//?} else {
-		/*return builtFrom != Minecraft.getInstance().getModelManager().getMissingBlockStateModel();
-		*///?}
+		/*return builtFrom != Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+		*///?} else {
+		return builtFrom != Minecraft.getInstance().getModelManager().getMissingModel();
+		//?}
 	}
 
 	/**
@@ -194,11 +194,11 @@ public final class BlockLooks extends Looks {
 		current = looks;
 		builds++;
 		//? if >=26.1 {
-		builtFrom = looks.models;
-		//?} else {
-		/*// The model shaper outlives resource reloads; the missing model is baked anew with each.
-		builtFrom = Minecraft.getInstance().getModelManager().getMissingBlockStateModel();
-		*///?}
+		/*builtFrom = looks.models;
+		*///?} else {
+		// The model shaper outlives resource reloads; the missing model is baked anew with each.
+		builtFrom = Minecraft.getInstance().getModelManager().getMissingModel();
+		//?}
 		Diorama.LOGGER.info("Block color table for {} states set up in {} ms; each state's colors are worked out when the map first meets it",
 			looks.registrySize, (System.nanoTime() - start) / 1_000_000);
 		return looks;
@@ -208,19 +208,19 @@ public final class BlockLooks extends Looks {
 	public static BlockLooks detached() {
 		Minecraft mc = Minecraft.getInstance();
 		//? if >=26.1 {
-		BlockStateModelSet models = mc.getModelManager().getBlockStateModelSet();
-		//?} else {
-		/*BlockModelShaper models = mc.getModelManager().getBlockModelShaper();
-		*///?}
+		/*BlockStateModelSet models = mc.getModelManager().getBlockStateModelSet();
+		*///?} else {
+		BlockModelShaper models = mc.getModelManager().getBlockModelShaper();
+		//?}
 		int size = Block.BLOCK_STATE_REGISTRY.size();
 		TextureAtlas atlas = null;
 		try {
 			// Found from a texture of a block every version has, so no version's atlas id is needed.
 			//? if >=26.1 {
-			TextureAtlasSprite stone = particle(models.get(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState()));
-			//?} else {
-			/*TextureAtlasSprite stone = particle(models.getBlockModel(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState()));
-			*///?}
+			/*TextureAtlasSprite stone = particle(models.get(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState()));
+			*///?} else {
+			TextureAtlasSprite stone = particle(models.getBlockModel(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState()));
+			//?}
 			if (stone != null && mc.getTextureManager().getTexture(stone.atlasLocation()) instanceof TextureAtlas blocks) {
 				atlas = blocks;
 			}
@@ -237,11 +237,11 @@ public final class BlockLooks extends Looks {
 				BiomeColors.GRASS_COLOR_RESOLVER,
 				BiomeColors.FOLIAGE_COLOR_RESOLVER,
 				//? if >=1.21.5 {
-				BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER,
-				//?} else {
-				/*// Dry foliage (leaf litter) came in 1.21.5; nothing reads this slot before.
+				/*BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER,
+				*///?} else {
+				// Dry foliage (leaf litter) came in 1.21.5; nothing reads this slot before.
 				BiomeColors.FOLIAGE_COLOR_RESOLVER,
-				*///?}
+				//?}
 				waterResolver(looks.probe)
 			);
 		}
@@ -274,7 +274,7 @@ public final class BlockLooks extends Looks {
 			// While a reload is swapping the models and textures, a look takes neither, and the table
 			// is made again once the reload is over. (Textures it frees are kept from a look being
 			// made by closing, which see.)
-			boolean reloading = Minecraft.getInstance().gui.overlay() != null;
+			boolean reloading = Minecraft.getInstance().getOverlay() != null;
 			this.withModels = !reloading;
 			byte kind = state == null ? AIR : this.work(id, state);
 			if (reloading) {
@@ -320,12 +320,12 @@ public final class BlockLooks extends Looks {
 	/** The state's colours from its model's textures; returns its kind, which they can change. */
 	private byte modelColours(int id, BlockState state, byte kind) {
 		//? if >=26.1 {
-		BlockStateModel model = this.models.get(state);
-		//?} else if >=1.21.5 {
+		/*BlockStateModel model = this.models.get(state);
+		*///?} else if >=1.21.5 {
 		/*BlockStateModel model = this.models.getBlockModel(state);
 		*///?} else {
-		/*BakedModel model = this.models.getBlockModel(state);
-		*///?}
+		BakedModel model = this.models.getBlockModel(state);
+		//?}
 		FaceColor topFace = new FaceColor();
 		FaceColor sideFace = new FaceColor();
 		// A mod's model can fail when asked for its faces without its block entity's data, as
@@ -334,19 +334,19 @@ public final class BlockLooks extends Looks {
 		// crashing the game.
 		try {
 			//? if >=1.21.5 {
-			this.parts.clear();
+			/*this.parts.clear();
 			this.random.setSeed(42L);
 			model.collectParts(this.random, this.parts);
-			//?} else {
-			/*List<LegacyPart> parts = List.of(new LegacyPart(model, state, this.random));
-			*///?}
+			*///?} else {
+			List<LegacyPart> parts = List.of(new LegacyPart(model, state, this.random));
+			//?}
 			//? if >=26.1 {
-			for (BlockStateModelPart part : this.parts) {
-			//?} else if >=1.21.5 {
+			/*for (BlockStateModelPart part : this.parts) {
+			*///?} else if >=1.21.5 {
 			/*for (BlockModelPart part : this.parts) {
 			*///?} else {
-			/*for (LegacyPart part : parts) {
-			*///?}
+			for (LegacyPart part : parts) {
+			//?}
 				this.accumulate(topFace, part.getQuads(Direction.UP));
 				this.accumulate(sideFace, part.getQuads(Direction.SOUTH));
 				if (sideFace.isEmpty()) {
@@ -404,18 +404,18 @@ public final class BlockLooks extends Looks {
 	}
 
 	//? if >=26.1 {
-	private static @Nullable TextureAtlasSprite particle(BlockStateModel model) {
-	//?} else if >=1.21.5 {
+	/*private static @Nullable TextureAtlasSprite particle(BlockStateModel model) {
+	*///?} else if >=1.21.5 {
 	/*private static @Nullable TextureAtlasSprite particle(BlockStateModel model) {
 	*///?} else {
-	/*private static @Nullable TextureAtlasSprite particle(BakedModel model) {
-	*///?}
+	private static @Nullable TextureAtlasSprite particle(BakedModel model) {
+	//?}
 		try {
 			//? if >=26.1 {
-			return model.particleMaterial().sprite();
-			//?} else if >=1.21.5 || fabric {
-			/*return model.particleIcon();
-			*///?} else {
+			/*return model.particleMaterial().sprite();
+			*///?} else if >=1.21.5 || fabric {
+			return model.getParticleIcon();
+			//?} else {
 			/*// Asked the loader's way, as the faces are (legacyQuads).
 			return model.getParticleIcon(net.neoforged.neoforge.client.model.data.ModelData.EMPTY);
 			*///?}
@@ -425,7 +425,7 @@ public final class BlockLooks extends Looks {
 	}
 
 	//? if <1.21.5 {
-	/*// Before 1.21.5 a block's model gave its quads itself, for one random seed, rather than
+	// Before 1.21.5 a block's model gave its quads itself, for one random seed, rather than
 	// through parts. This stands in for the one part, asked the same way collectParts would.
 	private record LegacyPart(BakedModel model, BlockState state, RandomSource random) {
 		List<BakedQuad> getQuads(@Nullable Direction direction) {
@@ -434,13 +434,13 @@ public final class BlockLooks extends Looks {
 		}
 	}
 
-	*///?}
+	//?}
 	//? if <1.21.5 && fabric {
-	/*private static List<BakedQuad> legacyQuads(BakedModel model, BlockState state, @Nullable Direction direction, RandomSource random) {
+	private static List<BakedQuad> legacyQuads(BakedModel model, BlockState state, @Nullable Direction direction, RandomSource random) {
 		return model.getQuads(state, direction, random);
 	}
 
-	*///?} else if <1.21.5 {
+	//?} else if <1.21.5 {
 	/*// NeoForge and Forge draw a block's faces through their own form of the call, given the block
 	// entity's model data and a render layer, and a mod's model may throw when asked the vanilla way
 	// (Immortalers Delight's spike trap does). Asked as Xaero's maps ask: no data, every layer.
@@ -458,11 +458,11 @@ public final class BlockLooks extends Looks {
 		TextureAtlasSprite sprite;
 		try {
 			//? if >=26.1 {
-			sprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid).stillMaterial().sprite();
-			//?} else if fabric {
-			/*FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid.getType());
+			/*sprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid).stillMaterial().sprite();
+			*///?} else if fabric {
+			FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid.getType());
 			sprite = handler == null ? null : handler.getFluidSprites(null, null, fluid)[0];
-			*///?} else if >=1.21.9 {
+			//?} else if >=1.21.9 {
 			/*sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS)
 				.getSprite(IClientFluidTypeExtensions.of(fluid).getStillTexture());
 			*///?} else {
@@ -520,11 +520,11 @@ public final class BlockLooks extends Looks {
 	/** Asks a block's tint code how one tint layer is coloured. */
 	private static Tint blockTint(BlockColors colors, BlockState state, int index, TintProbe probe) {
 		//? if >=26.1 {
-		BlockTintSource source = colors.getTintSource(state, index);
+		/*BlockTintSource source = colors.getTintSource(state, index);
 		return source == null ? Tint.NONE : Tint.ask(probe, () -> source.colorInWorld(state, probe, BlockPos.ZERO), () -> source.color(state));
-		//?} else {
-		/*return Tint.ask(probe, () -> colors.getColor(state, probe, BlockPos.ZERO, index), () -> colors.getColor(state, null, null, index));
-		*///?}
+		*///?} else {
+		return Tint.ask(probe, () -> colors.getColor(state, probe, BlockPos.ZERO, index), () -> colors.getColor(state, null, null, index));
+		//?}
 	}
 
 	/** The biome colour water's tint code asks for, the game's own if it asks for none. */
@@ -539,14 +539,14 @@ public final class BlockLooks extends Looks {
 	private static Tint fluidTint(FluidState fluid, TintProbe probe) {
 		try {
 			//? if >=26.1 {
-			BlockTintSource source = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid).tintSource();
+			/*BlockTintSource source = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid).tintSource();
 			BlockState block = fluid.createLegacyBlock();
 			return source == null ? Tint.NONE : Tint.ask(probe, () -> source.colorInWorld(block, probe, BlockPos.ZERO), () -> source.color(block));
-			//?} else if fabric {
-			/*FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid.getType());
+			*///?} else if fabric {
+			FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid.getType());
 			return handler == null ? Tint.NONE
 				: Tint.ask(probe, () -> handler.getFluidColor(probe, BlockPos.ZERO, fluid), () -> handler.getFluidColor(null, null, fluid));
-			*///?} else {
+			//?} else {
 			/*IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(fluid);
 			return Tint.ask(probe, () -> extensions.getTintColor(fluid, probe, BlockPos.ZERO), extensions::getTintColor);
 			*///?}
@@ -558,12 +558,12 @@ public final class BlockLooks extends Looks {
 	private void accumulate(FaceColor face, List<BakedQuad> quads) {
 		for (BakedQuad quad : quads) {
 			//? if >=26.1 {
-			TextureAtlasSprite sprite = quad.materialInfo().sprite();
+			/*TextureAtlasSprite sprite = quad.materialInfo().sprite();
 			int tintIndex = quad.materialInfo().tintIndex();
-			//?} else {
-			/*TextureAtlasSprite sprite = quad.sprite();
-			int tintIndex = quad.tintIndex();
-			*///?}
+			*///?} else {
+			TextureAtlasSprite sprite = quad.getSprite();
+			int tintIndex = quad.getTintIndex();
+			//?}
 			if (!isMissing(sprite)) {
 				face.add(this.spriteAverage(sprite), tintIndex);
 			}
@@ -573,17 +573,17 @@ public final class BlockLooks extends Looks {
 	private void accumulateLoose(FaceColor top, FaceColor side, List<BakedQuad> quads) {
 		for (BakedQuad quad : quads) {
 			//? if >=26.1 {
-			TextureAtlasSprite sprite = quad.materialInfo().sprite();
+			/*TextureAtlasSprite sprite = quad.materialInfo().sprite();
 			int tintIndex = quad.materialInfo().tintIndex();
-			//?} else {
-			/*TextureAtlasSprite sprite = quad.sprite();
-			int tintIndex = quad.tintIndex();
-			*///?}
+			*///?} else {
+			TextureAtlasSprite sprite = quad.getSprite();
+			int tintIndex = quad.getTintIndex();
+			//?}
 			if (isMissing(sprite)) {
 				continue;
 			}
 			float[] avg = this.spriteAverage(sprite);
-			if (quad.direction() == Direction.UP || quad.direction() == Direction.DOWN) {
+			if (quad.getDirection() == Direction.UP || quad.getDirection() == Direction.DOWN) {
 				top.add(avg, tintIndex);
 			} else {
 				top.add(avg, tintIndex);
@@ -603,19 +603,19 @@ public final class BlockLooks extends Looks {
 		Field field;
 		try {
 			//? if >=26.1 || neoforge {
-			field = SpriteContents.class.getDeclaredField("originalImage");
-			//?} else if forge {
+			/*field = SpriteContents.class.getDeclaredField("originalImage");
+			*///?} else if forge {
 			/*// Forge runs the game with SRG names outside the dev environment, so look the field up by
 			// its SRG name, mapped to whatever names this run uses.
 			field = SpriteContents.class.getDeclaredField(net.minecraftforge.fml.util.ObfuscationReflectionHelper.remapName(
 				cpw.mods.modlauncher.api.INameMappingService.Domain.FIELD, "f_243904_"));
 			*///?} else {
-			/*// Fabric runs the game with intermediary names outside the dev environment (NeoForge
+			// Fabric runs the game with intermediary names outside the dev environment (NeoForge
 			// doesn't), so look the field up by its intermediary name (SpriteContents.originalImage, a
 			// NativeImage) mapped to whatever names this run uses.
 			field = SpriteContents.class.getDeclaredField(FabricLoader.getInstance().getMappingResolver()
 				.mapFieldName("intermediary", "net.minecraft.class_7764", "field_40539", "Lnet/minecraft/class_1011;"));
-			*///?}
+			//?}
 			field.setAccessible(true);
 		} catch (ReflectiveOperationException e) {
 			field = null;
@@ -721,12 +721,12 @@ public final class BlockLooks extends Looks {
 			for (int y = 0; y < h; y++) {
 				for (int x = 0; x < w; x++) {
 					//? if >=1.21.2 {
-					int argb = image.getPixel(x, y);
-					//?} else {
-					/*// Only the ABGR getter existed; swap red and blue.
+					/*int argb = image.getPixel(x, y);
+					*///?} else {
+					// Only the ABGR getter existed; swap red and blue.
 					int abgr = image.getPixelRGBA(x, y);
 					int argb = (abgr & 0xFF00FF00) | (abgr >> 16 & 0xFF) | (abgr & 0xFF) << 16;
-					*///?}
+					//?}
 					int a = argb >>> 24;
 					if (a < 26) {
 						continue;

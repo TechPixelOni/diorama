@@ -22,7 +22,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.jspecify.annotations.Nullable;
@@ -167,9 +167,9 @@ public final class ChunkSnapshot {
 		this.facing = Facing.NORTH;
 		this.base = null;
 		this.views = new ChunkSnapshot[4];
-		this.chunkX = chunk.getPos().x();
-		this.chunkZ = chunk.getPos().z();
-		this.minSectionY = chunk.getMinSectionY();
+		this.chunkX = chunk.getPos().x;
+		this.chunkZ = chunk.getPos().z;
+		this.minSectionY = chunk.getMinSection();
 		LevelChunkSection[] sections = chunk.getSections();
 		this.states = new PalettedContainer[sections.length];
 		this.uniform = new BlockState[sections.length];
@@ -227,8 +227,8 @@ public final class ChunkSnapshot {
 				this.surface[(z << 4) | x] = surface;
 			}
 		}
-		this.maxY = top <= chunk.getMinY() ? Integer.MIN_VALUE : top;
-		this.floorY = floorY(floor, chunk.getMinY());
+		this.maxY = top <= chunk.getMinBuildHeight() ? Integer.MIN_VALUE : top;
+		this.floorY = floorY(floor, chunk.getMinBuildHeight());
 		this.copycats = Copycats.INSTALLED ? copycats(chunk, sections.length) : null;
 	}
 
@@ -242,9 +242,9 @@ public final class ChunkSnapshot {
 		this.facing = Facing.NORTH;
 		this.base = null;
 		this.views = new ChunkSnapshot[4];
-		this.chunkX = chunk.getPos().x();
-		this.chunkZ = chunk.getPos().z();
-		this.minSectionY = chunk.getMinSectionY();
+		this.chunkX = chunk.getPos().x;
+		this.chunkZ = chunk.getPos().z;
+		this.minSectionY = chunk.getMinSection();
 		LevelChunkSection[] sections = chunk.getSections();
 		this.states = new PalettedContainer[sections.length];
 		this.uniform = new BlockState[sections.length];
@@ -275,8 +275,8 @@ public final class ChunkSnapshot {
 				this.surface[(z << 4) | x] = surface;
 			}
 		}
-		this.maxY = top <= chunk.getMinY() ? Integer.MIN_VALUE : top;
-		this.floorY = chunk.getMinY();
+		this.maxY = top <= chunk.getMinBuildHeight() ? Integer.MIN_VALUE : top;
+		this.floorY = chunk.getMinBuildHeight();
 		this.copycats = null;
 	}
 
@@ -285,7 +285,7 @@ public final class ChunkSnapshot {
 	 * constructor. Call on the server thread.
 	 */
 	public static ChunkSnapshot fromServer(ChunkAccess chunk, ClientLevel level) {
-		return new ChunkSnapshot(chunk, level, chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL));
+		return new ChunkSnapshot(chunk, level, chunk.getStatus().isOrAfter(ChunkStatus.FULL));
 	}
 
 	/**
@@ -301,7 +301,7 @@ public final class ChunkSnapshot {
 		this.views = new ChunkSnapshot[4];
 		this.chunkX = chunk.chunkX();
 		this.chunkZ = chunk.chunkZ();
-		this.minSectionY = level.getMinSectionY();
+		this.minSectionY = level.getMinSection();
 		int count = chunk.states().length;
 		this.states = new PalettedContainer[count];
 		this.uniform = new BlockState[count];
@@ -336,8 +336,8 @@ public final class ChunkSnapshot {
 			floor = Math.min(floor, chunk.solid()[i]);
 			this.surface[i] = chunk.surface()[i];
 		}
-		this.maxY = top <= level.getMinY() ? Integer.MIN_VALUE : top;
-		this.floorY = floorY(floor, level.getMinY());
+		this.maxY = top <= level.getMinBuildHeight() ? Integer.MIN_VALUE : top;
+		this.floorY = floorY(floor, level.getMinBuildHeight());
 		this.copycats = null;
 	}
 
@@ -373,7 +373,7 @@ public final class ChunkSnapshot {
 				continue;
 			}
 			BlockPos pos = entity.getBlockPos();
-			int section = (pos.getY() >> 4) - chunk.getMinSectionY();
+			int section = (pos.getY() >> 4) - chunk.getMinSection();
 			if (section < 0 || section >= sectionCount) {
 				continue;
 			}

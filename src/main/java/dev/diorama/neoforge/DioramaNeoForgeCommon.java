@@ -18,8 +18,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 //? if <1.21.6 {
-/*import net.minecraft.network.protocol.PacketFlow;
-*///?}
+import net.minecraft.network.protocol.PacketFlow;
+//?}
 
 /**
  * Diorama's entrypoint on both sides on NeoForge: the share channel, and the server half on a
@@ -53,21 +53,21 @@ public final class DioramaNeoForgeCommon {
 	private static void register(RegisterPayloadHandlersEvent event) {
 		PayloadRegistrar registrar = event.registrar("1").optional();
 		//? if >=1.21.6 {
-		registrar.playBidirectional(ShareProtocol.TYPE, ShareProtocol.CODEC,
+		/*registrar.playBidirectional(ShareProtocol.TYPE, ShareProtocol.CODEC,
 			(packet, context) -> {
 				if (context.player() instanceof ServerPlayer player) {
 					ShareServer.receive(player, packet.data());
 				}
 			},
 			(packet, context) -> ShareProtocol.toClient(packet.data()));
-		//?} else {
-		/*registrar.playBidirectional(ShareProtocol.TYPE, ShareProtocol.CODEC, (packet, context) -> {
+		*///?} else {
+		registrar.playBidirectional(ShareProtocol.TYPE, ShareProtocol.CODEC, (packet, context) -> {
 			if (context.flow() == PacketFlow.CLIENTBOUND) {
 				ShareProtocol.toClient(packet.data());
 			} else if (context.player() instanceof ServerPlayer player) {
 				ShareServer.receive(player, packet.data());
 			}
 		});
-		*///?}
+		//?}
 	}
 }

@@ -124,7 +124,7 @@ final class RadarCategoriesTest {
 		context.runOnClient(mc -> Settings.get().minimapShape = Settings.Shape.SQUARE);
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(mc.player.getX(), dev.diorama.Projection.v(mc.player.getY(), mc.player.getZ()), 6.0, TileKey.SURFACE);
 			}
 		});
@@ -134,7 +134,7 @@ final class RadarCategoriesTest {
 		context.takeScreenshot("radar-categories-09-map-own-kept");
 		Set<String> shown = context.computeOnClient(mc -> {
 			Set<String> types = new TreeSet<>();
-			for (Radar.Blip blip : ((MapScreen) mc.gui.screen()).blips()) {
+			for (Radar.Blip blip : ((MapScreen) mc.screen).blips()) {
 				// Only the mobs summoned here: the world has its own fish and drops.
 				if (SUMMONED.contains(EntityType.getKey(blip.entity().getType()).getPath())) {
 					types.add(EntityType.getKey(blip.entity().getType()).getPath() + (blip.named() ? "+name" : ""));
@@ -149,7 +149,7 @@ final class RadarCategoriesTest {
 		float[] sizes = context.computeOnClient(mc -> {
 			float cow = 0;
 			float husk = 0;
-			for (Radar.Blip blip : ((MapScreen) mc.gui.screen()).blips()) {
+			for (Radar.Blip blip : ((MapScreen) mc.screen).blips()) {
 				String type = EntityType.getKey(blip.entity().getType()).getPath();
 				if (type.equals("cow")) {
 					cow = blip.size();
@@ -171,7 +171,7 @@ final class RadarCategoriesTest {
 		context.takeScreenshot("radar-categories-10-map-own-hidden");
 		shown = context.computeOnClient(mc -> {
 			Set<String> types = new TreeSet<>();
-			for (Radar.Blip blip : ((MapScreen) mc.gui.screen()).blips()) {
+			for (Radar.Blip blip : ((MapScreen) mc.screen).blips()) {
 				if (SUMMONED.contains(EntityType.getKey(blip.entity().getType()).getPath())) {
 					types.add(EntityType.getKey(blip.entity().getType()).getPath());
 				}
@@ -281,7 +281,7 @@ final class RadarCategoriesTest {
 		context.takeScreenshot("radar-categories-cobblemon-01-minimap-all");
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(mc.player.getX(), dev.diorama.Projection.v(mc.player.getY(), mc.player.getZ()), 6.0, TileKey.SURFACE);
 			}
 		});
@@ -300,7 +300,7 @@ final class RadarCategoriesTest {
 		context.takeScreenshot("radar-categories-cobblemon-03-farm-animals-hidden");
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(mc.player.getX(), dev.diorama.Projection.v(mc.player.getY(), mc.player.getZ()), 6.0, TileKey.SURFACE);
 			}
 		});
@@ -310,7 +310,7 @@ final class RadarCategoriesTest {
 		context.takeScreenshot("radar-categories-cobblemon-04-map");
 		List<String> shown = context.computeOnClient(mc -> {
 			List<String> types = new java.util.ArrayList<>();
-			for (Radar.Blip blip : ((MapScreen) mc.gui.screen()).blips()) {
+			for (Radar.Blip blip : ((MapScreen) mc.screen).blips()) {
 				if (blip.kind() != Radar.Kind.ITEM) {
 					types.add(EntityType.getKey(blip.entity().getType()).toString());
 				}
@@ -332,7 +332,7 @@ final class RadarCategoriesTest {
 
 	private static void expectScreen(ClientGameTestContext context, Class<?> type) {
 		context.waitTicks(3);
-		String open = context.computeOnClient(mc -> mc.gui.screen() == null ? "no screen" : mc.gui.screen().getClass().getSimpleName());
+		String open = context.computeOnClient(mc -> mc.screen == null ? "no screen" : mc.screen.getClass().getSimpleName());
 		if (!open.equals(type.getSimpleName())) {
 			throw new AssertionError("Expected " + type.getSimpleName() + " to be open, not " + open);
 		}

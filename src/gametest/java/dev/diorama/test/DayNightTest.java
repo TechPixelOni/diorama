@@ -255,12 +255,12 @@ final class DayNightTest {
 
 	private static void lookAt(ClientGameTestContext context) {
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 2.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 2.0, TileKey.SURFACE));
 		DioramaClientTest.settle(context, 40);
 	}
 
 	private static void zoomedOut(ClientGameTestContext context) {
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 0.5, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 0.5, TileKey.SURFACE));
 		DioramaClientTest.settle(context, 20);
 	}
 

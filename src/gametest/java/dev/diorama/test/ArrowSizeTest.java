@@ -85,7 +85,7 @@ final class ArrowSizeTest {
 		context.runOnClient(mc -> Settings.get().arrowSize = 100);
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(5);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(LOOK_TAB));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(LOOK_TAB));
 		context.waitTicks(5);
 		context.getInput().setCursorPos(0, 0);
 		context.waitTicks(3);
@@ -101,7 +101,7 @@ final class ArrowSizeTest {
 		context.waitTicks(10);
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(5);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(LOOK_TAB));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(LOOK_TAB));
 		context.waitTicks(5);
 		context.getInput().setCursorPos(0, 0);
 		context.waitTicks(3);

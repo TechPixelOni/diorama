@@ -76,9 +76,9 @@ final class TileFilterTest {
 		for (Case check : CASES) {
 			DioramaClientTest.setGuiScale(context, check.guiScale);
 			context.setScreen(MapScreen::new);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), check.zoom, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), check.zoom, TileKey.SURFACE));
 			DioramaClientTest.settle(context, 40);
-			MapViewport.View view = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).view());
+			MapViewport.View view = context.computeOnClient(mc -> ((MapScreen) mc.screen).view());
 			int lod = context.computeOnClient(mc -> MapViewport.lodFor(MapSession.get().map(), view));
 			if (lod != check.lod) {
 				throw new AssertionError(check.name + " draws overview level " + lod + ", not " + check.lod);

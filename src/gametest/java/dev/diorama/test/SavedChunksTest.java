@@ -83,7 +83,7 @@ final class SavedChunksTest {
 		}
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(X + 24, Projection.v(ground, Z + 24), 2, TileKey.SURFACE);
 			}
 		});
@@ -93,21 +93,21 @@ final class SavedChunksTest {
 		// chunk it hasn't loaded, and its stand-in for one is all Plains (#262).
 		hoverMiddle(context);
 		BlockPos far = new BlockPos(X + 24, ground, Z + 24);
-		context.waitFor(mc -> ((MapScreen) mc.gui.screen()).biomeAt(far) != null, 200);
+		context.waitFor(mc -> ((MapScreen) mc.screen).biomeAt(far) != null, 200);
 		context.waitTicks(5);
 		context.takeScreenshot("saved-chunks-far-tooltip");
 		sameBiomeAsTheServer(context, world, far, "over chunks the client hasn't loaded");
-		java.util.List<String> tooltip = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).tooltipText());
+		java.util.List<String> tooltip = context.computeOnClient(mc -> ((MapScreen) mc.screen).tooltipText());
 		if (tooltip.size() != 2 || !tooltip.get(1).contains(" · ")) {
 			throw new AssertionError("The tooltip over chunks the client hasn't loaded should have a biome and a distance on its second line: " + tooltip);
 		}
 		// Where the player is, it does.
 		BlockPos near = context.computeOnClient(mc -> mc.player.blockPosition().offset(8, 0, 0));
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(near.getX(), Projection.v(near.getY(), near.getZ()), 2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(near.getX(), Projection.v(near.getY(), near.getZ()), 2, TileKey.SURFACE));
 		hoverMiddle(context);
 		context.takeScreenshot("saved-chunks-near-tooltip");
 		context.runOnClient(mc -> {
-			if (((MapScreen) mc.gui.screen()).biomeAt(near) == null) {
+			if (((MapScreen) mc.screen).biomeAt(near) == null) {
 				throw new AssertionError("The tooltip next to the player names no biome");
 			}
 		});
@@ -120,14 +120,14 @@ final class SavedChunksTest {
 			while (mc.level.getChunkSource().hasChunk(chunkX + 1, chunkZ)) {
 				chunkX++;
 			}
-			if (((MapScreen) mc.gui.screen()).biomeAt(new BlockPos(chunkX * 16 + 8, near.getY(), chunkZ * 16 + 8)) == null) {
+			if (((MapScreen) mc.screen).biomeAt(new BlockPos(chunkX * 16 + 8, near.getY(), chunkZ * 16 + 8)) == null) {
 				throw new AssertionError("The tooltip names no biome in the middle of the loaded chunk " + chunkX + "," + chunkZ);
 			}
 			return new BlockPos(chunkX * 16 + 15, near.getY(), chunkZ * 16 + 8);
 		});
 		// The server may not have written the chunk beyond the edge yet.
 		save(context, world);
-		context.waitFor(mc -> ((MapScreen) mc.gui.screen()).biomeAt(edge) != null, 400);
+		context.waitFor(mc -> ((MapScreen) mc.screen).biomeAt(edge) != null, 400);
 		sameBiomeAsTheServer(context, world, edge, "at the edge of the loaded chunks");
 		context.getInput().setCursorPos(0, 0);
 		context.setScreen(() -> null);
@@ -136,9 +136,9 @@ final class SavedChunksTest {
 
 	/** The map names the biome at {@code pos} that the server has there. */
 	private static void sameBiomeAsTheServer(ClientGameTestContext context, TestSingleplayerContext world, BlockPos pos, String where) {
-		String key = world.getServer().computeOnServer(server -> server.overworld().getBiome(pos).unwrapKey().orElseThrow().identifier().toLanguageKey("biome"));
+		String key = world.getServer().computeOnServer(server -> server.overworld().getBiome(pos).unwrapKey().orElseThrow().location().toLanguageKey("biome"));
 		context.runOnClient(mc -> {
-			Component biome = ((MapScreen) mc.gui.screen()).biomeAt(pos);
+			Component biome = ((MapScreen) mc.screen).biomeAt(pos);
 			String expected = Component.translatable(key).getString();
 			if (biome == null || !biome.getString().equals(expected)) {
 				throw new AssertionError("The tooltip " + where + " names " + (biome == null ? "no biome" : biome.getString()) + " at " + pos + ", where the server has " + expected);
@@ -150,7 +150,7 @@ final class SavedChunksTest {
 	private static void hoverMiddle(ClientGameTestContext context) {
 		double[] at = context.computeOnClient(mc -> {
 			double scale = mc.getWindow().getGuiScale();
-			return new double[] {mc.gui.screen().width / 2.0 * scale, mc.gui.screen().height / 2.0 * scale};
+			return new double[] {mc.screen.width / 2.0 * scale, mc.screen.height / 2.0 * scale};
 		});
 		context.getInput().setCursorPos(at[0], at[1]);
 		context.waitTicks(20);
@@ -242,13 +242,13 @@ final class SavedChunksTest {
 			}, 3600);
 		}
 		//? if >=1.21.5 {
-		// Up to 1.21.4 reopening a world writes the far chunks again, each with a new save time, and a
+		/*// Up to 1.21.4 reopening a world writes the far chunks again, each with a new save time, and a
 		// chunk the save changed is drawn again, as it should be.
 		TileKey tile = tileAt(X + 24, ground, Z + 24);
 		if (context.computeOnClient(mc -> MapSession.get().savedChunks().drew(tile))) {
 			throw new AssertionError("Reopening the world drew tile " + tile + " from the save again");
 		}
-		//?}
+		*///?}
 	}
 
 	private static int drawn(ClientGameTestContext context) {

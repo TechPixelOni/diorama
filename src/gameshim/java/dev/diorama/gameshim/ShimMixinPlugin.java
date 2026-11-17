@@ -34,14 +34,14 @@ public final class ShimMixinPlugin implements IMixinConfigPlugin {
 	@Override
 	public List<String> getMixins() {
 		//? if >=26.3 {
-		return List.of("GlPresentMixin", "VulkanPresentMixin", "SDLEventHandlerMixin");
-		//?} else if >=26.2 {
+		/*return List.of("GlPresentMixin", "VulkanPresentMixin", "SDLEventHandlerMixin");
+		*///?} else if >=26.2 {
 		/*return List.of("GlPresentMixin", "VulkanPresentMixin");
 		*///?} else if >=1.21.5 {
 		/*return List.of("GlPresentMixin");
 		*///?} else {
-		/*return null;
-		*///?}
+		return null;
+		//?}
 	}
 
 	@Override

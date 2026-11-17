@@ -22,10 +22,10 @@ public final class WebMapCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("diorama-web")
 			//? if >=1.21.11 {
-			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-			//?} else {
-			/*.requires(source -> source.hasPermission(2))
-			*///?}
+			/*.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+			*///?} else {
+			.requires(source -> source.hasPermission(2))
+			//?}
 			.then(Commands.literal("status").executes(context -> {
 					WebMap map = WebMap.get();
 					context.getSource().sendSuccess(() -> Component.literal(map == null
@@ -78,7 +78,7 @@ public final class WebMapCommand {
 			return 0;
 		}
 		String name = StringArgumentType.getString(context, "name").strip();
-		String dimension = context.getSource().getLevel().dimension().identifier().toString();
+		String dimension = context.getSource().getLevel().dimension().location().toString();
 		if (name.isEmpty() || name.length() > WebMarkers.LONGEST_NAME) {
 			context.getSource().sendFailure(Component.literal("A marker's name is 1 to " + WebMarkers.LONGEST_NAME + " characters"));
 			return 0;

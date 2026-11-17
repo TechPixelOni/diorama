@@ -32,7 +32,7 @@ final class WaypointSearchTest {
 		List<Waypoint> added = context.computeOnClient(mc -> {
 			WaypointStore store = WaypointStore.get();
 			store.setSort(WaypointSort.DISTANCE, false);
-			String here = mc.level.dimension().identifier().toString();
+			String here = mc.level.dimension().location().toString();
 			List<Waypoint> made = new ArrayList<>();
 			made.add(add(store, at, here, "", "Iron Farm", 25, Waypoint.PALETTE[0]));
 			made.add(add(store, at, here, "", "Creeper Farm", 310, Waypoint.PALETTE[3]));
@@ -65,12 +65,12 @@ final class WaypointSearchTest {
 
 		// A row under the heading is clicked where it's drawn, and its buttons act on it.
 		Waypoint wheat = added.get(4);
-		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(wheat));
+		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(wheat));
 		DioramaClientTest.clickAtGui(context, row[0], row[1]);
 		context.waitTicks(2);
-		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).selected()) != wheat) {
+		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).selected()) != wheat) {
 			wrong.add("clicking Wheat Farm's row under the heading selected "
-				+ context.computeOnClient(mc -> { Waypoint w = ((WaypointListScreen) mc.gui.screen()).selected(); return w == null ? "nothing" : w.name; }));
+				+ context.computeOnClient(mc -> { Waypoint w = ((WaypointListScreen) mc.screen).selected(); return w == null ? "nothing" : w.name; }));
 		}
 		context.takeScreenshot("search-03-other-folder-selected");
 		clickOnRow(context, "Hide", wheat);
@@ -86,24 +86,24 @@ final class WaypointSearchTest {
 		// The heading takes a line of its own: the first row under it is two rows below the last above.
 		// Hiding Wheat Farm sent it to the end and the list after it, so back to the top first.
 		scroll(context, 1);
-		int[] above = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(added.get(1)));
-		int[] below = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(wheat));
+		int[] above = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(added.get(1)));
+		int[] below = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(wheat));
 		if (above == null || below == null || below[1] - above[1] != 52) {
 			wrong.add("Wheat Farm's row isn't two rows under Creeper Farm's, with the heading between");
 		}
 		// Scrolled to the end, past the heading, the last row is clicked where it's drawn too.
 		Waypoint wither = added.get(9);
-		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(wither)) != null) {
+		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(wither)) != null) {
 			wrong.add("the farms all fit in the list, so scrolling wasn't checked");
 		}
 		scroll(context, -1);
-		int[] last = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(wither));
+		int[] last = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(wither));
 		if (last == null) {
 			wrong.add("Wither Farm's row wasn't in view after scrolling to the end");
 		} else {
 			DioramaClientTest.clickAtGui(context, last[0], last[1]);
 			context.waitTicks(2);
-			if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).selected()) != wither) {
+			if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).selected()) != wither) {
 				wrong.add("clicking the last row after scrolling didn't select Wither Farm");
 			}
 			clickOnRow(context, "Hide", wither);
@@ -120,8 +120,8 @@ final class WaypointSearchTest {
 
 		// From one of the player's folders, with the search kept: its own first, the dimensions' after.
 		DioramaClientTest.typeInto(context, 0, "farm");
-		for (int i = 0; i < 20 && !context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderName()).equals(ALEX); i++) {
-			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), ">")));
+		for (int i = 0; i < 20 && !context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderName()).equals(ALEX); i++) {
+			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, ">")));
 			context.waitTicks(2);
 		}
 		expect(context, wrong, added, "farm from Alex's base", List.of("Wheat Farm"), List.of("Iron Farm", "Creeper Farm", "Slime Farm", "Blaze Farm", "Gold Farm", "Wart Farm", "Wither Farm"));
@@ -153,7 +153,7 @@ final class WaypointSearchTest {
 	/** Of the waypoints made here, the ones listed as the folder's own and the ones found in other folders, in order. */
 	private static void expect(ClientGameTestContext context, List<String> wrong, List<Waypoint> added, String what, List<String> own, List<String> others) {
 		List<List<String>> shown = context.computeOnClient(mc -> {
-			WaypointListScreen list = (WaypointListScreen) mc.gui.screen();
+			WaypointListScreen list = (WaypointListScreen) mc.screen;
 			List<Waypoint> rows = list.shown();
 			int split = list.shownInFolder();
 			List<String> first = rows.subList(0, split).stream().filter(added::contains).map(w -> w.name).toList();
@@ -170,10 +170,10 @@ final class WaypointSearchTest {
 		for (int i = 0; i < 12; i++) {
 			context.runOnClient(mc -> {
 				//? if >=1.21 {
-				mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, 0, direction);
-				//?} else {
-				/*mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, direction);
-				*///?}
+				/*mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, 0, direction);
+				*///?} else {
+				mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, direction);
+				//?}
 			});
 		}
 		context.waitTicks(2);
@@ -182,8 +182,8 @@ final class WaypointSearchTest {
 	/** Clicks the selected row's button with this label, not the folder bar's of the same name. */
 	private static void clickOnRow(ClientGameTestContext context, String label, Waypoint waypoint) {
 		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> {
-			int[] row = ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint);
-			for (var child : mc.gui.screen().children()) {
+			int[] row = ((WaypointListScreen) mc.screen).rowCentre(waypoint);
+			for (var child : mc.screen.children()) {
 				if (child instanceof Button button && button.visible && button.getMessage().getString().equals(label) && row != null && Math.abs(button.getY() + 10 - row[1]) <= 4) {
 					return button;
 				}

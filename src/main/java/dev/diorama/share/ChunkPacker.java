@@ -24,9 +24,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import org.jspecify.annotations.Nullable;
 //? if <1.21.2 {
-/*import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
-*///?}
+//?}
 
 /**
  * Packs a chunk for a player's shared map: only the sections the view from the sky can reach, from
@@ -110,12 +110,12 @@ final class ChunkPacker {
 			return null;
 		}
 		ChunkTags.Summary summary = ChunkTags.summaryOf(surface, solid);
-		if (summary.maxY() <= this.level.getMinY()) {
+		if (summary.maxY() <= this.level.getMinBuildHeight()) {
 			return null;
 		}
 		int minSolid = summary.floorY() + 24;
-		int floorY = minSolid > ORDINARY_TOP ? this.level.getMinY() : summary.floorY();
-		int minSection = this.level.getMinSectionY();
+		int floorY = minSolid > ORDINARY_TOP ? this.level.getMinBuildHeight() : summary.floorY();
+		int minSection = this.level.getMinSection();
 		int maxSection = minSection + this.level.getSectionsCount() - 1;
 		int lo = Math.max(minSection, Math.floorDiv(floorY, 16));
 		int hi = Math.min(maxSection, Math.floorDiv(summary.maxY(), 16));
@@ -290,10 +290,10 @@ final class ChunkPacker {
 		Boolean known = this.opaque.get(state);
 		if (known == null) {
 			//? if >=1.21.2 {
-			known = state.isSolidRender();
-			//?} else {
-			/*known = state.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
-			*///?}
+			/*known = state.isSolidRender();
+			*///?} else {
+			known = state.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+			//?}
 			this.opaque.put(state, known);
 		}
 		return known;

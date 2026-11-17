@@ -2,7 +2,7 @@ package dev.diorama;
 
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
@@ -133,7 +133,7 @@ public final class MapMenu {
 		return true;
 	}
 
-	public void draw(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 		int height = this.height();
 		graphics.fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + height + 1, 0xFF3A4048);
 		graphics.fill(this.x, this.y, this.x + this.width, this.y + height, 0xF0101418);
@@ -145,7 +145,7 @@ public final class MapMenu {
 				graphics.fill(this.x + 1, top, this.x + this.width - 1, top + ROW, 0xFF2D3A4E);
 			}
 			int colour = item.action == null ? (item.active ? TEXT : INFO) : !item.active ? OFF : !item.armed ? TEXT : item.stays ? DONE : CONFIRM;
-			graphics.text(this.font, item.shown(), this.x + PAD + 2, top + 2, colour, false);
+			graphics.drawString(this.font, item.shown(), this.x + PAD + 2, top + 2, colour, false);
 		}
 	}
 

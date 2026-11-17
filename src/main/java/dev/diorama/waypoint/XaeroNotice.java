@@ -77,10 +77,10 @@ public final class XaeroNotice {
 			Diorama.LOGGER.warn("Couldn't note that the Xaero's import was offered for {}", key, e);
 		}
 		//? if >=26.1 {
-		mc.gui.hud.getChat().addClientSystemMessage(message);
-		//?} else {
-		/*mc.gui.getChat().addMessage(message);
-		*///?}
+		/*mc.gui.getChat().addClientSystemMessage(message);
+		*///?} else {
+		mc.gui.getChat().addMessage(message);
+		//?}
 	}
 
 	/** The chat line for what Xaero's has, or null when the waypoint list wouldn't offer an import either. */
@@ -108,7 +108,7 @@ public final class XaeroNotice {
 	private static Component link() {
 		return Component.translatable("diorama.xaero.notice_link").withStyle(style -> style
 			.withColor(ChatFormatting.GREEN)
-			.withClickEvent(new ClickEvent.RunCommand(COMMAND))
-			.withHoverEvent(new HoverEvent.ShowText(Component.translatable("diorama.xaero.notice_hover"))));
+			.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, COMMAND))
+			.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("diorama.xaero.notice_hover"))));
 	}
 }

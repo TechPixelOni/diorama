@@ -48,19 +48,19 @@ public final class ChunkTags {
 		this.level = level;
 		this.withLight = withLight;
 		//? if >=1.21.9 {
-		this.blockStates = level.palettedContainerFactory().blockStatesContainerCodec();
+		/*this.blockStates = level.palettedContainerFactory().blockStatesContainerCodec();
 		this.biomes = level.palettedContainerFactory().biomeContainerCodec();
-		//?} else {
-		/*this.blockStates = PalettedContainer.codecRW(Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState());
+		*///?} else {
+		this.blockStates = PalettedContainer.codecRW(Block.BLOCK_STATE_REGISTRY, BlockState.CODEC, PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState());
 		//? if >=1.21.2 {
-		net.minecraft.core.Registry<Biome> registry = level.registryAccess().lookupOrThrow(Registries.BIOME);
+		/*net.minecraft.core.Registry<Biome> registry = level.registryAccess().lookupOrThrow(Registries.BIOME);
 		Holder<Biome> plains = registry.getOrThrow(Biomes.PLAINS);
-		//?} else {
+		*///?} else {
 		net.minecraft.core.Registry<Biome> registry = level.registryAccess().registryOrThrow(Registries.BIOME);
 		Holder<Biome> plains = registry.getHolderOrThrow(Biomes.PLAINS);
 		//?}
 		this.biomes = PalettedContainer.codecRO(registry.asHolderIdMap(), registry.holderByNameCodec(), PalettedContainer.Strategy.SECTION_BIOMES, plains);
-		*///?}
+		//?}
 		this.heightBits = Mth.ceillog2(level.getHeight() + 1);
 	}
 
@@ -73,7 +73,7 @@ public final class ChunkTags {
 	public SavedChunk read(int chunkX, int chunkZ, CompoundTag tag) {
 		boolean finished = finished(tag);
 		int count = this.level.getSectionsCount();
-		int minSection = this.level.getMinSectionY();
+		int minSection = this.level.getMinSection();
 		PalettedContainer<BlockState>[] states = new PalettedContainer[count];
 		PalettedContainerRO<Holder<Biome>>[] biomes = this.biomes(tag);
 		DataLayer[] blockLight = new DataLayer[count];
@@ -111,7 +111,7 @@ public final class ChunkTags {
 	@SuppressWarnings("unchecked")
 	public @Nullable PalettedContainerRO<Holder<Biome>>[] biomes(CompoundTag tag) {
 		int count = this.level.getSectionsCount();
-		int minSection = this.level.getMinSectionY();
+		int minSection = this.level.getMinSection();
 		PalettedContainerRO<Holder<Biome>>[] biomes = new PalettedContainerRO[count];
 		ListTag sections = Nbt.list(tag, "sections");
 		for (int s = 0; s < sections.size(); s++) {
@@ -149,7 +149,7 @@ public final class ChunkTags {
 		try {
 			SimpleBitStorage storage = new SimpleBitStorage(this.heightBits, 256, packed);
 			int[] heights = new int[256];
-			int minY = this.level.getMinY();
+			int minY = this.level.getMinBuildHeight();
 			for (int i = 0; i < 256; i++) {
 				// Saved as the first free y above the column, counted from the bottom of the world.
 				heights[i] = storage.get(i) + minY - 1;
@@ -173,7 +173,7 @@ public final class ChunkTags {
 			}
 		}
 		int[] heights = new int[256];
-		java.util.Arrays.fill(heights, lowest == Integer.MAX_VALUE ? this.level.getMinY() - 1 : lowest);
+		java.util.Arrays.fill(heights, lowest == Integer.MAX_VALUE ? this.level.getMinBuildHeight() - 1 : lowest);
 		for (int column = 0; column < 256; column++) {
 			int x = column & 15;
 			int z = column >> 4;
@@ -241,9 +241,9 @@ public final class ChunkTags {
 	/** This version's chunk data version: older chunks need upgrading before their fields mean what they say. */
 	public static int dataVersion() {
 		//? if >=1.21.6 {
-		return SharedConstants.getCurrentVersion().dataVersion().version();
-		//?} else {
-		/*return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
-		*///?}
+		/*return SharedConstants.getCurrentVersion().dataVersion().version();
+		*///?} else {
+		return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
+		//?}
 	}
 }

@@ -7,12 +7,12 @@ import dev.diorama.Projection;
 import dev.diorama.bake.TileKey;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+/*import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-//?}
+*///?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
@@ -35,7 +35,7 @@ final class UnsentChunksTest {
 	}
 
 	//? if >=1.21.4 && fabric {
-	static void run(ClientGameTestContext context) {
+	/*static void run(ClientGameTestContext context) {
 		java.util.Properties properties = DioramaClientTest.serverProperties();
 		properties.setProperty("view-distance", "4");
 		properties.setProperty("simulation-distance", "4");
@@ -79,7 +79,7 @@ final class UnsentChunksTest {
 				}
 			});
 			int before;
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				// South of the site, with every chunk the rays cross sent: the ground gets mapped.
 				teleport(server, midX, midZ + 48);
 				waitForMap(context);
@@ -88,7 +88,7 @@ final class UnsentChunksTest {
 				teleport(server, midX, midZ - 32);
 				waitForMap(context);
 			}
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				// A new session north of the site: the chunks south of it never arrive.
 				waitForMap(context);
 				// Where the rays down to the roof start, at the pillar's height.
@@ -107,7 +107,7 @@ final class UnsentChunksTest {
 				}
 				Diorama.LOGGER.info("unsent-chunks: roof spot {} before the house, {} after", String.format("%08x", before), String.format("%08x", after));
 				context.setScreen(MapScreen::new);
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(midX + 0.5, midZ + 0.5),
+				context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(midX + 0.5, midZ + 0.5),
 					Projection.v(midX + 0.5, roofY + 1, midZ + 0.5), 2, TileKey.SURFACE));
 				DioramaClientTest.settle(context, 40);
 				context.takeScreenshot("unsent-chunks");
@@ -124,12 +124,12 @@ final class UnsentChunksTest {
 		server.runCommand("tp @a " + x + " " + surface(server, Heightmap.Types.MOTION_BLOCKING, x, z) + " " + z);
 	}
 
-	/** The first open y above a column, generating its chunk if it has to. */
+	/^* The first open y above a column, generating its chunk if it has to. ^/
 	private static int surface(TestDedicatedServerContext server, Heightmap.Types type, int x, int z) {
 		return server.computeOnServer(s -> s.overworld().getChunk(x >> 4, z >> 4).getHeight(type, x & 15, z & 15) + 1);
 	}
 
-	//?}
+	*///?}
 
 	private static void waitForMap(ClientGameTestContext context) {
 		context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 60, 2400);

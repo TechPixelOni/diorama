@@ -117,7 +117,7 @@ final class WebMapClaimsTest {
 				server.command("ftbchunks admin claim_as " + team + " 16 " + (hill[0] * 16 + 8) + " " + (hill[1] * 16 + 8));
 				// And a patch in the Nether.
 				server.command("execute in minecraft:the_nether run tp " + me + " 8 100 8");
-				context.waitFor(mc -> mc.level.dimension().identifier().getPath().equals("the_nether"), 1200);
+				context.waitFor(mc -> mc.level.dimension().location().getPath().equals("the_nether"), 1200);
 				context.waitTicks(40);
 				server.command("execute as " + me + " at " + me + " run ftbchunks claim 0");
 			} else {
@@ -125,13 +125,13 @@ final class WebMapClaimsTest {
 				DioramaClientTest.opacRequest(context, "requestAreaForceload", flat[0], flat[1], flat[0], flat[1], true, false);
 				claimOpac(context, server, me, hill, true);
 				server.command("execute in minecraft:the_nether run tp " + me + " 8 100 8");
-				context.waitFor(mc -> mc.level.dimension().identifier().getPath().equals("the_nether"), 1200);
+				context.waitFor(mc -> mc.level.dimension().location().getPath().equals("the_nether"), 1200);
 				context.waitTicks(40);
 				DioramaClientTest.opacRequest(context, "requestAreaClaim", 0, 0, 0, 0, false);
 			}
 			context.waitTicks(100);
 			server.command("execute in minecraft:overworld run tp " + me + " " + (px * 16 + 8) + " " + (ground + 1) + " " + (pz * 16 + 8));
-			context.waitFor(mc -> mc.level.dimension().identifier().getPath().equals("overworld"), 1200);
+			context.waitFor(mc -> mc.level.dimension().location().getPath().equals("overworld"), 1200);
 			context.waitTicks(60);
 			RealServer.leave(context);
 		}
@@ -186,7 +186,7 @@ final class WebMapClaimsTest {
 			// About as far out as the page's picture of both.
 			double inGameV = Projection.v(flat[2] + 10, flat[1] * 16 + 8);
 			context.runOnClient(mc -> {
-				if (mc.gui.screen() instanceof dev.diorama.MapScreen screen) {
+				if (mc.screen instanceof dev.diorama.MapScreen screen) {
 					screen.lookAt(middleU, inGameV, 1.5, TileKey.SURFACE);
 				}
 			});

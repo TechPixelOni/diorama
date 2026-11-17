@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -51,7 +51,7 @@ import org.jspecify.annotations.Nullable;
  * with its own event. Anything else in a file is ignored, so files written for Xaero's work as they are.
  */
 public final class XaeroRadarIcons {
-	public static final Identifier ID = Diorama.id("xaero_radar_icons");
+	public static final ResourceLocation ID = Diorama.id("xaero_radar_icons");
 	public static final ResourceManagerReloadListener LISTENER = XaeroRadarIcons::reload;
 	private static final String NAMESPACE = "xaerominimap";
 	private static final String DEFINITIONS = "entity/icon/definition/";
@@ -80,9 +80,9 @@ public final class XaeroRadarIcons {
 	/** Sprites by location, shared by every file that names them; their textures are made when first drawn. */
 	private static final Map<SpriteKey, Sprite> sprites = new HashMap<>();
 	/** Sprites a mod named that can't be drawn, so they're tried once per resource load, not every frame. */
-	private static final Set<Identifier> unreadable = new HashSet<>();
+	private static final Set<ResourceLocation> unreadable = new HashSet<>();
 
-	private record SpriteKey(Identifier location, boolean outlined, boolean flipped) {
+	private record SpriteKey(ResourceLocation location, boolean outlined, boolean flipped) {
 	}
 
 	private XaeroRadarIcons() {
@@ -100,7 +100,7 @@ public final class XaeroRadarIcons {
 		Icon icon = null;
 		if (definition != null) {
 			if (!definition.byTexture().isEmpty()) {
-				Identifier texture = MobFaces.texture(entity);
+				ResourceLocation texture = MobFaces.texture(entity);
 				icon = texture == null ? null : definition.byTexture().get(texture.toString());
 			}
 			if (icon == null) {
@@ -115,7 +115,7 @@ public final class XaeroRadarIcons {
 	 * Cobblemon's portrait of a Pokémon or NPC. A pack's file for the mob comes first.
 	 */
 	private static @Nullable Icon pokemon(Entity entity) {
-		Identifier location = Pixelmon.sprite(entity);
+		ResourceLocation location = Pixelmon.sprite(entity);
 		if (location == null) {
 			return CobblemonPortraits.of(entity);
 		}
@@ -171,8 +171,8 @@ public final class XaeroRadarIcons {
 		// Like Xaero's, one file per mob in the game: the top pack's file wins, and files for mobs
 		// that aren't installed (Xaero's own example_mod, a modpack's leftovers) are never read.
 		for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
-			Identifier mob = BuiltInRegistries.ENTITY_TYPE.getKey(type);
-			Identifier file = Identifier.fromNamespaceAndPath(NAMESPACE, DEFINITIONS + mob.getNamespace() + "/" + mob.getPath() + ".json");
+			ResourceLocation mob = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+			ResourceLocation file = new net.minecraft.resources.ResourceLocation(NAMESPACE, DEFINITIONS + mob.getNamespace() + "/" + mob.getPath() + ".json");
 			Optional<Resource> resource = manager.getResource(file);
 			if (resource.isEmpty()) {
 				continue;
@@ -261,7 +261,7 @@ public final class XaeroRadarIcons {
 					problems.add("\"" + value + "\" isn't a form Xaero's reads");
 					return null;
 				}
-				Identifier id = parts.length == 2 ? Identifier.tryParse(parts[1]) : Identifier.tryBuild(parts[1], parts[2]);
+				ResourceLocation id = parts.length == 2 ? ResourceLocation.tryParse(parts[1]) : ResourceLocation.tryBuild(parts[1], parts[2]);
 				Optional<Item> item = id == null ? Optional.empty() : BuiltInRegistries.ITEM.getOptional(id);
 				if (item.isEmpty()) {
 					// Xaero shows a dot when its item renderer fails.
@@ -277,7 +277,7 @@ public final class XaeroRadarIcons {
 					problems.add("\"" + value + "\" isn't a form Xaero's reads");
 					return null;
 				}
-				Identifier location = Identifier.tryBuild(NAMESPACE, SPRITES + parts[1]);
+				ResourceLocation location = ResourceLocation.tryBuild(NAMESPACE, SPRITES + parts[1]);
 				if (location == null) {
 					problems.add("\"" + parts[1] + "\" isn't a valid file name");
 					return Basic.OWN_FACE;
@@ -290,7 +290,7 @@ public final class XaeroRadarIcons {
 		}
 	}
 
-	private static @Nullable Sprite sprite(Identifier location, boolean outlined, boolean flipped, ResourceManager manager, List<String> problems) {
+	private static @Nullable Sprite sprite(ResourceLocation location, boolean outlined, boolean flipped, ResourceManager manager, List<String> problems) {
 		SpriteKey key = new SpriteKey(location, outlined, flipped);
 		Sprite cached = sprites.get(key);
 		if (cached != null) {
@@ -321,7 +321,7 @@ public final class XaeroRadarIcons {
 	 * and each shrunk copy becomes a texture the first time it's drawn.
 	 */
 	static final class Sprite implements Icon {
-		final Identifier location;
+		final ResourceLocation location;
 		final boolean outlined;
 		/** Upside down: Xaero's old "sprite" form. The image is stored flipped. */
 		final boolean flipped;
@@ -339,7 +339,7 @@ public final class XaeroRadarIcons {
 		private record Baked(MapTexture texture, int edge, int w, int h) {
 		}
 
-		private Sprite(Identifier location, boolean outlined, boolean flipped, int w, int h, int[] argb) {
+		private Sprite(ResourceLocation location, boolean outlined, boolean flipped, int w, int h, int[] argb) {
 			this.location = location;
 			this.outlined = outlined;
 			this.flipped = flipped;
@@ -348,7 +348,7 @@ public final class XaeroRadarIcons {
 			this.argb = argb;
 		}
 
-		static @Nullable Sprite cropped(Identifier location, NativeImage image, boolean outlined, boolean flipped) {
+		static @Nullable Sprite cropped(ResourceLocation location, NativeImage image, boolean outlined, boolean flipped) {
 			int width = image.getWidth();
 			int height = image.getHeight();
 			int[] all = new int[width * height];
@@ -359,12 +359,12 @@ public final class XaeroRadarIcons {
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					//? if >=1.21.2 {
-					int argb = image.getPixel(x, y);
-					//?} else {
-					/*// Only the ABGR getter existed; swap red and blue.
+					/*int argb = image.getPixel(x, y);
+					*///?} else {
+					// Only the ABGR getter existed; swap red and blue.
 					int abgr = image.getPixelRGBA(x, y);
 					int argb = (abgr & 0xFF00FF00) | (abgr >> 16 & 0xFF) | (abgr & 0xFF) << 16;
-					*///?}
+					//?}
 					all[(flipped ? height - 1 - y : y) * width + x] = argb;
 					if (argb >>> 24 >= SOLID) {
 						int row = flipped ? height - 1 - y : y;
@@ -397,10 +397,10 @@ public final class XaeroRadarIcons {
 			float texel = Radar.texel(size, Math.max(b.w(), b.h()));
 			float x0 = x - b.w() * texel / 2;
 			float y0 = y - b.h() * texel / 2;
-			GuiGraphicsExtractor graphics = icons.graphics();
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(x0, y0);
-			graphics.pose().scale(texel);
+			GuiGraphics graphics = icons.graphics();
+			graphics.pose().pushPose();
+			graphics.pose().translate(x0, y0, 0);
+			graphics.pose().scale(texel, texel, 1);
 			int shadow = Radar.withAlpha(0x60000000, alpha);
 			if (this.outlined) {
 				this.mask(icons, b, 0, 0, shadow);
@@ -410,7 +410,7 @@ public final class XaeroRadarIcons {
 				this.image(icons, b, 0, 0, b.w() + 2, b.h() + 2, shadow);
 			}
 			this.image(icons, b, -1, -1, b.w() + 1, b.h() + 1, color);
-			graphics.pose().popMatrix();
+			graphics.pose().popPose();
 		}
 
 		/** Draws the image fitted in a square {@code size} across centred on (x, y), with no outline: the framed style's box is its edge. */
@@ -419,12 +419,12 @@ public final class XaeroRadarIcons {
 			float scale = size / Math.max(b.w(), b.h());
 			float w = b.w() * scale;
 			float h = b.h() * scale;
-			GuiGraphicsExtractor graphics = icons.graphics();
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(x - w / 2, y - h / 2);
-			graphics.pose().scale(scale);
+			GuiGraphics graphics = icons.graphics();
+			graphics.pose().pushPose();
+			graphics.pose().translate(x - w / 2, y - h / 2, 0);
+			graphics.pose().scale(scale, scale, 1);
 			this.image(icons, b, -1, -1, b.w() + 1, b.h() + 1, color);
-			graphics.pose().popMatrix();
+			graphics.pose().popPose();
 		}
 
 		private void image(IconBatch icons, Baked b, float x0, float y0, float x1, float y1, int color) {

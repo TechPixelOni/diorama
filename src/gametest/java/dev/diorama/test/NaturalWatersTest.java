@@ -88,24 +88,24 @@ final class NaturalWatersTest {
 		// The game itself, straight down, facing north as the map does.
 		world.getServer().runCommand("gamemode spectator @a");
 		//? if >=26.2 {
-		context.runOnClient(mc -> mc.gui.hud.toggle());
-		//?} else {
-		/*context.runOnClient(mc -> mc.options.hideGui = true);
-		*///?}
+		/*context.runOnClient(mc -> mc.gui.toggle());
+		*///?} else {
+		context.runOnClient(mc -> mc.options.hideGui = true);
+		//?}
 		world.getServer().runCommand("tp @a " + centerX + " " + (y + 34) + " " + centerZ + " 180 90");
 		context.waitTicks(100);
 		context.takeScreenshot("natural-waters-03-world");
 		//? if >=26.2 {
-		context.runOnClient(mc -> mc.gui.hud.toggle());
-		//?} else {
-		/*context.runOnClient(mc -> mc.options.hideGui = false);
-		*///?}
+		/*context.runOnClient(mc -> mc.gui.toggle());
+		*///?} else {
+		context.runOnClient(mc -> mc.options.hideGui = false);
+		//?}
 		world.getServer().runCommand("gamemode creative @a");
 	}
 
 	private static void lookAt(ClientGameTestContext context, double x, double y, double z, double zoom) {
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(x, Projection.v(y, z), zoom, TileKey.SURFACE);
 			}
 		});

@@ -80,14 +80,14 @@ final class WaypointClutterTest {
 		context.setScreen(MapScreen::new);
 		// Over the hint bar at the bottom, so no hover box covers the map.
 		context.getInput().setCursorPos(1500, 880);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(at.getX(), Projection.v(at.getY(), at.getZ()), 0.3, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(at.getX(), Projection.v(at.getY(), at.getZ()), 0.3, TileKey.SURFACE));
 		settle(context, 100);
 		context.takeScreenshot("clutter-map-256");
 		context.setScreen(() -> null);
 
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(3);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(3));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(3));
 		context.waitTicks(5);
 		context.takeScreenshot("clutter-settings");
 		context.setScreen(() -> null);

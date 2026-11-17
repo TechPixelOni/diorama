@@ -56,7 +56,7 @@ final class LeavesTest {
 		context.waitTicks(40);
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(centerX, Projection.v(y, centerZ), 6.0, TileKey.SURFACE);
 			}
 		});

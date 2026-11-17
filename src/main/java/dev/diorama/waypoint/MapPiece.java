@@ -15,7 +15,7 @@ import dev.diorama.render.gpu.MapTexture;
 import dev.diorama.render.gpu.Sampling;
 import java.nio.file.Path;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
@@ -132,12 +132,12 @@ final class MapPiece {
 	}
 
 	/** Draws the piece around the player, with its outline's top left at (x, y); the shadow reaches 3 further east. */
-	void draw(GuiGraphicsExtractor graphics, int x, int y) {
+	void draw(GuiGraphics graphics, int x, int y) {
 		this.draw(graphics, x, y, null);
 	}
 
 	/** Same, around {@code place} instead if there is one, which can be in another dimension. */
-	void draw(GuiGraphicsExtractor graphics, int x, int y, @Nullable Place place) {
+	void draw(GuiGraphics graphics, int x, int y, @Nullable Place place) {
 		graphics.fill(x + 3, y - 1, x + this.outerWidth() + 3, y + this.outerHeight() - 1, SHADOW);
 		graphics.fill(x, y, x + this.outerWidth(), y + this.outerHeight(), OUTLINE);
 		int left = x + 1;
@@ -153,7 +153,7 @@ final class MapPiece {
 		}
 		MapSession session = MapSession.get();
 		// In the player's dimension the live map has the place, and the loaded world its blocks.
-		boolean here = place == null || place.dimension().equals(level.dimension().identifier().toString());
+		boolean here = place == null || place.dimension().equals(level.dimension().location().toString());
 		MapLevel map = !here ? this.savedMap(place.dimension()) : session != null ? session.map() : null;
 		MapViewport.View view = place == null
 			? new MapViewport.View(left, top, this.width, this.depth, Projection.u(viewer.getX(), viewer.getZ()), Projection.v(viewer.getX(), viewer.getY(), viewer.getZ()), ZOOM, TileKey.SURFACE)
@@ -273,11 +273,11 @@ final class MapPiece {
 	private static int @Nullable [] surface(ClientLevel level, BlockLooks looks, int x, double v) {
 		double sin = Projection.sin();
 		double cos = Projection.cos();
-		int minY = level.getMinY();
+		int minY = level.getMinBuildHeight();
 		boolean ceiling = level.dimensionType().hasCeiling();
 		int start;
 		if (ceiling) {
-			start = Math.min(level.getMaxY(), minY + level.dimensionType().logicalHeight() - 1);
+			start = Math.min((level.getMaxBuildHeight() - 1), minY + level.dimensionType().logicalHeight() - 1);
 		} else {
 			// Start a little above the ground the heightmap finds along the ray, to save walking
 			// down from the sky; a few rounds settle where the ray meets it.
@@ -290,7 +290,7 @@ final class MapPiece {
 			if (y <= minY) {
 				return null;
 			}
-			start = Math.min(level.getMaxY(), y + 16);
+			start = Math.min((level.getMaxBuildHeight() - 1), y + 16);
 		}
 		// Under a roof the map starts below it, so walk out of the roof first.
 		boolean underRoof = !ceiling;

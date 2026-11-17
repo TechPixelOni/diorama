@@ -207,18 +207,18 @@ final class VanillaTableTest {
 	/** This game's version name, which names its table file. */
 	private static String minecraftVersion() {
 		//? if >=1.21.6 {
-		return net.minecraft.SharedConstants.getCurrentVersion().name();
-		//?} else {
-		/*return net.minecraft.SharedConstants.getCurrentVersion().getName();
-		*///?}
+		/*return net.minecraft.SharedConstants.getCurrentVersion().name();
+		*///?} else {
+		return net.minecraft.SharedConstants.getCurrentVersion().getName();
+		//?}
 	}
 
 	private static int dryFoliage(double temp, double rain) {
 		//? if >=1.21.5 {
-		return net.minecraft.world.level.DryFoliageColor.get(temp, rain);
-		//?} else {
-		/*return 0;
-		*///?}
+		/*return net.minecraft.world.level.DryFoliageColor.get(temp, rain);
+		*///?} else {
+		return 0;
+		//?}
 	}
 
 	private static void writeTile(Path file, int[] px) {

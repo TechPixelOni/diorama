@@ -2,7 +2,7 @@ package dev.diorama;
 
 import java.util.Locale;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -97,7 +97,7 @@ public final class RadarCategoryScreen extends Screen {
 
 		if (own != null) {
 			this.addRenderableWidget(Button.builder(SettingsScreen.label(Component.translatable("diorama.radar_category.mobs"), Component.literal(Integer.toString(own.mobs.size()))),
-				b -> this.minecraft.gui.setScreen(new RadarMobsScreen(this, own)))
+				b -> this.minecraft.setScreen(new RadarMobsScreen(this, own)))
 				.bounds(left, y, WIDTH, 20).tooltip(Tooltip.create(Component.translatable("diorama.radar_category.mobs.tooltip"))).build());
 			y += ROW;
 		}
@@ -131,23 +131,23 @@ public final class RadarCategoryScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
 		// The name as it is now, a typed one included.
-		graphics.centeredText(this.font, this.entry.name(), this.width / 2, this.top() - 20, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, this.entry.name(), this.width / 2, this.top() - 20, 0xFFFFFFFF);
 		if (this.own != null) {
-			graphics.text(this.font, Component.translatable("diorama.waypoint.name"), this.width / 2 - WIDTH / 2, this.top() + 6, LABEL, true);
+			graphics.drawString(this.font, Component.translatable("diorama.waypoint.name"), this.width / 2 - WIDTH / 2, this.top() + 6, LABEL, true);
 		}
 	}
 
 	@Override
 	public void onClose() {
 		// The game makes the list behind again as it shows it, with this category's name and what it changes.
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

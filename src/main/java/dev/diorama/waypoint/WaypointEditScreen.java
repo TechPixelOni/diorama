@@ -7,15 +7,15 @@ import dev.diorama.render.Pins;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.KeyEvent;
+/*import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+*///?}
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -140,13 +140,13 @@ public final class WaypointEditScreen extends Screen {
 		this.addRenderableWidget(Button.builder(Component.translatable("diorama.waypoint.random"), b -> this.pick(WaypointColours.random(this.color)))
 			.bounds(left + 98, top + 132, FORM - 98, 20).build());
 		//? if >=1.21 {
-		this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.waypoint.show_on_maps"), this.font)
+		/*this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.waypoint.show_on_maps"), this.font)
 			.pos(left, top + 157)
 			.selected(this.visible)
 			.onValueChange((box, value) -> this.visible = value)
 			.build());
-		//?} else {
-		/*// 1.20.1's checkbox has no builder and tells no one it changed: a 20 pixel box with the
+		*///?} else {
+		// 1.20.1's checkbox has no builder and tells no one it changed: a 20 pixel box with the
 		// label 4 pixels right of it.
 		Component showOnMaps = Component.translatable("diorama.waypoint.show_on_maps");
 		this.addRenderableWidget(new Checkbox(left, top + 157, 24 + this.font.width(showOnMaps), 20, showOnMaps, this.visible) {
@@ -156,7 +156,7 @@ public final class WaypointEditScreen extends Screen {
 				WaypointEditScreen.this.visible = this.selected();
 			}
 		});
-		*///?}
+		//?}
 
 		// What to do with this place, under its preview. A new waypoint has none until it's saved.
 		int previewLeft = left + PREVIEW_LEFT;
@@ -198,7 +198,7 @@ public final class WaypointEditScreen extends Screen {
 		this.preview.name = this.typedName();
 		this.preview.initials = this.initials.getValue().trim();
 		this.preview.color = this.color;
-		this.minecraft.gui.setScreen(new WaypointIconScreen(this, this.preview, this.icon, id -> {
+		this.minecraft.setScreen(new WaypointIconScreen(this, this.preview, this.icon, id -> {
 			this.icon = id;
 			if (this.iconButton != null) {
 				this.iconButton.setMessage(this.iconLabel());
@@ -333,26 +333,26 @@ public final class WaypointEditScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
+		this.renderBackground(graphics);
+		//?}
 		// Nothing under the open list of folders lights up or shows its tooltip.
 		boolean menuOpen = this.folderMenu != null;
-		super.extractRenderState(graphics, menuOpen ? -1 : mouseX, menuOpen ? -1 : mouseY, a);
+		super.render(graphics, menuOpen ? -1 : mouseX, menuOpen ? -1 : mouseY, a);
 		int left = this.left();
 		int top = this.top();
-		graphics.centeredText(this.font, this.title, this.width / 2, top - 12, 0xFFFFFFFF);
-		graphics.text(this.font, Component.translatable("diorama.waypoint.name"), left, top + 5, LABEL, true);
-		graphics.text(this.font, Component.translatable("diorama.waypoint.icon"), left + 116, top + 5, LABEL, true);
-		graphics.text(this.font, Component.translatable("diorama.waypoint.initials"), left + 160, top + 5, LABEL, true);
-		graphics.text(this.font, Component.translatable("diorama.waypoint.position"), left, top + 45, LABEL, true);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, top - 12, 0xFFFFFFFF);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.name"), left, top + 5, LABEL, true);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.icon"), left + 116, top + 5, LABEL, true);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.initials"), left + 160, top + 5, LABEL, true);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.position"), left, top + 45, LABEL, true);
 		Component colourLabel = Component.translatable("diorama.waypoint.colour");
-		graphics.text(this.font, colourLabel, left, top + 81, LABEL, true);
+		graphics.drawString(this.font, colourLabel, left, top + 81, LABEL, true);
 		WaypointColours.Swatch current = WaypointColours.named(this.color);
 		if (current != null) {
-			graphics.text(this.font, Component.literal("· ").append(current.name()), left + this.font.width(colourLabel) + 4, top + 81, 0xFFFFFFFF, true);
+			graphics.drawString(this.font, Component.literal("· ").append(current.name()), left + this.font.width(colourLabel) + 4, top + 81, 0xFFFFFFFF, true);
 		}
 		this.drawSwatches(graphics, menuOpen ? -1 : mouseX, menuOpen ? -1 : mouseY);
 		this.drawPreview(graphics);
@@ -360,45 +360,45 @@ public final class WaypointEditScreen extends Screen {
 		if (menu != null) {
 			// Over everything drawn so far, text included.
 			//? if >=1.21.6 {
-			graphics.nextStratum();
+			/*graphics.nextStratum();
 			menu.draw(graphics, mouseX, mouseY);
-			//?} else {
-			/*graphics.flush();
+			*///?} else {
+			graphics.flush();
 			var pose = graphics.pose();
 			pose.pushPose();
 			pose.translate(0, 0, 400);
 			menu.draw(graphics, mouseX, mouseY);
 			pose.popPose();
-			*///?}
+			//?}
 		}
 	}
 
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
 		if (this.folderMenu != null) {
 			this.folderMenu.scroll(scrollY);
 			return true;
 		}
 		return super.mouseScrolled(x, y, scrollX, scrollY);
 	}
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
 		if (this.folderMenu != null) {
 			this.folderMenu.scroll(scrollY);
 			return true;
 		}
 		return super.mouseScrolled(x, y, scrollY);
 	}
-	*///?}
+	//?}
 
 	/**
 	 * The colours as flat swatches on a dark panel, the hovered one ringed in grey and the picked
 	 * one in white; then the hue bar and the shade bar for any other colour, each with a marker
 	 * where the colour sits; then a chip of the colour itself beside its hex.
 	 */
-	private void drawSwatches(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	private void drawSwatches(GuiGraphics graphics, int mouseX, int mouseY) {
 		int rows = WaypointColours.rows();
 		int x0 = this.swatchX;
 		int y0 = this.swatchY;
@@ -445,11 +445,11 @@ public final class WaypointEditScreen extends Screen {
 		graphics.fill(chipX + 2, chipY + 2, chipX + 18, chipY + 18, 0xFF000000 | this.color);
 		if (hovered >= 0) {
 			WaypointColours.Swatch swatch = WaypointColours.ALL.get(hovered);
-			graphics.setTooltipForNextFrame(this.font, Component.empty().append(swatch.name()).append(" " + WaypointColours.hex(swatch.argb())), mouseX, mouseY);
+			this.setTooltipForNextRenderPass(Component.empty().append(swatch.name()).append(" " + WaypointColours.hex(swatch.argb())));
 		}
 	}
 
-	private static void ring(GuiGraphicsExtractor graphics, int x0, int y0, int x1, int y1, int color) {
+	private static void ring(GuiGraphics graphics, int x0, int y0, int x1, int y1, int color) {
 		graphics.fill(x0, y0, x1, y0 + 1, color);
 		graphics.fill(x0, y1 - 1, x1, y1, color);
 		graphics.fill(x0, y0 + 1, x0 + 1, y1 - 1, color);
@@ -457,7 +457,7 @@ public final class WaypointEditScreen extends Screen {
 	}
 
 	/** A bar's marker: a white line a pixel wide in a black outline, a little taller than the bar. */
-	private static void marker(GuiGraphicsExtractor graphics, int x, int barY) {
+	private static void marker(GuiGraphics graphics, int x, int barY) {
 		graphics.fill(x - 1, barY - 2, x + 2, barY + BAR_HEIGHT + 2, 0xFF000000);
 		graphics.fill(x, barY - 1, x + 1, barY + BAR_HEIGHT + 1, 0xFFFFFFFF);
 	}
@@ -528,12 +528,12 @@ public final class WaypointEditScreen extends Screen {
 	 * The pin as the map will draw it, standing on its own piece of the map, in a list panel of its
 	 * own. The pin's head rises above the piece, so the two are centred together.
 	 */
-	private void drawPreview(GuiGraphicsExtractor graphics) {
+	private void drawPreview(GuiGraphics graphics) {
 		int x0 = this.left() + PREVIEW_LEFT;
 		int x1 = this.left() + WIDTH;
 		int y0 = this.previewTop();
 		int y1 = this.previewBottom();
-		graphics.text(this.font, Component.translatable("diorama.waypoint.preview"), x0, this.top() + 5, LABEL, true);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.preview"), x0, this.top() + 5, LABEL, true);
 		ScreenArt.list(graphics, x0, y0, x1, y1);
 		this.preview.name = this.typedName();
 		this.preview.initials = this.initials.getValue().trim();
@@ -550,17 +550,17 @@ public final class WaypointEditScreen extends Screen {
 		this.piece.draw(graphics, pieceX, pieceY, new MapPiece.Place(this.waypoint.dimension,
 			this.typed(this.x, this.waypoint.x), this.typed(this.y, this.waypoint.y), this.typed(this.z, this.waypoint.z)));
 		// The caption of the folder button under the panel.
-		graphics.text(this.font, Component.translatable("diorama.waypoint.folder_caption"), x0, y1 + 3, LABEL, true);
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(pieceX + this.piece.tipX(), pieceY + this.piece.tipY());
-		graphics.pose().scale(2);
+		graphics.drawString(this.font, Component.translatable("diorama.waypoint.folder_caption"), x0, y1 + 3, LABEL, true);
+		graphics.pose().pushPose();
+		graphics.pose().translate(pieceX + this.piece.tipX(), pieceY + this.piece.tipY(), 0);
+		graphics.pose().scale(2, 2, 1);
 		Pins.standing(graphics, this.preview, 0, 0, Pins.LARGE);
-		graphics.pose().popMatrix();
+		graphics.pose().popPose();
 	}
 
 	// Mouse events came as separate numbers before 1.21.9.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (this.folderMenu != null) {
 			this.clickFolderMenu(event.x(), event.y(), event.button());
@@ -589,8 +589,8 @@ public final class WaypointEditScreen extends Screen {
 		}
 		return super.keyPressed(event);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean keyPressed(int key, int scancode, int modifiers) {
 		if (this.folderMenu != null) {
 			this.keyFolderMenu(key);
@@ -618,7 +618,7 @@ public final class WaypointEditScreen extends Screen {
 		this.dragging = 0;
 		return super.mouseReleased(x, y, button);
 	}
-	*///?}
+	//?}
 
 	/** Picks the colour swatch or the bar spot under a left click; false if the click was on neither. */
 	private boolean clicked(double x, double y, int button) {
@@ -810,7 +810,7 @@ public final class WaypointEditScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

@@ -27,8 +27,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.MouseButtonInfo;
-//?}
+/*import net.minecraft.client.input.MouseButtonInfo;
+*///?}
 import net.minecraft.network.chat.Component;
 
 /** The shim's {@link ClientGameTestContext}, after Fabric API's ClientGameTestContextImpl. */
@@ -88,7 +88,7 @@ final class ShimContext implements ClientGameTestContext {
 	@Override
 	public void setScreen(Supplier<Screen> screen) {
 		ShimThreading.checkOnTestThread("setScreen");
-		runOnClient(minecraft -> minecraft.gui.setScreen(screen.get()));
+		runOnClient(minecraft -> minecraft.setScreen(screen.get()));
 	}
 
 	@Override
@@ -96,7 +96,7 @@ final class ShimContext implements ClientGameTestContext {
 		ShimThreading.checkOnTestThread("clickScreenButton");
 		Objects.requireNonNull(translationKey, "translationKey");
 		runOnClient(minecraft -> {
-			Screen current = minecraft.gui.screen();
+			Screen current = minecraft.screen;
 			if (!clickButton(current, translationKey)) {
 				throw new AssertionError("Could not find button '%s' in screen '%s'".formatted(
 					translationKey, current == null ? null : current.getClass().getName()));
@@ -131,10 +131,10 @@ final class ShimContext implements ClientGameTestContext {
 	private static boolean pressIfMatches(AbstractWidget widget, String text) {
 		if (widget instanceof Button button && text.equals(button.getMessage().getString())) {
 			//? if >=1.21.9 {
-			button.onPress(new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
-			//?} else {
-			/*button.onPress();
-			*///?}
+			/*button.onPress(new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
+			*///?} else {
+			button.onPress();
+			//?}
 			return true;
 		}
 		return false;
@@ -152,16 +152,16 @@ final class ShimContext implements ClientGameTestContext {
 			Path folder = minecraft.gameDirectory.toPath().resolve("screenshots");
 			Path file = folder.resolve("%04d_%s.png".formatted(SCREENSHOT_COUNTER.getAndIncrement(), name));
 			//? if >=26.2 {
-			RenderTarget target = minecraft.gameRenderer.mainRenderTarget();
-			//?} else {
-			/*RenderTarget target = minecraft.getMainRenderTarget();
-			*///?}
+			/*RenderTarget target = minecraft.gameRenderer.mainRenderTarget();
+			*///?} else {
+			RenderTarget target = minecraft.getMainRenderTarget();
+			//?}
 			//? if >=1.21.5 {
-			// The GPU copies the frame out, and the game hands the image over a frame or two later.
+			/*// The GPU copies the frame out, and the game hands the image over a frame or two later.
 			Screenshot.takeScreenshot(target, image -> write(image, file, written));
-			//?} else {
-			/*write(Screenshot.takeScreenshot(target), file, written);
-			*///?}
+			*///?} else {
+			write(Screenshot.takeScreenshot(target), file, written);
+			//?}
 		});
 		// A few frames normally; a lost callback fails the test instead of hanging it.
 		for (int frames = 0; !written.isDone(); frames++) {

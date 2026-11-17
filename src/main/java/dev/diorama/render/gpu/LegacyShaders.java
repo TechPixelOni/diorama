@@ -1,22 +1,22 @@
 //? if <1.21.6 {
-/*package dev.diorama.render.gpu;
+package dev.diorama.render.gpu;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.BufferBuilder.RenderedBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.diorama.Diorama;
 import net.minecraft.client.renderer.RenderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //? if >=1.21.5 {
-import com.mojang.blaze3d.pipeline.BlendFunction;
+/*import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.shaders.UniformType;
 import net.minecraft.client.renderer.RenderPipelines;
-//?} else if >=1.21.2 {
-import com.mojang.blaze3d.vertex.BufferUploader;
+*///?} else if >=1.21.2 {
+/*import com.mojang.blaze3d.vertex.BufferUploader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CompiledShaderProgram;
 import net.minecraft.client.renderer.CoreShaders;
@@ -25,7 +25,7 @@ import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.client.renderer.ShaderManager;
 import net.minecraft.client.renderer.ShaderProgram;
 import org.lwjgl.opengl.GL11;
-//?} else {
+*///?} else {
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -46,8 +46,8 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 // may be drawn. A resource reload can change the shaders' sources, so they're checked again after
 // each one.
 //? if >=1.21 {
-final class LegacyShaders {
-//?} else {
+/*final class LegacyShaders {
+*///?} else {
 // Before 1.21 shader shards and render type states were protected, so only a subclass of
 // RenderType can build these. It's never made.
 final class LegacyShaders extends RenderType {
@@ -55,7 +55,7 @@ final class LegacyShaders extends RenderType {
 	private static final Logger LOGGER = LoggerFactory.getLogger("diorama");
 
 	//? if >=1.21.5 {
-	private static final RenderPipeline TEXTURED_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
+	/*private static final RenderPipeline TEXTURED_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
 		.withLocation(Diorama.id("pipeline/textured"))
 		.withVertexShader("core/position_tex_color")
 		.withFragmentShader("core/position_tex_color")
@@ -171,15 +171,15 @@ final class LegacyShaders extends RenderType {
 		return ready;
 	}
 
-	static void drawTileNight(MeshData mesh) {
+	static void drawTileNight(RenderedBuffer mesh) {
 		TILE_NIGHT.draw(mesh);
 	}
 
-	static void draw(RenderType type, MeshData mesh) {
+	static void draw(RenderType type, RenderedBuffer mesh) {
 		type.draw(mesh);
 	}
 
-	static void drawFog(MeshData mesh) {
+	static void drawFog(RenderedBuffer mesh) {
 		FOG.draw(mesh);
 	}
 
@@ -188,7 +188,7 @@ final class LegacyShaders extends RenderType {
 	}
 
 	// Into a FogLayer texture, with the textures bound in slots 0 to 2: a pass of its own.
-	static void drawFogLayer(MeshData mesh, com.mojang.blaze3d.textures.GpuTexture into) {
+	static void drawFogLayer(RenderedBuffer mesh, com.mojang.blaze3d.textures.GpuTexture into) {
 		com.mojang.blaze3d.buffers.GpuBuffer vertices = FOG_LAYER_PIPELINE.getVertexFormat().uploadImmediateVertexBuffer(mesh.vertexBuffer());
 		RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
 		int count = mesh.drawState().indexCount();
@@ -208,12 +208,12 @@ final class LegacyShaders extends RenderType {
 		mesh.close();
 	}
 
-	static void drawTile(MeshData mesh) {
+	static void drawTile(RenderedBuffer mesh) {
 		TILE.draw(mesh);
 	}
-	//?} else {
+	*///?} else {
 	//? if >=1.21.2 {
-	private static final ShaderProgram FOG_PROGRAM = new ShaderProgram(Diorama.id("core/fog"), DefaultVertexFormat.POSITION_TEX_COLOR, ShaderDefines.EMPTY);
+	/*private static final ShaderProgram FOG_PROGRAM = new ShaderProgram(Diorama.id("core/fog"), DefaultVertexFormat.POSITION_TEX_COLOR, ShaderDefines.EMPTY);
 	private static final ShaderProgram TILE_PROGRAM = new ShaderProgram(Diorama.id("core/tile"), DefaultVertexFormat.POSITION_TEX_COLOR, ShaderDefines.EMPTY);
 	private static final ShaderProgram TILE_NIGHT_PROGRAM = new ShaderProgram(Diorama.id("core/tile_night"), DefaultVertexFormat.POSITION_TEX_COLOR, ShaderDefines.EMPTY);
 	private static final RenderStateShard.ShaderStateShard TEXTURED_SHADER = new RenderStateShard.ShaderStateShard(CoreShaders.POSITION_TEX_COLOR);
@@ -223,7 +223,7 @@ final class LegacyShaders extends RenderType {
 	private static CompiledShaderProgram fogProgram;
 	private static CompiledShaderProgram tileProgram;
 	private static CompiledShaderProgram tileNightProgram;
-	//?} else {
+	*///?} else {
 	private static ShaderInstance fogShader;
 	private static ShaderInstance fogLayerShader;
 	// The layer's program failed since the last reload: the map draws the fog directly until the next.
@@ -252,9 +252,9 @@ final class LegacyShaders extends RenderType {
 	private static final RenderType FOG_LAYER = create("diorama_fog_layer", DefaultVertexFormat.POSITION_TEX_COLOR, FOG_LAYER_SHADER);
 	//?}
 	//? if >=1.21.2 {
-	private static final RenderType TILE = create("diorama_tile", DefaultVertexFormat.POSITION_TEX_COLOR, FOG_SHADER);
+	/*private static final RenderType TILE = create("diorama_tile", DefaultVertexFormat.POSITION_TEX_COLOR, FOG_SHADER);
 	private static final RenderType TILE_NIGHT = create("diorama_tile_night", DefaultVertexFormat.POSITION_TEX_COLOR, FOG_SHADER);
-	//?} else {
+	*///?} else {
 	private static final RenderType TILE = create("diorama_tile", DefaultVertexFormat.POSITION_TEX_COLOR, TILE_SHADER);
 	private static final RenderType TILE_NIGHT = create("diorama_tile_night", DefaultVertexFormat.POSITION_TEX_COLOR, TILE_NIGHT_SHADER);
 	//?}
@@ -273,7 +273,7 @@ final class LegacyShaders extends RenderType {
 
 	static boolean fogReady() {
 		//? if >=1.21.2 {
-		ShaderManager shaders = Minecraft.getInstance().getShaderManager();
+		/*ShaderManager shaders = Minecraft.getInstance().getShaderManager();
 		Object reload = shaders.getProgram(CoreShaders.POSITION_TEX_COLOR);
 		if (reload != fogReload) {
 			fogReload = reload;
@@ -294,7 +294,7 @@ final class LegacyShaders extends RenderType {
 			LOGGER.error("Diorama's fog shader didn't compile; the map draws without fog", e);
 			return false;
 		}
-		//?} else {
+		*///?} else {
 		ShaderInstance reload = GameRenderer.getPositionTexColorShader();
 		if (reload != fogReload) {
 			fogReload = reload;
@@ -331,8 +331,8 @@ final class LegacyShaders extends RenderType {
 	// Whether the fog can be drawn into a FogLayer texture; asked after fogReady.
 	static boolean fogLayerReady() {
 		//? if >=1.21.2 {
-		return fogProgram != null;
-		//?} else {
+		/*return fogProgram != null;
+		*///?} else {
 		if (fogLayerShader == null && fogShader != null && !fogLayerFailed) {
 			try {
 				fogLayerShader = new ShaderInstance(Minecraft.getInstance().getResourceManager(), "diorama_fog_layer", DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -348,11 +348,11 @@ final class LegacyShaders extends RenderType {
 	// Into a FogLayer texture through its framebuffer, {@code size} on a side: the fog written as it
 	// is, not blended. The framebuffer is bound after the render type's state, which from 1.21.2
 	// binds the game's main target, and the main target is bound again after.
-	static void drawFogLayer(MeshData mesh, int framebuffer, int size) {
+	static void drawFogLayer(RenderedBuffer mesh, int framebuffer, int size) {
 		boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
 		//? if >=1.21.2 {
-		FOG.setupRenderState();
-		//?} else {
+		/*FOG.setupRenderState();
+		*///?} else {
 		FOG_LAYER.setupRenderState();
 		//?}
 		RenderSystem.disableBlend();
@@ -360,10 +360,10 @@ final class LegacyShaders extends RenderType {
 		com.mojang.blaze3d.platform.GlStateManager._glBindFramebuffer(36160, framebuffer);
 		com.mojang.blaze3d.platform.GlStateManager._viewport(0, 0, size, size);
 		//? if >=1.21.2 {
-		RenderSystem.setShader(fogProgram);
+		/*RenderSystem.setShader(fogProgram);
 		BufferUploader.drawWithShader(mesh);
 		FOG.clearRenderState();
-		//?} else {
+		*///?} else {
 		com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(mesh);
 		FOG_LAYER.clearRenderState();
 		//?}
@@ -376,7 +376,7 @@ final class LegacyShaders extends RenderType {
 	// As fogReady, for the tile shader.
 	static boolean tileReady() {
 		//? if >=1.21.2 {
-		ShaderManager shaders = Minecraft.getInstance().getShaderManager();
+		/*ShaderManager shaders = Minecraft.getInstance().getShaderManager();
 		Object reload = shaders.getProgram(CoreShaders.POSITION_TEX_COLOR);
 		if (reload != tileReload) {
 			tileReload = reload;
@@ -394,7 +394,7 @@ final class LegacyShaders extends RenderType {
 			LOGGER.error("Diorama's tile shader didn't compile; the map draws a little softer", e);
 			return false;
 		}
-		//?} else {
+		*///?} else {
 		ShaderInstance reload = GameRenderer.getPositionTexColorShader();
 		if (reload != tileReload) {
 			tileReload = reload;
@@ -419,7 +419,7 @@ final class LegacyShaders extends RenderType {
 	// As tileReady, for the night tile shader.
 	static boolean tileNightReady() {
 		//? if >=1.21.2 {
-		ShaderManager shaders = Minecraft.getInstance().getShaderManager();
+		/*ShaderManager shaders = Minecraft.getInstance().getShaderManager();
 		Object reload = shaders.getProgram(CoreShaders.POSITION_TEX_COLOR);
 		if (reload != tileNightReload) {
 			tileNightReload = reload;
@@ -437,7 +437,7 @@ final class LegacyShaders extends RenderType {
 			LOGGER.error("Diorama's night tile shader didn't compile; the map draws night without block light", e);
 			return false;
 		}
-		//?} else {
+		*///?} else {
 		ShaderInstance reload = GameRenderer.getPositionTexColorShader();
 		if (reload != tileNightReload) {
 			tileNightReload = reload;
@@ -462,12 +462,12 @@ final class LegacyShaders extends RenderType {
 	// The depth test shard for "always" leaves depth testing as it found it, and before 1.21.2 the
 	// GUI's flush turns it on, so earlier GUI shapes could hide parts of the map. Off for the draw,
 	// then back as it was.
-	static void draw(RenderType type, MeshData mesh) {
+	static void draw(RenderType type, RenderedBuffer mesh) {
 		boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
 		RenderSystem.disableDepthTest();
 		//? if >=1.21 {
-		type.draw(mesh);
-		//?} else {
+		/*type.draw(mesh);
+		*///?} else {
 		// What RenderType.draw does from 1.21.
 		type.setupRenderState();
 		BufferUploader.drawWithShader(mesh);
@@ -478,9 +478,9 @@ final class LegacyShaders extends RenderType {
 		}
 	}
 
-	static void drawFog(MeshData mesh) {
+	static void drawFog(RenderedBuffer mesh) {
 		//? if >=1.21.2 {
-		boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+		/*boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
 		FOG.setupRenderState();
 		RenderSystem.disableDepthTest();
 		RenderSystem.setShader(fogProgram);
@@ -489,14 +489,14 @@ final class LegacyShaders extends RenderType {
 		if (depth) {
 			RenderSystem.enableDepthTest();
 		}
-		//?} else {
+		*///?} else {
 		draw(FOG, mesh);
 		//?}
 	}
 
-	static void drawTile(MeshData mesh) {
+	static void drawTile(RenderedBuffer mesh) {
 		//? if >=1.21.2 {
-		boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+		/*boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
 		TILE.setupRenderState();
 		RenderSystem.disableDepthTest();
 		RenderSystem.setShader(tileProgram);
@@ -505,14 +505,14 @@ final class LegacyShaders extends RenderType {
 		if (depth) {
 			RenderSystem.enableDepthTest();
 		}
-		//?} else {
+		*///?} else {
 		draw(TILE, mesh);
 		//?}
 	}
 
-	static void drawTileNight(MeshData mesh) {
+	static void drawTileNight(RenderedBuffer mesh) {
 		//? if >=1.21.2 {
-		boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+		/*boolean depth = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
 		TILE_NIGHT.setupRenderState();
 		RenderSystem.disableDepthTest();
 		RenderSystem.setShader(tileNightProgram);
@@ -521,7 +521,7 @@ final class LegacyShaders extends RenderType {
 		if (depth) {
 			RenderSystem.enableDepthTest();
 		}
-		//?} else {
+		*///?} else {
 		draw(TILE_NIGHT, mesh);
 		//?}
 	}
@@ -533,4 +533,4 @@ final class LegacyShaders extends RenderType {
 		//?}
 	}
 }
-*///?}
+//?}

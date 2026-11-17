@@ -20,12 +20,12 @@
  */
 
 //? if >=26.2 {
-package net.fabricmc.fabric.api.client.gametest.v1.context;
+/*package net.fabricmc.fabric.api.client.gametest.v1.context;
 
 // The client's connection to a dedicated server, as its own type from 26.2. The whole file is a
 // Stonecutter block (before 26.2 the tests name TestServerConnection), so no block comments here.
-public interface TestDedicatedServerConnection extends TestServerConnection, AutoCloseable {
+public interface TestServerConnection extends TestServerConnection, AutoCloseable {
 	@Override
 	void close();
 }
-//?}
+*///?}

@@ -12,7 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 //?} else {
 /*import net.neoforged.fml.ModList;
 *///?}
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 
@@ -69,7 +69,7 @@ public final class Cobblemon {
 	 * One of Cobblemon's creatures as it's drawn: the species of a Pokémon or the class of an NPC, and
 	 * its aspects (shiny, a form, a gender, an NPC's outfit), which pick its model and texture.
 	 */
-	public record Subject(Identifier id, Set<String> aspects, boolean npc) {
+	public record Subject(ResourceLocation id, Set<String> aspects, boolean npc) {
 		public boolean shiny() {
 			return !this.npc && this.aspects.contains("shiny");
 		}
@@ -136,7 +136,7 @@ public final class Cobblemon {
 	}
 
 	private static @Nullable Subject subject(Object id, Object aspects, boolean npc) {
-		if (!(id instanceof Identifier identifier) || !(aspects instanceof Set<?> set)) {
+		if (!(id instanceof ResourceLocation identifier) || !(aspects instanceof Set<?> set)) {
 			return null;
 		}
 		Set<String> names = new TreeSet<>();
@@ -174,12 +174,12 @@ public final class Cobblemon {
 				if (state != null) {
 					floatingState = Class.forName("com.cobblemon.mod.common.client.render.models.blockbench.FloatingState").getConstructor();
 					setAspects = state.getMethod("setCurrentAspects", Set.class);
-					posablePortrait = gui.getMethod("drawPosablePortrait", Identifier.class, PoseStack.class, state, float.class);
+					posablePortrait = gui.getMethod("drawPosablePortrait", ResourceLocation.class, PoseStack.class, state, float.class);
 				} else {
 					Class<?> species = Class.forName("com.cobblemon.mod.common.pokemon.Species");
 					Class<?> all = Class.forName("com.cobblemon.mod.common.api.pokemon.PokemonSpecies");
 					allSpecies = all.getField("INSTANCE").get(null);
-					speciesById = all.getMethod("getByIdentifier", Identifier.class);
+					speciesById = all.getMethod("getByIdentifier", ResourceLocation.class);
 					pokemonPortrait = gui.getMethod("drawPortraitPokemon", species, Set.class, PoseStack.class, float.class, boolean.class,
 						Class.forName("com.cobblemon.mod.common.client.render.models.blockbench.PoseableEntityState"), float.class);
 				}

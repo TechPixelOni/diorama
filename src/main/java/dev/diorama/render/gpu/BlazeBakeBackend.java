@@ -1,31 +1,31 @@
 //? if >=26.2 {
-package dev.diorama.render.gpu;
+/*package dev.diorama.render.gpu;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.renderpearl.api.GpuFormat;
-import com.mojang.renderpearl.api.buffers.GpuBuffer;
-import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
-import com.mojang.renderpearl.api.commands.CommandEncoder;
-import com.mojang.renderpearl.api.commands.GpuQueryPool;
-import com.mojang.renderpearl.api.commands.RenderPass;
-import com.mojang.renderpearl.api.commands.RenderPassDescriptor;
-import com.mojang.renderpearl.api.device.GpuDevice;
-import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
-import com.mojang.renderpearl.api.pipeline.BlendFactor;
-import com.mojang.renderpearl.api.pipeline.BlendFunction;
-import com.mojang.renderpearl.api.pipeline.ColorTargetState;
-import com.mojang.renderpearl.api.pipeline.CompareOp;
-import com.mojang.renderpearl.api.pipeline.DepthStencilState;
-import com.mojang.renderpearl.api.pipeline.IndexType;
-import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-import com.mojang.renderpearl.api.pipeline.UniformType;
-import com.mojang.renderpearl.api.textures.AddressMode;
-import com.mojang.renderpearl.api.textures.FilterMode;
-import com.mojang.renderpearl.api.textures.GpuSampler;
-import com.mojang.renderpearl.api.textures.GpuTexture;
-import com.mojang.renderpearl.api.textures.GpuTextureView;
-import com.mojang.renderpearl.api.vertex.VertexFormat;
+import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.CommandEncoder;
+import com.mojang.blaze3d.systems.GpuQueryPool;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderPassDescriptor;
+import com.mojang.blaze3d.systems.GpuDevice;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
+import com.mojang.blaze3d.platform.BlendFactor;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.IndexType;
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.shaders.UniformType;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.diorama.Diorama;
 import dev.diorama.Projection;
 import dev.diorama.bake.GpuMesher;
@@ -46,11 +46,11 @@ import static dev.diorama.render.gpu.GpuTileBaker.UBO_SIZE;
 import static dev.diorama.render.gpu.GpuTileBaker.VOXEL_HEIGHT;
 import static dev.diorama.render.gpu.GpuTileBaker.VOXEL_WIDTH;
 
-/**
+/^*
  * Bakes through Minecraft's own GPU layer, which from 26.2 can express everything a bake needs
  * and runs on OpenGL and Vulkan alike. Pipelines aren't registered: they compile the first time
  * they're used, so a broken shader only sends tiles back to the tracer.
- */
+ ^/
 final class BlazeBakeBackend implements BakeBackend {
 	private @Nullable Targets targets;
 	private long timestampSlot;
@@ -84,51 +84,51 @@ final class BlazeBakeBackend implements BakeBackend {
 		BindGroupLayout.Builder builder = BindGroupLayout.builder();
 		for (String name : names) {
 			//? if >=26.3 {
-			builder.withUniform(name, UniformType.COMBINED_IMAGE_SAMPLER);
-			//?} else {
-			/*builder.withSampler(name);
-			*///?}
+			/^builder.withUniform(name, UniformType.COMBINED_IMAGE_SAMPLER);
+			^///?} else {
+			builder.withSampler(name);
+			//?}
 		}
 		return builder.build();
 	}
 
 	private static void bind(RenderPass pass, String name, GpuTextureView view, GpuSampler sampler) {
 		//? if >=26.3 {
-		pass.setUniform(name, view, sampler);
-		//?} else {
-		/*pass.bindTexture(name, view, sampler);
-		*///?}
+		/^pass.setUniform(name, view, sampler);
+		^///?} else {
+		pass.bindTexture(name, view, sampler);
+		//?}
 	}
 
-	/**
+	/^*
 	 * 26.2 gives every pipeline and pass a colour target, and sizes a pass by its first one, so a
 	 * depth-only pass there draws into a stand-in target it never writes.
-	 */
+	 ^/
 	private static RenderPipeline.Builder depthOnly(RenderPipeline.Builder builder) {
 		//? if <26.3 {
-		/*builder.withColorTargetState(new ColorTargetState(Optional.empty(), GpuFormat.R8_UNORM, ColorTargetState.WRITE_NONE));
-		*///?}
+		builder.withColorTargetState(new ColorTargetState(Optional.empty(), GpuFormat.R8_UNORM, ColorTargetState.WRITE_NONE));
+		//?}
 		return builder;
 	}
 
-	/** Whether the pipeline compiled; compiles it the first time. */
+	/^* Whether the pipeline compiled; compiles it the first time. ^/
 	private static boolean ready(RenderPipeline pipeline) {
 		//? if >=26.3 {
-		return RenderSystem.getCompiledPipelineNullable(pipeline) != null;
-		//?} else {
-		/*return RenderSystem.getDevice().precompilePipeline(pipeline).isValid();
-		*///?}
+		/^return RenderSystem.getCompiledPipelineNullable(pipeline) != null;
+		^///?} else {
+		return RenderSystem.getDevice().precompilePipeline(pipeline).isValid();
+		//?}
 	}
 
 	private static void use(RenderPass pass, RenderPipeline pipeline) {
 		//? if >=26.3 {
-		pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
-		//?} else {
-		/*pass.setPipeline(pipeline);
-		*///?}
+		/^pass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
+		^///?} else {
+		pass.setPipeline(pipeline);
+		//?}
 	}
 
-	/** A pass over several targets of one size. */
+	/^* A pass over several targets of one size. ^/
 	private static final class Pass {
 		private final java.util.function.Supplier<String> label;
 		private final java.util.List<GpuTextureView> colors = new java.util.ArrayList<>();
@@ -154,7 +154,7 @@ final class BlazeBakeBackend implements BakeBackend {
 
 		RenderPass open(CommandEncoder encoder, int size) {
 			//? if >=26.3 {
-			RenderPassDescriptor.Builder d = RenderPassDescriptor.builder(this.label);
+			/^RenderPassDescriptor.Builder d = RenderPassDescriptor.builder(this.label);
 			for (int i = 0; i < this.colors.size(); i++) {
 				d.withColorAttachment(this.colors.get(i), this.clears.get(i));
 			}
@@ -162,8 +162,8 @@ final class BlazeBakeBackend implements BakeBackend {
 				d.withDepthAttachment(this.depth, this.depthClear);
 			}
 			return encoder.createRenderPass(d.build());
-			//?} else {
-			/*RenderPassDescriptor d = RenderPassDescriptor.create(this.label);
+			^///?} else {
+			RenderPassDescriptor d = RenderPassDescriptor.create(this.label);
 			for (int i = 0; i < this.colors.size(); i++) {
 				d = d.withColorAttachment(this.colors.get(i), this.clears.get(i));
 			}
@@ -171,7 +171,7 @@ final class BlazeBakeBackend implements BakeBackend {
 				d = d.withDepthAttachment(this.depth, this.depthClear);
 			}
 			return encoder.createRenderPass(d.withRenderArea(new RenderPass.RenderArea(0, 0, size, size)));
-			*///?}
+			//?}
 		}
 	}
 
@@ -241,13 +241,13 @@ final class BlazeBakeBackend implements BakeBackend {
 		return depthRange(builder);
 	}
 
-	/** 26.3 tells shaders how its depth range runs; 26.2 leaves it to the pipeline. */
+	/^* 26.3 tells shaders how its depth range runs; 26.2 leaves it to the pipeline. ^/
 	private static RenderPipeline.Builder depthRange(RenderPipeline.Builder builder) {
 		//? if <26.3 {
-		/*if (RenderSystem.getDevice().getDeviceInfo().isZZeroToOne()) {
+		if (RenderSystem.getDevice().getDeviceInfo().isZZeroToOne()) {
 			builder.withShaderDefine("DIORAMA_DEPTH_ZERO_TO_ONE");
 		}
-		*///?}
+		//?}
 		return builder;
 	}
 
@@ -278,14 +278,14 @@ final class BlazeBakeBackend implements BakeBackend {
 		encoder.writeToBuffer(t.ubo.slice(), job.uniforms);
 		if (job.voxels != null && job.voxelRows > 0) {
 			//? if >=26.3 {
-			encoder.writeToTexture(t.voxels, job.voxels, 0, 0, 0, 0, VOXEL_WIDTH, job.voxelRows);
-			//?} else {
-			/*// 26.2's OpenGL writeToTexture sends every texture as bytes, which scrambles these 32-bit
+			/^encoder.writeToTexture(t.voxels, job.voxels, 0, 0, 0, 0, VOXEL_WIDTH, job.voxelRows);
+			^///?} else {
+			// 26.2's OpenGL writeToTexture sends every texture as bytes, which scrambles these 32-bit
 			// words; a copy from a buffer sends the texture's own type.
 			GpuBufferSlice upload = t.voxelUpload.slice(0, (long) job.voxelRows * VOXEL_WIDTH * 4);
 			encoder.writeToBuffer(upload, job.voxels);
 			encoder.copyBufferToTexture(upload, 0, 0, VOXEL_WIDTH, job.voxelRows, t.voxels, 0, 0, VOXEL_WIDTH, job.voxelRows, 0, 0);
-			*///?}
+			//?}
 		}
 
 		GpuBuffer faceBuffer = null;
@@ -319,8 +319,8 @@ final class BlazeBakeBackend implements BakeBackend {
 			}
 			Pass shadowPass = new Pass(() -> "Diorama bake shadow").depth(t.shadowView, OptionalDouble.of(0.0));
 			//? if <26.3 {
-			/*shadowPass.color(t.shadowStandInView, Optional.empty());
-			*///?}
+			shadowPass.color(t.shadowStandInView, Optional.empty());
+			//?}
 			try (RenderPass pass = shadowPass.open(encoder, SHADOW_SIZE)) {
 				if (casterBuffer != null) {
 					use(pass, SHADOW);
@@ -464,7 +464,7 @@ final class BlazeBakeBackend implements BakeBackend {
 	// What a ray that never meets a block shows: the tracer's near-black floor.
 	private static final Vector4f VOID = new Vector4f(0.01F, 0.01F, 0.015F, 1.0F);
 	private static final Vector4f CLEAR = new Vector4f(0, 0, 0, 0);
-	/** Nothing tinted yet: no colour added, everything let through. */
+	/^* Nothing tinted yet: no colour added, everything let through. ^/
 	private static final Vector4f NO_TINT = new Vector4f(0, 0, 0, 1);
 
 	private Targets targets() {
@@ -474,33 +474,33 @@ final class BlazeBakeBackend implements BakeBackend {
 		return this.targets;
 	}
 
-	/**
+	/^*
 	 * A nearest sampler an integer texture can use. Minecraft's OpenGL samplers minify "nearest"
 	 * with GL_NEAREST_MIPMAP_LINEAR, which OpenGL doesn't allow on integer textures: drivers that
 	 * keep to that (Apple's, Mesa's) read the voxel table as zeros, and lose the sky occlusion.
-	 */
+	 ^/
 	private static GpuSampler integerSampler(GpuDevice device) {
 		GpuSampler sampler = device.createSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, 1, OptionalDouble.empty());
 		//? if >=26.3 {
-		int gl = sampler instanceof com.mojang.renderpearl.backend.opengl.GlSampler glSampler ? glSampler.getId() : 0;
-		//?} else {
-		/*int gl = sampler instanceof com.mojang.blaze3d.opengl.GlSampler glSampler ? glSampler.getId() : 0;
-		*///?}
+		/^int gl = sampler instanceof com.mojang.renderpearl.backend.opengl.GlSampler glSampler ? glSampler.getId() : 0;
+		^///?} else {
+		int gl = sampler instanceof com.mojang.blaze3d.opengl.GlSampler glSampler ? glSampler.getId() : 0;
+		//?}
 		if (gl != 0) {
 			org.lwjgl.opengl.GL33C.glSamplerParameteri(gl, org.lwjgl.opengl.GL33C.GL_TEXTURE_MIN_FILTER, org.lwjgl.opengl.GL33C.GL_NEAREST);
 		}
 		return sampler;
 	}
 
-	/** The textures and buffers every bake reuses. Bakes run one after another in stream order, so one set does. */
+	/^* The textures and buffers every bake reuses. Bakes run one after another in stream order, so one set does. ^/
 	private static final class Targets {
 		static final int TIMESTAMPS = 128;
 		final GpuTexture shadow;
 		final GpuTextureView shadowView;
 		//? if <26.3 {
-		/*final GpuTexture shadowStandIn;
+		final GpuTexture shadowStandIn;
 		final GpuTextureView shadowStandInView;
-		*///?}
+		//?}
 		final GpuTexture sceneColor;
 		final GpuTextureView sceneColorView;
 		final GpuTexture sceneAux;
@@ -519,8 +519,8 @@ final class BlazeBakeBackend implements BakeBackend {
 		final GpuTextureView voxelsView;
 		final GpuSampler voxelSampler;
 		//? if <26.3 {
-		/*final GpuBuffer voxelUpload;
-		*///?}
+		final GpuBuffer voxelUpload;
+		//?}
 		final GpuTexture output;
 		final GpuTextureView outputView;
 		final GpuTexture outputInfo;
@@ -528,10 +528,10 @@ final class BlazeBakeBackend implements BakeBackend {
 		final GpuBuffer corners;
 		final GpuBuffer ubo;
 		final GpuQueryPool timestamps;
-		/**
+		/^*
 		 * The faces and shadow casters of the bake being drawn, grown to fit and kept. Making them
 		 * new for each bake took half of a bake's time on the render thread.
-		 */
+		 ^/
 		private @Nullable GpuBuffer faces;
 		private @Nullable GpuBuffer casters;
 
@@ -547,7 +547,7 @@ final class BlazeBakeBackend implements BakeBackend {
 			return this.casters;
 		}
 
-		/** {@code buffer} if it holds {@code bytes}, else a new one: the next power of two that does, at least a megabyte. */
+		/^* {@code buffer} if it holds {@code bytes}, else a new one: the next power of two that does, at least a megabyte. ^/
 		private static GpuBuffer fit(GpuDevice device, @Nullable GpuBuffer buffer, long bytes, String label) {
 			if (buffer != null && buffer.size() >= bytes) {
 				return buffer;
@@ -567,9 +567,9 @@ final class BlazeBakeBackend implements BakeBackend {
 			this.shadow = device.createTexture("Diorama bake shadow", sampled, GpuFormat.D32_FLOAT, SHADOW_SIZE, SHADOW_SIZE, 1, 1);
 			this.shadowView = device.createTextureView(this.shadow);
 			//? if <26.3 {
-			/*this.shadowStandIn = device.createTexture("Diorama bake shadow stand-in", GpuTexture.USAGE_RENDER_ATTACHMENT, GpuFormat.R8_UNORM, SHADOW_SIZE, SHADOW_SIZE, 1, 1);
+			this.shadowStandIn = device.createTexture("Diorama bake shadow stand-in", GpuTexture.USAGE_RENDER_ATTACHMENT, GpuFormat.R8_UNORM, SHADOW_SIZE, SHADOW_SIZE, 1, 1);
 			this.shadowStandInView = device.createTextureView(this.shadowStandIn);
-			*///?}
+			//?}
 			this.sceneColor = device.createTexture("Diorama bake scene", sampled, GpuFormat.RGBA16_FLOAT, SCENE, SCENE, 1, 1);
 			this.sceneColorView = device.createTextureView(this.sceneColor);
 			this.sceneAux = device.createTexture("Diorama bake scene aux", sampled, GpuFormat.RGBA16_FLOAT, SCENE, SCENE, 1, 1);
@@ -590,10 +590,10 @@ final class BlazeBakeBackend implements BakeBackend {
 			this.voxelsView = device.createTextureView(this.voxels);
 			this.voxelSampler = integerSampler(device);
 			//? if <26.3 {
-			/*this.voxelUpload = device.createBuffer(
+			this.voxelUpload = device.createBuffer(
 				() -> "Diorama bake voxel upload", GpuBuffer.USAGE_COPY_SRC | GpuBuffer.USAGE_COPY_DST, (long) VOXEL_WIDTH * VOXEL_HEIGHT * 4
 			);
-			*///?}
+			//?}
 			this.output = device.createTexture("Diorama bake output", read, GpuFormat.RGBA8_UNORM, size, size, 1, 1);
 			this.outputView = device.createTextureView(this.output);
 			// Overlay bits in red, block light in green.
@@ -616,4 +616,4 @@ final class BlazeBakeBackend implements BakeBackend {
 		}
 	}
 }
-//?}
+*///?}

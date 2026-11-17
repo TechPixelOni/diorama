@@ -1,6 +1,6 @@
-#version 330
+#version 150
 //? if >=26.3 {
-#extension GL_ARB_separate_shader_objects : require
+//#extension GL_ARB_separate_shader_objects : require
 //?}
 
 // A map tile at night that has block light on it: the day picture dimmed toward moonlight, with a
@@ -18,16 +18,16 @@ uniform sampler2D Sampler1;
 // crisp (else each screen pixel averages the tile's under it, as tile.fsh does), and the map's
 // opacity in alpha.
 //? if >=26.3 {
-layout(location = 0) in vec2 maskUv;
-layout(location = 1) in vec4 params;
-
-layout(location = 0) out vec4 fragColor;
+//layout(location = 0) in vec2 maskUv;
+//layout(location = 1) in vec4 params;
+//
+//layout(location = 0) out vec4 fragColor;
 //?} else {
-/*in vec2 maskUv;
+in vec2 maskUv;
 in vec4 params;
 
 out vec4 fragColor;
-*///?}
+//?}
 
 const float LAST_LEVEL = 5.0;
 const vec3 MOON = vec3(0.27, 0.33, 0.49);

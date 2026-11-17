@@ -11,7 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -243,7 +243,7 @@ public final class WaypointBeams {
 		double nextZ = uz == 0 ? Double.POSITIVE_INFINITY : (uz > 0 ? z + 1 - this.eye.z : this.eye.z - z) * perZ;
 		// Which way the line runs over the ground decides which face of a block it meets.
 		int face = Math.abs(ux) >= Math.abs(uz) ? ALONG_X : ALONG_Z;
-		int floor = this.level.getMinY();
+		int floor = this.level.getMinBuildHeight();
 		int budget = this.blocks - LOOK_MOST;
 		double entered = 0;
 		// Past its budget a look stops, and the beam shows for what wasn't looked at: a camera high over
@@ -466,7 +466,7 @@ public final class WaypointBeams {
 	}
 
 	/** Draws what was added since {@link #begin}. */
-	void draw(GuiGraphicsExtractor graphics) {
+	void draw(GuiGraphics graphics) {
 		if (this.quads == 0) {
 			return;
 		}

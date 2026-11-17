@@ -1,7 +1,7 @@
 package dev.diorama.test;
 
 //? if >=1.21.4 && fabric {
-import dev.diorama.Diorama;
+/*import dev.diorama.Diorama;
 import dev.diorama.MapScreen;
 import dev.diorama.MapSession;
 import dev.diorama.Projection;
@@ -11,7 +11,7 @@ import dev.diorama.render.SavedChunkImport;
 import dev.diorama.share.ShareClient;
 import dev.diorama.share.SharedChunks;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
 import java.util.ArrayList;
 import net.minecraft.core.BlockPos;
@@ -23,13 +23,13 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-/**
+/^*
  * The shared map on the test API's server (#289): land a player spent time on far from where this
  * player is shows up on this player's map without them going there, land nobody visited doesn't,
  * and the blocks that came can't be read for ores.
- */
+ ^/
 final class SharedMapTest {
-	/** Chunks east of spawn a player spent time near, and as far west, ones only generated. */
+	/^* Chunks east of spawn a player spent time near, and as far west, ones only generated. ^/
 	private static final int VISITED_X = 41;
 	private static final int UNVISITED_X = -41;
 	private static final int RADIUS = 3;
@@ -68,14 +68,14 @@ final class SharedMapTest {
 				s.saveEverything(true, true, true);
 			});
 			int ground = server.computeOnServer(s -> s.overworld().getHeight(Heightmap.Types.WORLD_SURFACE, VISITED_X * 16 + 8, 8));
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				long joined = System.nanoTime();
 				context.waitFor(mc -> ShareClient.sharing() && MapSession.get() != null && MapSession.get().savedChunks() != null, 1200);
 				if (context.computeOnClient(mc -> MapSession.get().map().chunk(VISITED_X, 0) != null)) {
 					throw new AssertionError("The client loaded the visited chunks itself: this wouldn't show sharing");
 				}
 				context.setScreen(MapScreen::new);
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
+				context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
 				context.waitFor(mc -> job().drewChunk(VISITED_X, 0), 12000);
 				Diorama.LOGGER.info("Shared land drawn {} s after joining", Math.round((System.nanoTime() - joined) / 1e9));
 				context.waitTicks(40);
@@ -110,14 +110,14 @@ final class SharedMapTest {
 
 				// The same land drawn by this player's own map once they go there: shared land is
 				// drawn as their own would be, so where one meets the other there's no seam.
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
+				context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
 				int[] sharedPixels = context.computeOnClient(mc -> MapSession.get().map().savedMap().read(tile)).clone();
 				context.setScreen(() -> null);
 				server.runCommand("tp @a " + (VISITED_X * 16 + 8) + " " + (ground + 20) + " 8");
 				context.waitFor(mc -> MapSession.get().map().chunk(VISITED_X, 0) != null, 2400);
 				DioramaClientTest.settle(context, 200);
 				context.setScreen(MapScreen::new);
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
+				context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(VISITED_X * 16 + 8, Projection.v(ground, 8), 2, TileKey.SURFACE));
 				context.waitTicks(40);
 				context.takeScreenshot("shared-map-then-walked");
 				int[] ownPixels = context.computeOnClient(mc -> MapSession.get().map().savedMap().read(tile));
@@ -154,7 +154,7 @@ final class SharedMapTest {
 		return MapSession.get().savedChunks();
 	}
 
-	/** The indexes of the sections that came with a shared chunk. */
+	/^* The indexes of the sections that came with a shared chunk. ^/
 	private static List<Integer> sent(SavedChunk chunk) {
 		List<Integer> sent = new ArrayList<>();
 		for (int s = 0; s < chunk.states().length; s++) {
@@ -165,7 +165,7 @@ final class SharedMapTest {
 		return sent;
 	}
 
-	/** Ores no ray can reach, inside the given sections of the chunk as the server has it. */
+	/^* Ores no ray can reach, inside the given sections of the chunk as the server has it. ^/
 	private static int hiddenOres(LevelChunk chunk, List<Integer> sections) {
 		int count = 0;
 		for (int s : sections) {
@@ -174,7 +174,7 @@ final class SharedMapTest {
 		return count;
 	}
 
-	/** The same, in what came. */
+	/^* The same, in what came. ^/
 	private static int hiddenOres(SavedChunk chunk) {
 		int count = 0;
 		for (int s : sent(chunk)) {
@@ -183,7 +183,7 @@ final class SharedMapTest {
 		return count;
 	}
 
-	/** Ores inside one section with an opaque full block on every side. */
+	/^* Ores inside one section with an opaque full block on every side. ^/
 	private static int hiddenOres(PalettedContainer<BlockState> states) {
 		int count = 0;
 		for (int y = 1; y < 15; y++) {
@@ -208,4 +208,4 @@ final class SharedMapTest {
 		return true;
 	}
 }
-//?}
+*///?}

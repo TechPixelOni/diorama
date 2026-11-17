@@ -311,7 +311,7 @@ final class ServerSave implements ChunkSave {
 	}
 
 	private void setTop(int chunkX, int chunkZ, ChunkTags.@Nullable Summary summary) {
-		short top = summary == null || !summary.finished() || summary.maxY() <= this.level.getMinY() ? NONE : (short) summary.maxY();
+		short top = summary == null || !summary.finished() || summary.maxY() <= this.level.getMinBuildHeight() ? NONE : (short) summary.maxY();
 		this.tops.computeIfAbsent(regionKey(chunkX >> 5, chunkZ >> 5), k -> {
 			short[] tops = new short[1024];
 			Arrays.fill(tops, UNKNOWN);
@@ -369,9 +369,9 @@ final class ServerSave implements ChunkSave {
 	@Override
 	public boolean serverBehind() {
 		//? if >=1.21 {
-		return this.level.getServer().getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
-		//?} else {
-		/*return this.level.getServer().getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
-		*///?}
+		/*return this.level.getServer().getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
+		*///?} else {
+		return this.level.getServer().getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
+		//?}
 	}
 }

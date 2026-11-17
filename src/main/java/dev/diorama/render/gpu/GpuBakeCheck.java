@@ -586,10 +586,10 @@ public final class GpuBakeCheck {
 		mc.execute(() -> {
 			Component message = Component.translatable("diorama.gpu_baking.failed");
 			//? if >=26.1 {
-			mc.gui.hud.getChat().addClientSystemMessage(message);
-			//?} else {
-			/*mc.gui.getChat().addMessage(message);
-			*///?}
+			/*mc.gui.getChat().addClientSystemMessage(message);
+			*///?} else {
+			mc.gui.getChat().addMessage(message);
+			//?}
 		});
 	}
 }

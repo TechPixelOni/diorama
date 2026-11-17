@@ -1,5 +1,5 @@
 //? if >=26.3 {
-package dev.diorama.gameshim.mixin;
+/*package dev.diorama.gameshim.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,4 +28,4 @@ public abstract class SDLEventHandlerMixin {
 		ci.cancel();
 	}
 }
-//?}
+*///?}

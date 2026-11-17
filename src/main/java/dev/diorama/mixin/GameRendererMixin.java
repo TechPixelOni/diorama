@@ -4,16 +4,16 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.diorama.waypoint.WorldProjection;
 import net.minecraft.client.renderer.GameRenderer;
 //? if >=26.1 {
-import com.mojang.blaze3d.vertex.PoseStack;
+/*import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
-//?} else {
-/*import net.minecraft.client.Camera;
+*///?} else {
+import net.minecraft.client.Camera;
 import org.joml.Quaternionf;
-*///?}
+//?}
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,19 +34,19 @@ public abstract class GameRendererMixin {
 	// tiles after it has started drawing it. From 26.1 the GUI is handed its draws in extract,
 	// before render; until then, at the start of render.
 	//? if >=26.1 {
-	@Inject(method = "extract(Lnet/minecraft/client/DeltaTracker;Z)V", at = @At("HEAD"))
-	//?} else if >=1.21 {
+	/*@Inject(method = "extract(Lnet/minecraft/client/DeltaTracker;Z)V", at = @At("HEAD"))
+	*///?} else if >=1.21 {
 	/*@Inject(method = "render(Lnet/minecraft/client/DeltaTracker;Z)V", at = @At("HEAD"))
 	*///?} else {
-	/*@Inject(method = "render(FJZ)V", at = @At("HEAD"))
-	*///?}
+	@Inject(method = "render(FJZ)V", at = @At("HEAD"))
+	//?}
 	private void diorama$gpuBakes(CallbackInfo ci) {
 		boolean baked = dev.diorama.render.gpu.GpuTileBaker.frame();
 		dev.diorama.MapSession.frame(baked);
 	}
 
 	//? if >=26.1 {
-	@Shadow
+	/*@Shadow
 	@Final
 	private GameRenderState gameRenderState;
 
@@ -59,24 +59,24 @@ public abstract class GameRendererMixin {
 	}
 
 	//? if <26.3 {
-	/*@Shadow
+	@Shadow
 	@Final
 	private net.minecraft.client.Minecraft minecraft;
 	@Shadow
 	private float spinningEffectTime;
 	@Shadow
 	private float spinningEffectSpeed;
-	*///?}
+	//?}
 
 	// From 26.1 the GUI is laid out in extract, before renderLevel draws the world, so renderLevel's
 	// projection would reach the waypoints a frame late. The frame's camera is already extracted
 	// when the GUI's turn comes, so the projection is worked out here as renderLevel will from the
 	// same state: the camera's, then the damage tilt and view bobbing, then nausea's skew.
 	//? if >=26.2 {
-	@Inject(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V"))
-	//?} else {
-	/*@Inject(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"))
-	*///?}
+	/^@Inject(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/DeltaTracker;ZZ)V"))
+	^///?} else {
+	@Inject(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"))
+	//?}
 	private void diorama$captureWorldProjection(CallbackInfo ci, @Local(argsOnly = true) net.minecraft.client.DeltaTracker deltaTracker) {
 		CameraRenderState cameraState = this.gameRenderState.levelRenderState.cameraRenderState;
 		// Not before a world's camera has been extracted. A frame that doesn't draw the world
@@ -92,17 +92,17 @@ public abstract class GameRendererMixin {
 		}
 		projectionMatrix.mul(bobStack.last().pose());
 		//? if >=26.3 {
-		var playerState = this.gameRenderState.levelRenderState.playerRenderState;
+		/^var playerState = this.gameRenderState.levelRenderState.playerRenderState;
 		float portal = playerState.portalEffectIntensity;
 		float nausea = playerState.nauseaEffectIntensity;
 		float spinningAngle = playerState.spinningEffectAngle;
-		//?} else {
-		/*var player = this.minecraft.player;
+		^///?} else {
+		var player = this.minecraft.player;
 		float worldPartialTicks = deltaTracker.getGameTimeDeltaPartialTick(false);
 		float portal = player == null ? 0 : net.minecraft.util.Mth.lerp(worldPartialTicks, player.oPortalEffectIntensity, player.portalEffectIntensity);
 		float nausea = player == null ? 0 : player.getEffectBlendFactor(net.minecraft.world.effect.MobEffects.NAUSEA, worldPartialTicks);
 		float spinningAngle = this.spinningEffectTime + worldPartialTicks * this.spinningEffectSpeed;
-		*///?}
+		//?}
 		float screenEffectScale = this.gameRenderState.optionsRenderState.screenEffectScale;
 		float spinning = Math.max(portal, nausea) * screenEffectScale * screenEffectScale;
 		if (spinning > 0) {
@@ -116,7 +116,7 @@ public abstract class GameRendererMixin {
 		}
 		WorldProjection.capture(projectionMatrix, cameraState.viewRotationMatrix, cameraState.pos);
 	}
-	//?} else if >=1.21.9 {
+	*///?} else if >=1.21.9 {
 	/*// renderLevel sets the projection twice here: first for the world, then for the hand.
 	@Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setProjectionMatrix", ordinal = 0))
 	private void diorama$captureWorldProjection(CallbackInfo ci, @Local Matrix4f projectionMatrix) {
@@ -148,7 +148,7 @@ public abstract class GameRendererMixin {
 		WorldProjection.capture(projectionMatrix, new Matrix4f().rotation(camera.rotation().conjugate(new Quaternionf())), camera.getPosition());
 	}
 	*///?} else {
-	/*// 1.20.1 sets the camera up after the world's projection, so this waits for the level
+	// 1.20.1 sets the camera up after the world's projection, so this waits for the level
 	// renderer's call: by then the camera has this frame's rotation, where the projection's call
 	// would still see the last frame's. The projection is the first Matrix4f local there too. The
 	// view rotation is the pose stack renderLevel turned by the camera's pitch and yaw, as the
@@ -158,7 +158,7 @@ public abstract class GameRendererMixin {
 		Camera camera = ((GameRenderer) (Object) this).getMainCamera();
 		WorldProjection.capture(projectionMatrix, new Matrix4f(view.last().pose()), camera.getPosition());
 	}
-	*///?}
+	//?}
 
 	// Waypoints in the world go under the whole GUI on Fabric before 1.21.6 and on Forge too, as
 	// addFirst from 1.21.6 (and NeoForge's registerBelowAll) puts them. Fabric API's HUD layers and
@@ -172,35 +172,35 @@ public abstract class GameRendererMixin {
 	private static final dev.diorama.waypoint.WaypointHud diorama$waypoints = new dev.diorama.waypoint.WaypointHud();
 
 	@Inject(method = "render(Lnet/minecraft/client/DeltaTracker;Z)V", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=gui"))
-	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphicsExtractor graphics, @Local(argsOnly = true) net.minecraft.client.DeltaTracker deltaTracker) {
+	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphics graphics, @Local(argsOnly = true) net.minecraft.client.DeltaTracker deltaTracker) {
 		var pose = graphics.pose();
 		pose.pushPose();
 		pose.translate(0, 0, -5000);
-		diorama$waypoints.extractRenderState(graphics, deltaTracker);
+		diorama$waypoints.render(graphics, deltaTracker);
 		pose.popPose();
 	}
 	*///?} else if fabric && <1.21 {
-	/*@org.spongepowered.asm.mixin.Unique
+	@org.spongepowered.asm.mixin.Unique
 	private static final dev.diorama.waypoint.WaypointHud diorama$waypoints = new dev.diorama.waypoint.WaypointHud();
 
 	@Inject(method = "render(FJZ)V", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=gui"))
-	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphicsExtractor graphics, @Local(argsOnly = true, ordinal = 0) float partialTick) {
+	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphics graphics, @Local(argsOnly = true, ordinal = 0) float partialTick) {
 		var pose = graphics.pose();
 		pose.pushPose();
 		pose.translate(0, 0, -5000);
-		diorama$waypoints.extractRenderState(graphics, partialTick);
+		diorama$waypoints.render(graphics, partialTick);
 		pose.popPose();
 	}
-	*///?} else if forge {
+	//?} else if forge {
 	/*@org.spongepowered.asm.mixin.Unique
 	private static final dev.diorama.waypoint.WaypointHud diorama$waypoints = new dev.diorama.waypoint.WaypointHud();
 
 	@Inject(method = "render(FJZ)V", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=gui"))
-	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphicsExtractor graphics, @Local(argsOnly = true, ordinal = 0) float partialTick) {
+	private void diorama$waypointsUnderGui(CallbackInfo ci, @Local net.minecraft.client.gui.GuiGraphics graphics, @Local(argsOnly = true, ordinal = 0) float partialTick) {
 		var pose = graphics.pose();
 		pose.pushPose();
 		pose.translate(0, 0, -900);
-		diorama$waypoints.extractRenderState(graphics, partialTick);
+		diorama$waypoints.render(graphics, partialTick);
 		pose.popPose();
 	}
 	*///?}

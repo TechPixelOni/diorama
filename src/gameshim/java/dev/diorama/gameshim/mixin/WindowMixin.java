@@ -8,15 +8,15 @@ import com.mojang.blaze3d.platform.VideoMode;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.WindowEventHandler;
 //? if >=26.2 {
-import com.mojang.blaze3d.platform.MonitorManager;
-//?} else {
-/*import com.mojang.blaze3d.platform.ScreenManager;
-*///?}
+/*import com.mojang.blaze3d.platform.MonitorManager;
+*///?} else {
+import com.mojang.blaze3d.platform.ScreenManager;
+//?}
 //? if >=26.3 {
-import com.mojang.renderpearl.api.device.GpuBackend;
+/*import com.mojang.renderpearl.api.device.GpuBackend;
 import org.lwjgl.sdl.SDLEvents;
 import org.lwjgl.sdl.SDL_Event;
-//?} else if >=26.1 {
+*///?} else if >=26.1 {
 /*import com.mojang.blaze3d.systems.GpuBackend;
 *///?}
 
@@ -64,20 +64,20 @@ public abstract class WindowMixin implements WindowHooks {
 	@Final
 	private WindowEventHandler eventHandler;
 	//? if >=26.2 {
-	@Shadow
-	@Final
-	private MonitorManager monitorManager;
-	//?} else {
 	/*@Shadow
 	@Final
+	private MonitorManager monitorManager;
+	*///?} else {
+	@Shadow
+	@Final
 	private ScreenManager screenManager;
-	*///?}
+	//?}
 	@Shadow
 	private Optional<VideoMode> preferredFullscreenVideoMode;
 	//? if >=26.1 {
-	@Shadow
+	/*@Shadow
 	private boolean focused;
-	//?}
+	*///?}
 
 	@Shadow
 	protected abstract void setMode();
@@ -104,26 +104,26 @@ public abstract class WindowMixin implements WindowHooks {
 	private int keptFramebufferHeight;
 
 	//? if >=26.3 {
-	// The constructor that does the work; the other one calls it.
+	/*// The constructor that does the work; the other one calls it.
 	@Inject(method = "<init>(Lcom/mojang/blaze3d/platform/WindowEventHandler;Lcom/mojang/blaze3d/platform/DisplayData;Ljava/lang/String;ZLjava/lang/String;Lcom/mojang/blaze3d/platform/MonitorManager;Lcom/mojang/renderpearl/api/device/GpuBackend;I)V", at = @At("RETURN"))
 	private void diorama$init(WindowEventHandler eventHandler, DisplayData displayData, String videoMode, boolean exclusiveFullscreen, String title, MonitorManager monitorManager, GpuBackend backend, int maximumSize, CallbackInfo ci) {
-	//?} else if >=26.2 {
+	*///?} else if >=26.2 {
 	/*@Inject(method = "<init>", at = @At("RETURN"))
 	private void diorama$init(WindowEventHandler eventHandler, DisplayData displayData, String videoMode, boolean exclusiveFullscreen, String title, MonitorManager monitorManager, GpuBackend backend, CallbackInfo ci) {
 	*///?} else if >=26.1 {
 	/*@Inject(method = "<init>", at = @At("RETURN"))
 	private void diorama$init(WindowEventHandler eventHandler, DisplayData displayData, String videoMode, String title, GpuBackend backend, CallbackInfo ci) {
 	*///?} else {
-	/*@Inject(method = "<init>", at = @At("RETURN"))
+	@Inject(method = "<init>", at = @At("RETURN"))
 	private void diorama$init(WindowEventHandler eventHandler, ScreenManager screenManager, DisplayData displayData, String videoMode, String title, CallbackInfo ci) {
-	*///?}
+	//?}
 		//? if >=1.21.5 {
-		defaultWidth = displayData.width();
+		/*defaultWidth = displayData.width();
 		defaultHeight = displayData.height();
-		//?} else {
-		/*defaultWidth = displayData.width;
+		*///?} else {
+		defaultWidth = displayData.width;
 		defaultHeight = displayData.height;
-		*///?}
+		//?}
 		realFramebufferWidth = framebufferWidth;
 		realFramebufferHeight = framebufferHeight;
 		width = windowedWidth = framebufferWidth = defaultWidth;
@@ -131,7 +131,7 @@ public abstract class WindowMixin implements WindowHooks {
 	}
 
 	//? if >=26.3 {
-	@Inject(method = {"onFocus", "onIconified"}, at = @At("HEAD"), cancellable = true)
+	/*@Inject(method = {"onFocus", "onIconified"}, at = @At("HEAD"), cancellable = true)
 	private void diorama$ignoreFocus(CallbackInfo ci) {
 		ci.cancel();
 	}
@@ -151,8 +151,8 @@ public abstract class WindowMixin implements WindowHooks {
 
 	@Inject(method = "onFramebufferResize", at = @At("HEAD"), cancellable = true)
 	private void diorama$ignoreFramebufferResize(int width, int height, CallbackInfo ci) {
-	//?} else {
-	/*@Inject(method = {"onFocus", "onEnter"}, at = @At("HEAD"), cancellable = true)
+	*///?} else {
+	@Inject(method = {"onFocus", "onEnter"}, at = @At("HEAD"), cancellable = true)
 	private void diorama$ignoreFocus(CallbackInfo ci) {
 		ci.cancel();
 	}
@@ -170,7 +170,7 @@ public abstract class WindowMixin implements WindowHooks {
 
 	@Inject(method = "onFramebufferResize", at = @At("HEAD"), cancellable = true)
 	private void diorama$ignoreFramebufferResize(long window, int width, int height, CallbackInfo ci) {
-	*///?}
+	//?}
 		if (width != 0 && height != 0) {
 			realFramebufferWidth = width;
 			realFramebufferHeight = height;
@@ -200,12 +200,12 @@ public abstract class WindowMixin implements WindowHooks {
 		windowedWidth = keptWindowedWidth;
 		windowedHeight = keptWindowedHeight;
 		//? if >=26.3 {
-		// From 26.3 the mode change also reads the real framebuffer size back.
+		/*// From 26.3 the mode change also reads the real framebuffer size back.
 		realFramebufferWidth = framebufferWidth;
 		realFramebufferHeight = framebufferHeight;
 		framebufferWidth = keptFramebufferWidth;
 		framebufferHeight = keptFramebufferHeight;
-		//?}
+		*///?}
 	}
 
 	@Inject(method = "setWindowed", at = @At("HEAD"), cancellable = true)
@@ -233,8 +233,8 @@ public abstract class WindowMixin implements WindowHooks {
 	@Override
 	public void diorama$focus() {
 		//? if >=26.1 {
-		focused = true;
-		//?}
+		/*focused = true;
+		*///?}
 	}
 
 	@Override
@@ -245,23 +245,23 @@ public abstract class WindowMixin implements WindowHooks {
 		}
 		// Grow or shrink around the window's centre, keeping it on its monitor where possible.
 		//? if >=26.2 {
-		Monitor monitor = monitorManager.findBestMonitor((Window) (Object) this);
-		//?} else {
-		/*Monitor monitor = screenManager.findBestMonitor((Window) (Object) this);
-		*///?}
+		/*Monitor monitor = monitorManager.findBestMonitor((Window) (Object) this);
+		*///?} else {
+		Monitor monitor = screenManager.findBestMonitor((Window) (Object) this);
+		//?}
 		if (monitor != null) {
 			//? if >=26.3 {
-			VideoMode videoMode = monitor.getPreferredVideoMode(preferredFullscreenVideoMode);
-			//?} else {
-			/*VideoMode videoMode = monitor.getPreferredVidMode(preferredFullscreenVideoMode);
-			*///?}
+			/*VideoMode videoMode = monitor.getPreferredVideoMode(preferredFullscreenVideoMode);
+			*///?} else {
+			VideoMode videoMode = monitor.getPreferredVidMode(preferredFullscreenVideoMode);
+			//?}
 			//? if >=26.2 {
-			int monitorX = monitor.x();
+			/*int monitorX = monitor.x();
 			int monitorY = monitor.y();
-			//?} else {
-			/*int monitorX = monitor.getX();
+			*///?} else {
+			int monitorX = monitor.getX();
 			int monitorY = monitor.getY();
-			*///?}
+			//?}
 			x += (windowedWidth - width) / 2;
 			y += (windowedHeight - height) / 2;
 			x = Math.max(monitorX, Math.min(x, monitorX + videoMode.getWidth() - width));
@@ -273,9 +273,9 @@ public abstract class WindowMixin implements WindowHooks {
 		this.height = windowedHeight = framebufferHeight = height;
 		setMode();
 		//? if >=26.1 {
-		eventHandler.resizeGui();
-		//?} else {
-		/*eventHandler.resizeDisplay();
-		*///?}
+		/*eventHandler.resizeGui();
+		*///?} else {
+		eventHandler.resizeDisplay();
+		//?}
 	}
 }

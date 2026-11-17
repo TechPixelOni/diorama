@@ -11,12 +11,12 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 //? if >=1.21 {
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-//?} else {
-/*import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+/*import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+*///?} else {
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
 import net.minecraft.network.FriendlyByteBuf;
-*///?}
+//?}
 
 /**
  * Diorama's entrypoint on both sides on Fabric: the share channel, and the server half on a
@@ -35,8 +35,8 @@ public final class DioramaFabricCommon implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPED.register(ShareServer::stopped);
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> WebMapCommand.register(dispatcher));
 		//? if >=1.21 {
-		PayloadTypeRegistry.clientboundPlay().register(ShareProtocol.TYPE, ShareProtocol.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(ShareProtocol.TYPE, ShareProtocol.CODEC);
+		/*PayloadTypeRegistry.playS2C().register(ShareProtocol.TYPE, ShareProtocol.CODEC);
+		PayloadTypeRegistry.playC2S().register(ShareProtocol.TYPE, ShareProtocol.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(ShareProtocol.TYPE, (packet, context) -> ShareServer.receive(context.player(), packet.data()));
 		ShareProtocol.sender((player, data) -> ServerPlayNetworking.send(player, new ShareProtocol.Packet(data)));
 		// The client says which channels it has while it's configured, before it plays.
@@ -45,8 +45,8 @@ public final class DioramaFabricCommon implements ModInitializer {
 				ShareServer.listening(handler.player);
 			}
 		});
-		//?} else {
-		/*ServerPlayNetworking.registerGlobalReceiver(ShareProtocol.CHANNEL, (server, player, handler, buf, responseSender) -> {
+		*///?} else {
+		ServerPlayNetworking.registerGlobalReceiver(ShareProtocol.CHANNEL, (server, player, handler, buf, responseSender) -> {
 			// Read here: the buffer is only good until this returns.
 			byte[] data = ShareProtocol.read(buf).data();
 			server.execute(() -> ShareServer.receive(player, data));
@@ -67,6 +67,6 @@ public final class DioramaFabricCommon implements ModInitializer {
 				ShareServer.listening(handler.player);
 			}
 		});
-		*///?}
+		//?}
 	}
 }

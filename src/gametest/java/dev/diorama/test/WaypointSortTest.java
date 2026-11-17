@@ -33,7 +33,7 @@ final class WaypointSortTest {
 		List<Waypoint> added = context.computeOnClient(mc -> {
 			WaypointStore store = WaypointStore.get();
 			store.setSort(WaypointSort.DISTANCE, false);
-			String here = mc.level.dimension().identifier().toString();
+			String here = mc.level.dimension().location().toString();
 			List<Waypoint> made = new ArrayList<>();
 			// Distance from the player, initials, icon, colour: each order puts them differently.
 			store.addFolder(SORTING);
@@ -73,11 +73,11 @@ final class WaypointSortTest {
 		context.takeScreenshot("sort-04-name");
 		// Hiding a waypoint moves it down among the hidden ones, still selected; showing it puts it back.
 		Waypoint home = added.get(0);
-		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(home));
+		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(home));
 		DioramaClientTest.clickAtGui(context, row[0], row[1]);
 		clickOnRow(context, "Hide", home);
 		expect(context, wrong, "name with Home hidden", "Apple Orchard", "beacon", "Iron Farm", "Zed's Tower", "Home", "Mine");
-		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).selected()) != home) {
+		if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).selected()) != home) {
 			wrong.add("Home wasn't selected any more after hiding it");
 		}
 		context.takeScreenshot("sort-04b-name-home-hidden");
@@ -162,7 +162,7 @@ final class WaypointSortTest {
 	/** Steps the folder bar with its right arrow, as a player does, until it shows this folder. */
 	private static void showFolder(ClientGameTestContext context, List<String> wrong, String name) {
 		for (int i = 0; i < 20; i++) {
-			if (context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderName()).equals(name)) {
+			if (context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderName()).equals(name)) {
 				return;
 			}
 			click(context, ">");
@@ -173,7 +173,7 @@ final class WaypointSortTest {
 	private static void expect(ClientGameTestContext context, List<String> wrong, String what, String... names) {
 		// The folder's own rows: a search also lists what it finds in other folders, after these.
 		List<String> shown = context.computeOnClient(mc -> {
-			WaypointListScreen list = (WaypointListScreen) mc.gui.screen();
+			WaypointListScreen list = (WaypointListScreen) mc.screen;
 			return list.shown().stream().limit(list.shownInFolder()).map(w -> w.name).toList();
 		});
 		if (!shown.equals(List.of(names))) {
@@ -182,21 +182,21 @@ final class WaypointSortTest {
 	}
 
 	private static void click(ClientGameTestContext context, String label) {
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), label)));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, label)));
 		context.waitTicks(2);
 	}
 
 	/** Clicks the sort direction's button, which has a caret rather than a label. */
 	private static void reverse(ClientGameTestContext context) {
-		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).sortDirection()));
+		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).sortDirection()));
 		context.waitTicks(2);
 	}
 
 	/** Clicks the selected row's button with this label, not the folder bar's of the same name. */
 	private static void clickOnRow(ClientGameTestContext context, String label, Waypoint waypoint) {
 		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> {
-			int[] row = ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint);
-			for (var child : mc.gui.screen().children()) {
+			int[] row = ((WaypointListScreen) mc.screen).rowCentre(waypoint);
+			for (var child : mc.screen.children()) {
 				if (child instanceof Button button && button.visible && button.getMessage().getString().equals(label) && row != null && Math.abs(button.getY() + 10 - row[1]) <= 4) {
 					return button;
 				}
@@ -208,7 +208,7 @@ final class WaypointSortTest {
 
 	private static void hover(ClientGameTestContext context, String label) {
 		double[] at = context.computeOnClient(mc -> {
-			Button button = DioramaClientTest.buttonLabelled(mc.gui.screen(), label);
+			Button button = DioramaClientTest.buttonLabelled(mc.screen, label);
 			double scale = mc.getWindow().getGuiScale();
 			return new double[] {(button.getX() + button.getWidth() / 2.0) * scale, (button.getY() + button.getHeight() / 2.0) * scale};
 		});
@@ -222,7 +222,7 @@ final class WaypointSortTest {
 	private static void overlaps(ClientGameTestContext context, List<String> wrong, String what) {
 		List<String> found = context.computeOnClient(mc -> {
 			List<AbstractWidget> shown = new ArrayList<>();
-			for (var child : mc.gui.screen().children()) {
+			for (var child : mc.screen.children()) {
 				if (child instanceof AbstractWidget widget && widget.visible) {
 					shown.add(widget);
 				}

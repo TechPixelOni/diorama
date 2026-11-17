@@ -25,7 +25,7 @@ final class ShimClientWorld implements TestClientWorldContext {
 	@Override
 	public int waitForChunksRender(boolean waitForDownload, int timeout) {
 		ShimThreading.checkOnTestThread("waitForChunksRender");
-		return context.waitFor(minecraft -> (!waitForDownload || chunksLoaded(minecraft)) && minecraft.levelRenderer.hasRenderedAllSections(), timeout);
+		return context.waitFor(minecraft -> (!waitForDownload || chunksLoaded(minecraft)) && minecraft.levelRenderer.hasRenderedAllChunks(), timeout);
 	}
 
 	private static boolean chunksLoaded(Minecraft minecraft) {
@@ -38,10 +38,10 @@ final class ShimClientWorld implements TestClientWorldContext {
 		for (int dz = -distance; dz <= distance; dz++) {
 			for (int dx = -distance; dx <= distance; dx++) {
 				//? if >=26.1 {
-				boolean loaded = level.getChunkSource().hasChunk(center.x() + dx, center.z() + dz);
-				//?} else {
-				/*boolean loaded = level.getChunkSource().hasChunk(center.x + dx, center.z + dz);
-				*///?}
+				/*boolean loaded = level.getChunkSource().hasChunk(center.x() + dx, center.z() + dz);
+				*///?} else {
+				boolean loaded = level.getChunkSource().hasChunk(center.x + dx, center.z + dz);
+				//?}
 				if (!loaded) {
 					return false;
 				}

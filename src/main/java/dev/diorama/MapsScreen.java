@@ -17,12 +17,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.MouseButtonEvent;
-//?}
+/*import net.minecraft.client.input.MouseButtonEvent;
+*///?}
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
@@ -114,7 +114,7 @@ public final class MapsScreen extends Screen {
 
 	@Override
 	protected void init() {
-		String here = this.minecraft.level == null ? null : this.minecraft.level.dimension().identifier().toString();
+		String here = this.minecraft.level == null ? null : this.minecraft.level.dimension().location().toString();
 		Maps maps = Maps.get();
 		this.collectDimensions(here, maps);
 		this.rows.clear();
@@ -140,7 +140,7 @@ public final class MapsScreen extends Screen {
 		this.addRenderableWidget(Button.builder(Component.literal("<"), b -> this.step(-1)).bounds(left, BAR_Y, ARROW, 20).build());
 		this.addRenderableWidget(Button.builder(Component.literal(">"), b -> this.step(1)).bounds(nameRight + ACTION_GAP, BAR_Y, ARROW, 20).build());
 		Button newMap = this.addRenderableWidget(Button.builder(Component.translatable("diorama.maps.new"), b ->
-			this.minecraft.gui.setScreen(new MapNameScreen(this, this.dimension, null))).bounds(left + LIST_WIDTH - NEW_WIDTH, BAR_Y, NEW_WIDTH, 20).build());
+			this.minecraft.setScreen(new MapNameScreen(this, this.dimension, null))).bounds(left + LIST_WIDTH - NEW_WIDTH, BAR_Y, NEW_WIDTH, 20).build());
 		newMap.active = maps != null;
 
 		this.actions.clear();
@@ -148,7 +148,7 @@ public final class MapsScreen extends Screen {
 		this.actions.add(this.use);
 		this.actions.add(this.action(Component.translatable("diorama.maps.rename"), () -> {
 			if (this.selected != null) {
-				this.minecraft.gui.setScreen(new MapNameScreen(this, this.dimension, this.selected));
+				this.minecraft.setScreen(new MapNameScreen(this, this.dimension, this.selected));
 			}
 		}));
 		this.delete = this.action(Component.translatable("diorama.waypoint.delete").withStyle(ChatFormatting.RED), () -> {
@@ -226,11 +226,11 @@ public final class MapsScreen extends Screen {
 		if (confirm != null) {
 			show(confirm, shown && this.armed);
 			//? if >=1.21 {
-			confirm.setRectangle(span, 20, right - span, y);
-			//?} else {
-			/*confirm.setWidth(span);
+			/*confirm.setRectangle(span, 20, right - span, y);
+			*///?} else {
+			confirm.setWidth(span);
 			confirm.setPosition(right - span, y);
-			*///?}
+			//?}
 		}
 	}
 
@@ -265,11 +265,11 @@ public final class MapsScreen extends Screen {
 	}
 
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		super.extractBackground(graphics, mouseX, mouseY, a);
-	//?} else {
 	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+		super.renderBackground(graphics, mouseX, mouseY, a);
+	*///?} else {
+	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		this.drawBackground(graphics);
 		super.render(graphics, mouseX, mouseY, a);
@@ -277,22 +277,22 @@ public final class MapsScreen extends Screen {
 
 	private void drawBackground(GuiGraphics graphics) {
 		this.renderBackground(graphics);
-	*///?}
+	//?}
 		// Drawn with the background, so the buttons go on top of it, as in the waypoint list.
 		//? if >=1.21.6 {
-		graphics.nextStratum();
-		//?}
+		/*graphics.nextStratum();
+		*///?}
 		int cx = this.width / 2;
 		int left = cx - LIST_WIDTH / 2;
 		int right = left + LIST_WIDTH;
-		graphics.centeredText(this.font, this.title, cx, 8, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, this.title, cx, 8, 0xFFFFFFFF);
 		int nameLeft = left + ARROW + ACTION_GAP;
 		ScreenArt.sprite(graphics, ScreenArt.TEXT_FIELD, nameLeft, BAR_Y, NAME_WIDTH, 20);
 		String label = this.fit(Waypoints.dimensionName(this.dimension).getString() + " (" + this.rows.size() + ")", NAME_WIDTH - 8);
-		graphics.centeredText(this.font, Component.literal(label), nameLeft + NAME_WIDTH / 2, BAR_Y + 6, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, Component.literal(label), nameLeft + NAME_WIDTH / 2, BAR_Y + 6, 0xFFFFFFFF);
 		ScreenArt.list(graphics, 0, LIST_TOP, this.width, this.listBottom);
 		if (this.rows.isEmpty()) {
-			graphics.centeredText(this.font, Component.translatable("diorama.maps.none"), cx, LIST_TOP + 20, HINT);
+			graphics.drawCenteredString(this.font, Component.translatable("diorama.maps.none"), cx, LIST_TOP + 20, HINT);
 		}
 		WaypointStore store = WaypointStore.get();
 		for (int i = 0; i < this.visibleRows && this.scroll + i < this.rows.size(); i++) {
@@ -303,8 +303,8 @@ public final class MapsScreen extends Screen {
 				ScreenArt.selection(graphics, left, y, right, y + ROW);
 			}
 			int room = right - (selected ? this.actionsWidth() + 4 : 6) - (left + TEXT_LEFT);
-			graphics.text(this.font, this.fit(info.name(), room), left + TEXT_LEFT, y + 4, 0xFFFFFFFF, true);
-			graphics.text(this.font, this.fit(this.detail(info, store), room), left + TEXT_LEFT, y + 14, DETAIL, true);
+			graphics.drawString(this.font, this.fit(info.name(), room), left + TEXT_LEFT, y + 4, 0xFFFFFFFF, true);
+			graphics.drawString(this.font, this.fit(this.detail(info, store), room), left + TEXT_LEFT, y + 14, DETAIL, true);
 		}
 		if (this.maxScroll() > 0) {
 			int track = this.listBottom - LIST_TOP;
@@ -349,28 +349,28 @@ public final class MapsScreen extends Screen {
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
-	*///?}
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+	//?}
 		this.scrollTo(this.scroll - (int) Math.signum(scrollY));
 		return true;
 	}
 
 	// Mouse events came as separate numbers before 1.21.9.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		this.disarmUnless(event.x(), event.y());
 		return super.mouseClicked(event, doubleClick) || this.clicked(event.x(), event.y(), event.button());
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean mouseClicked(double x, double y, int button) {
 		this.disarmUnless(x, y);
 		return super.mouseClicked(x, y, button) || this.clicked(x, y, button);
 	}
-	*///?}
+	//?}
 
 	/** A click anywhere but on Click again to delete puts the row's buttons back. */
 	private void disarmUnless(double x, double y) {
@@ -415,7 +415,7 @@ public final class MapsScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

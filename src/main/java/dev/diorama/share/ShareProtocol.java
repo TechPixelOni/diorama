@@ -5,10 +5,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.network.FriendlyByteBuf;
 //? if >=1.21 {
-import net.minecraft.network.codec.StreamCodec;
+/*import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-//?}
-import net.minecraft.resources.Identifier;
+*///?}
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;
 
@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * without Diorama, and a client without it, never see a message.
  */
 public final class ShareProtocol {
-	public static final Identifier CHANNEL = Diorama.id("share");
+	public static final ResourceLocation CHANNEL = Diorama.id("share");
 	/** Changes when a message changes shape; a client and server on different versions don't talk. */
 	public static final int VERSION = 2;
 
@@ -77,12 +77,12 @@ public final class ShareProtocol {
 	}
 
 	//? if <1.21 {
-	/*// Payload types came after 1.20.1: a channel was only its id there, and the loaders read and
+	// Payload types came after 1.20.1: a channel was only its id there, and the loaders read and
 	// write its bytes by hand.
 	public record Packet(byte[] data) {
 	}
-	*///?} else {
-	/** A message, as it travels. */
+	//?} else {
+	/*/^* A message, as it travels. ^/
 	public record Packet(byte[] data) implements CustomPacketPayload {
 		@Override
 		public Type<Packet> type() {
@@ -92,7 +92,7 @@ public final class ShareProtocol {
 
 	public static final CustomPacketPayload.Type<Packet> TYPE = new CustomPacketPayload.Type<>(CHANNEL);
 	public static final StreamCodec<FriendlyByteBuf, Packet> CODEC = StreamCodec.of(ShareProtocol::write, ShareProtocol::read);
-	//?}
+	*///?}
 
 	public static void write(FriendlyByteBuf buf, Packet packet) {
 		buf.writeBytes(packet.data());

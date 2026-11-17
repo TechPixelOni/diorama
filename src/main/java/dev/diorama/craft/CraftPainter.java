@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -106,7 +106,7 @@ final class CraftPainter {
 	private record Shade(Craft craft, double u0, double v0) {
 	}
 
-	void draw(GuiGraphicsExtractor graphics, MapViewport.View view, Collection<Craft> crafts, float partialTick, float opacity) {
+	void draw(GuiGraphics graphics, MapViewport.View view, Collection<Craft> crafts, float partialTick, float opacity) {
 		BlockLooks looks = BlockLooks.get();
 		if (looks == null || crafts.isEmpty()) {
 			return;
@@ -183,7 +183,7 @@ final class CraftPainter {
 		return u1 > view.minU() && u0 < view.minU() + view.width() / view.zoom() && v1 > view.minV() && v0 < view.minV() + view.height() / view.zoom();
 	}
 
-	private void paint(GuiGraphicsExtractor graphics, MapViewport.View view, List<Drawn> drawn, List<Shade> shades, boolean surface, float opacity) {
+	private void paint(GuiGraphics graphics, MapViewport.View view, List<Drawn> drawn, List<Shade> shades, boolean surface, float opacity) {
 		int layer = view.layer();
 		graphics.enableScissor(view.x(), view.y(), view.x() + view.width(), view.y() + view.height());
 		MapCanvas canvas = MapCanvas.of(graphics);

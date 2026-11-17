@@ -3,7 +3,7 @@ package dev.diorama;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
@@ -70,7 +70,7 @@ public final class RadarCategoriesScreen extends Screen {
 			checkbox.setPosition(left, y);
 			this.addRenderableWidget(checkbox);
 			this.summaries.add(summary);
-			this.addRenderableWidget(Button.builder(Component.translatable("diorama.radar_categories.edit"), b -> this.minecraft.gui.setScreen(new RadarCategoryScreen(this, entry)))
+			this.addRenderableWidget(Button.builder(Component.translatable("diorama.radar_categories.edit"), b -> this.minecraft.setScreen(new RadarCategoryScreen(this, entry)))
 				.bounds(left + WIDTH - this.edit, y, this.edit, 20).build());
 		}
 		int bottom = this.height - 26;
@@ -117,7 +117,7 @@ public final class RadarCategoriesScreen extends Screen {
 		RadarCategories.changed();
 		Settings.get().save();
 		this.page = 0;
-		this.minecraft.gui.setScreen(new RadarCategoryScreen(this, category));
+		this.minecraft.setScreen(new RadarCategoryScreen(this, category));
 	}
 
 	private void turn(int pages) {
@@ -126,23 +126,23 @@ public final class RadarCategoriesScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
-		graphics.centeredText(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, 14, 0xFFFFFFFF);
 		int right = this.width / 2 + WIDTH / 2 - this.edit - 6;
 		for (int i = 0; i < this.summaries.size(); i++) {
 			Component summary = this.summaries.get(i);
-			graphics.text(this.font, summary, right - this.font.width(summary), TOP + i * ROW + 6, SUMMARY, true);
+			graphics.drawString(this.font, summary, right - this.font.width(summary), TOP + i * ROW + 6, SUMMARY, true);
 		}
 	}
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

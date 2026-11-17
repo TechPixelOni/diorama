@@ -19,7 +19,7 @@ public final class Waypoints {
 
 	public static @Nullable String dimension() {
 		Minecraft mc = Minecraft.getInstance();
-		return mc.level == null ? null : mc.level.dimension().identifier().toString();
+		return mc.level == null ? null : mc.level.dimension().location().toString();
 	}
 
 	/** A new, unsaved waypoint where the player stands, or at who they're watching through. */
@@ -91,7 +91,7 @@ public final class Waypoints {
 		}
 		var execute = connection.getCommands().getRoot().getChild("execute");
 		return execute != null && execute.getChild("in") != null
-			&& connection.levels().stream().anyMatch(level -> level.identifier().toString().equals(dimension));
+			&& connection.levels().stream().anyMatch(level -> level.location().toString().equals(dimension));
 	}
 
 	private static boolean mayUse(String command) {
@@ -137,12 +137,12 @@ public final class Waypoints {
 			return false;
 		}
 		//? if >=26.3 {
-		// A straw bed is for a night away: the respawn point stays where it was, and so does the pin.
+		/*// A straw bed is for a night away: the respawn point stays where it was, and so does the pin.
 		var level = Minecraft.getInstance().level;
 		if (level.getBlockState(pos).getBlock() instanceof net.minecraft.world.level.block.AbstractBedBlock bed && bed.getBedRule(level, pos).canSetSpawn() == net.minecraft.world.attribute.BedRule.Rule.NEVER) {
 			return true;
 		}
-		//?}
+		*///?}
 		for (Waypoint waypoint : store.in(dimension)) {
 			if (waypoint.kind == Waypoint.Kind.BED) {
 				waypoint.x = pos.getX();
@@ -172,7 +172,7 @@ public final class Waypoints {
 		LocalPlayer player = mc.player;
 		// While the death screen is up, the player still stands where they died. With any screen open
 		// it waits, so a pin doesn't go from under its editor or the waypoint list.
-		if (player == null || !player.isAlive() || mc.gui.screen() != null || !Settings.get().removeReachedDeaths) {
+		if (player == null || !player.isAlive() || mc.screen != null || !Settings.get().removeReachedDeaths) {
 			return;
 		}
 		WaypointStore store = WaypointStore.get();

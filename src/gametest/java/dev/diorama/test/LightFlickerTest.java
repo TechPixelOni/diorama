@@ -81,11 +81,11 @@ final class LightFlickerTest {
 		// light while it draws the world, which the full map stops.
 		freed += rounds(context, world, key, light, "minimap");
 		//? if >=1.21.2 {
-		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 2.0, TileKey.SURFACE));
+		/*context.setScreen(MapScreen::new);
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(X, Z), Projection.v(X, Y, Z), 2.0, TileKey.SURFACE));
 		DioramaClientTest.settle(context, 20);
 		freed += rounds(context, world, key, light, "map");
-		//?}
+		*///?}
 		dev.diorama.Diorama.LOGGER.info("Light flicker: freed the light texture {} times at night without a crash", freed);
 	}
 

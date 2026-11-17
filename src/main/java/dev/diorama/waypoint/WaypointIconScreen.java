@@ -5,7 +5,7 @@ import dev.diorama.render.WaypointIcons;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -79,11 +79,11 @@ public final class WaypointIconScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+		super.render(graphics, mouseX, mouseY, a);
 		int left = this.left();
 		int top = this.top();
-		graphics.centeredText(this.font, this.title, this.width / 2, top - 14, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, top - 14, 0xFFFFFFFF);
 		ScreenArt.list(graphics, left - 2, top - 2, left + this.columns() * CELL + 2, top + this.rows() * CELL + 2);
 		int hovered = this.cellAt(mouseX, mouseY);
 		for (int i = 0; i < this.icons.size(); i++) {
@@ -99,7 +99,7 @@ public final class WaypointIconScreen extends Screen {
 			Pins.badge(graphics, this.sample, x + CELL / 2.0F, y + CELL / 2.0F, Pins.LARGE);
 		}
 		if (hovered >= 0) {
-			graphics.setTooltipForNextFrame(this.font, name(this.icons.get(hovered)), mouseX, mouseY);
+			this.setTooltipForNextRenderPass(name(this.icons.get(hovered)));
 		}
 	}
 
@@ -129,20 +129,20 @@ public final class WaypointIconScreen extends Screen {
 	}
 
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
 		return this.clicked(event.x(), event.y(), event.button()) || super.mouseClicked(event, doubleClick);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		return this.clicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
 	}
-	*///?}
+	//?}
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

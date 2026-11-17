@@ -22,7 +22,7 @@ import dev.diorama.gameshim.HeldKeys;
 @Mixin(InputConstants.class)
 public abstract class InputConstantsMixin {
 	//? if >=26.3 {
-	@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
+	/*@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
 	private static void diorama$noKeyHeld(int key, CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(HeldKeys.held(key));
 	}
@@ -31,20 +31,20 @@ public abstract class InputConstantsMixin {
 	private static void diorama$noCursorCapture(CallbackInfo ci) {
 		ci.cancel();
 	}
-	//?} else if >=1.21.9 {
+	*///?} else if >=1.21.9 {
 	/*@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
 	private static void diorama$noKeyHeld(Window window, int key, CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(HeldKeys.held(key));
 	}
 	*///?} else {
-	/*@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
 	private static void diorama$noKeyHeld(long window, int key, CallbackInfoReturnable<Boolean> cir) {
 		cir.setReturnValue(HeldKeys.held(key));
 	}
-	*///?}
+	//?}
 
 	//? if <26.3 {
-	/*@Inject(method = {"setupKeyboardCallbacks", "setupMouseCallbacks"}, at = @At("HEAD"), cancellable = true)
+	@Inject(method = {"setupKeyboardCallbacks", "setupMouseCallbacks"}, at = @At("HEAD"), cancellable = true)
 	private static void diorama$noInputCallbacks(CallbackInfo ci) {
 		ci.cancel();
 	}
@@ -53,5 +53,5 @@ public abstract class InputConstantsMixin {
 	private static void diorama$noCursorCapture(CallbackInfo ci) {
 		ci.cancel();
 	}
-	*///?}
+	//?}
 }

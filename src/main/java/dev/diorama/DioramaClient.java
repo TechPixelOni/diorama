@@ -5,8 +5,8 @@ import dev.diorama.compat.Contraptions;
 import dev.diorama.compat.SubLevels;
 import dev.diorama.craft.Crafts;
 //? if >=1.21.6 {
-import dev.diorama.render.DioramaPipelines;
-//?}
+/*import dev.diorama.render.DioramaPipelines;
+*///?}
 import dev.diorama.waypoint.Waypoint;
 import dev.diorama.waypoint.WaypointEditScreen;
 import dev.diorama.waypoint.WaypointListScreen;
@@ -25,15 +25,15 @@ import net.minecraft.client.Minecraft;
  */
 public final class DioramaClient {
 	//? if >=1.21.9 && fabric {
-	public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Diorama.id("map"));
-	//?} else if >=1.21.9 {
+	/*public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Diorama.id("map"));
+	*///?} else if >=1.21.9 {
 	/*// NeoForge constructs mods in parallel and vanilla's category list isn't thread-safe, so there
 	// DioramaNeoForge registers it through RegisterKeyMappingsEvent instead.
 	public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Diorama.id("map"));
 	*///?} else {
-	/*// Key categories were bare translation keys; this is the one Category.register makes.
+	// Key categories were bare translation keys; this is the one Category.register makes.
 	public static final String CATEGORY = "key.category.diorama.map";
-	*///?}
+	//?}
 	public static final KeyMapping OPEN_MAP = new KeyMapping("key.diorama.open_map", InputConstants.KEY_M, CATEGORY);
 	public static final KeyMapping NEW_WAYPOINT = new KeyMapping("key.diorama.new_waypoint", InputConstants.KEY_B, CATEGORY);
 	public static final KeyMapping WAYPOINT_LIST = new KeyMapping("key.diorama.waypoints", InputConstants.KEY_U, CATEGORY);
@@ -80,8 +80,8 @@ public final class DioramaClient {
 		Crafts.register(Contraptions::bodies);
 		Crafts.register(SubLevels::bodies);
 		//? if >=1.21.6 {
-		DioramaPipelines.init();
-		//?}
+		/*DioramaPipelines.init();
+		*///?}
 		//? if fabric {
 		// The settings file sits in the game directory. Fabric calls this from inside Minecraft's
 		// constructor; NeoForge constructs mods before Minecraft exists, so DioramaNeoForge loads them
@@ -101,14 +101,14 @@ public final class DioramaClient {
 		XaeroNotice.tick(mc);
 		dev.diorama.web.ClientWebMap.tick(mc);
 		while (OPEN_MAP.consumeClick()) {
-			if (mc.gui.screen() == null && mc.level != null && !ServerRules.sayMapOffHere(mc) && ServerRules.minimapAllowed()) {
-				mc.gui.setScreen(new MapScreen());
+			if (mc.screen == null && mc.level != null && !ServerRules.sayMapOffHere(mc) && ServerRules.minimapAllowed()) {
+				mc.setScreen(new MapScreen());
 			}
 		}
 		while (NEW_WAYPOINT.consumeClick()) {
 			Waypoint waypoint = Waypoints.atPlayer();
-			if (mc.gui.screen() == null && waypoint != null && !ServerRules.sayMapOffHere(mc)) {
-				mc.gui.setScreen(new WaypointEditScreen(null, waypoint, true));
+			if (mc.screen == null && waypoint != null && !ServerRules.sayMapOffHere(mc)) {
+				mc.setScreen(new WaypointEditScreen(null, waypoint, true));
 			}
 		}
 		while (ZOOM_IN.consumeClick()) {
@@ -118,8 +118,8 @@ public final class DioramaClient {
 			changeZoom(-1);
 		}
 		while (SETTINGS.consumeClick()) {
-			if (mc.gui.screen() == null) {
-				mc.gui.setScreen(new SettingsScreen(null));
+			if (mc.screen == null) {
+				mc.setScreen(new SettingsScreen(null));
 			}
 		}
 		while (TOGGLE_MINIMAP.consumeClick()) {
@@ -152,8 +152,8 @@ public final class DioramaClient {
 			enlargeToggled = false;
 		}
 		while (WAYPOINT_LIST.consumeClick()) {
-			if (mc.gui.screen() == null && mc.level != null && !ServerRules.sayMapOffHere(mc)) {
-				mc.gui.setScreen(new WaypointListScreen(null));
+			if (mc.screen == null && mc.level != null && !ServerRules.sayMapOffHere(mc)) {
+				mc.setScreen(new WaypointListScreen(null));
 			}
 		}
 	}

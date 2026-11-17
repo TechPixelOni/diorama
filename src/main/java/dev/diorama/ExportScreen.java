@@ -8,7 +8,7 @@ import dev.diorama.render.MapViewport;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import dev.diorama.drawing.Drawing;
 import dev.diorama.drawing.DrawingOverlay;
 import dev.diorama.drawing.DrawingStore;
@@ -17,8 +17,8 @@ import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.MouseButtonEvent;
-//?}
+/*import net.minecraft.client.input.MouseButtonEvent;
+*///?}
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -117,13 +117,13 @@ public final class ExportScreen extends Screen {
 		}
 		if (!this.drawings().isEmpty()) {
 			//? if >=1.21 {
-			this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.export.drawings"), this.font)
+			/*this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.export.drawings"), this.font)
 				.pos(6, 104)
 				.selected(this.withDrawings)
 				.onValueChange((box, value) -> this.withDrawings = value)
 				.build());
-			//?} else {
-			/*// 1.20.1's checkbox has no builder and tells no one it changed.
+			*///?} else {
+			// 1.20.1's checkbox has no builder and tells no one it changed.
 			Component label = Component.translatable("diorama.export.drawings");
 			this.addRenderableWidget(new Checkbox(6, 104, 24 + this.font.width(label), 20, label, this.withDrawings) {
 				@Override
@@ -132,18 +132,18 @@ public final class ExportScreen extends Screen {
 					ExportScreen.this.withDrawings = this.selected();
 				}
 			});
-			*///?}
+			//?}
 		}
 		if (this.hasNight()) {
 			int y = this.drawings().isEmpty() ? 104 : 128;
 			//? if >=1.21 {
-			this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.export.night"), this.font)
+			/*this.addRenderableWidget(Checkbox.builder(Component.translatable("diorama.export.night"), this.font)
 				.pos(6, y)
 				.selected(this.atNight)
 				.onValueChange((box, value) -> this.atNight = value)
 				.build());
-			//?} else {
-			/*Component label = Component.translatable("diorama.export.night");
+			*///?} else {
+			Component label = Component.translatable("diorama.export.night");
 			this.addRenderableWidget(new Checkbox(6, y, 24 + this.font.width(label), 20, label, this.atNight) {
 				@Override
 				public void onPress() {
@@ -151,7 +151,7 @@ public final class ExportScreen extends Screen {
 					ExportScreen.this.atNight = this.selected();
 				}
 			});
-			*///?}
+			//?}
 		}
 		this.save = this.addRenderableWidget(Button.builder(Component.translatable("diorama.export.save"), b -> this.save())
 			.bounds(6, this.height - FOOTER + 4, 80, 20).build());
@@ -203,13 +203,13 @@ public final class ExportScreen extends Screen {
 
 	// No blurred, dimmed world behind the map. On 1.20.1 a screen draws no background unless it asks for one.
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 	}
-	//?}
+	*///?}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		MapSession session = MapSession.get();
 		if (session == null || !ServerRules.minimapAllowed() || (this.caves() ? !ServerRules.caveMapsAllowed() : session.map().savedMap() == null)) {
 			this.onClose();
@@ -264,7 +264,7 @@ public final class ExportScreen extends Screen {
 		} else if (this.whole) {
 			graphics.fill(SIDEBAR, 0, this.width, ph, DIM);
 			Component what = Component.translatable(this.finding != null ? "diorama.export.finding" : "diorama.export.nothing");
-			graphics.centeredText(this.font, what, SIDEBAR + pw / 2, ph / 2 - 4, 0xFFFFFFFF);
+			graphics.drawCenteredString(this.font, what, SIDEBAR + pw / 2, ph / 2 - 4, 0xFFFFFFFF);
 		}
 
 		// The sidebar and footer, over the map.
@@ -273,7 +273,7 @@ public final class ExportScreen extends Screen {
 		graphics.fill(0, ph, this.width, this.height, PANEL);
 		graphics.fill(0, ph, this.width, ph + 1, EDGE);
 		this.drawTabs(graphics, mouseX, mouseY);
-		graphics.text(this.font, Component.translatable("diorama.export.detail"), 6, 34, MUTED, false);
+		graphics.drawString(this.font, Component.translatable("diorama.export.detail"), 6, 34, MUTED, false);
 
 		int lod = box != null ? this.lod(box) : -1;
 		List<Integer> levels = box != null ? this.levels(box) : List.of();
@@ -290,20 +290,20 @@ public final class ExportScreen extends Screen {
 		}
 		if (box != null && !levels.isEmpty()) {
 			ImageExport.Area area = ImageExport.Area.ofUnits(lod, box[0], box[1], box[2], box[3]);
-			graphics.text(this.font, Component.translatable("diorama.export.pixels", number(area.width()), number(area.height())), 6, 76, 0xFFFFFFFF, false);
-			graphics.text(this.font, size(ImageExport.estimateBytes(area)), 6, 88, MUTED, false);
+			graphics.drawString(this.font, Component.translatable("diorama.export.pixels", number(area.width()), number(area.height())), 6, 76, 0xFFFFFFFF, false);
+			graphics.drawString(this.font, size(ImageExport.estimateBytes(area)), 6, 88, MUTED, false);
 			// In map units, a block each, so it reads against pixels per block.
 			Component blocks = Component.translatable("diorama.export.blocks", number(Math.round(box[2] - box[0])), number(Math.round(box[3] - box[1])));
 			graphics.fill(SIDEBAR + 4, 4, SIDEBAR + 10 + this.font.width(blocks), 16, DIM);
-			graphics.text(this.font, blocks, SIDEBAR + 7, 6, 0xFFFFFFFF, false);
+			graphics.drawString(this.font, blocks, SIDEBAR + 7, 6, 0xFFFFFFFF, false);
 		}
 		if (!this.whole) {
 			// Beside the buttons, not over what's being saved.
 			String help = this.font.plainSubstrByWidth(Component.translatable("diorama.export.help").getString(), Math.max(0, this.width - 164));
-			graphics.text(this.font, help, 158, ph + 10, MUTED, false);
+			graphics.drawString(this.font, help, 158, ph + 10, MUTED, false);
 		}
 
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		super.render(graphics, mouseX, mouseY, a);
 		// The chosen level: a dark face with a white rim and underline, so it doesn't read as hovered or greyed out.
 		if (lod >= 0) {
 			Button chosen = this.detail[lod];
@@ -313,13 +313,13 @@ public final class ExportScreen extends Screen {
 			graphics.fill(x + 1, y + 1, x + chosen.getWidth() - 1, y + chosen.getHeight() - 1, 0xFF101014);
 			String label = DETAIL_LABELS[lod];
 			int lx = x + (chosen.getWidth() - this.font.width(label)) / 2;
-			graphics.text(this.font, label, lx, y + 6, 0xFFFFFFFF, true);
+			graphics.drawString(this.font, label, lx, y + 6, 0xFFFFFFFF, true);
 			graphics.fill(lx - 1, y + 15, lx + this.font.width(label), y + 16, 0xFFFFFFFF);
 		}
 	}
 
 	/** The box's edge and, in Area mode, its eight handles. */
-	private void outline(GuiGraphicsExtractor graphics, double[] box) {
+	private void outline(GuiGraphics graphics, double[] box) {
 		int x0 = (int) Math.round(this.screenX(box[0]));
 		int x1 = (int) Math.round(this.screenX(box[2]));
 		int y0 = (int) Math.round(this.screenY(box[1]));
@@ -341,7 +341,7 @@ public final class ExportScreen extends Screen {
 	}
 
 	/** Area and Whole map, drawn as the map's own Surface and Caves tabs are. */
-	private void drawTabs(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	private void drawTabs(GuiGraphics graphics, int mouseX, int mouseY) {
 		int x = 6;
 		for (int i = 0; i < 2; i++) {
 			boolean selected = (i == 1) == this.whole;
@@ -354,12 +354,12 @@ public final class ExportScreen extends Screen {
 			MapScreen.tab(graphics, selected, hovered, x, y, w, h);
 			if (selected) {
 				//? if >=1.21 {
-				graphics.fill(x + 2, y + 2, x + w - 2, y + h, 0x40000000);
-				//?}
+				/*graphics.fill(x + 2, y + 2, x + w - 2, y + h, 0x40000000);
+				*///?}
 				int underline = nameWidth - 1;
 				graphics.fill(x + (w - underline) / 2, y + h - 3, x + (w - underline) / 2 + underline, y + h - 2, 0xFFFFFFFF);
 			}
-			graphics.text(this.font, name, x + w / 2 - nameWidth / 2, y + (selected ? 5 : 6), selected ? 0xFFFFFFFF : 0xFFE0E0E0, true);
+			graphics.drawString(this.font, name, x + w / 2 - nameWidth / 2, y + (selected ? 5 : 6), selected ? 0xFFFFFFFF : 0xFFE0E0E0, true);
 			x += w;
 		}
 	}
@@ -475,7 +475,7 @@ public final class ExportScreen extends Screen {
 		if (store == null || this.minecraft == null || this.minecraft.level == null) {
 			return List.of();
 		}
-		return store.in(this.minecraft.level.dimension().identifier().toString());
+		return store.in(this.minecraft.level.dimension().location().toString());
 	}
 
 	private void save() {
@@ -497,7 +497,7 @@ public final class ExportScreen extends Screen {
 
 	// Mouse events came as separate numbers before 1.21.9.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		return super.mouseClicked(event, doubleClick) || this.pressed(event.x(), event.y(), event.button());
 	}
@@ -512,8 +512,8 @@ public final class ExportScreen extends Screen {
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
 		return this.dragged(event.button(), dx, dy) || super.mouseDragged(event, dx, dy);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean mouseClicked(double x, double y, int button) {
 		return super.mouseClicked(x, y, button) || this.pressed(x, y, button);
 	}
@@ -528,7 +528,7 @@ public final class ExportScreen extends Screen {
 	public boolean mouseDragged(double x, double y, int button, double dx, double dy) {
 		return this.dragged(button, dx, dy) || super.mouseDragged(x, y, button, dx, dy);
 	}
-	*///?}
+	//?}
 
 	/** A press no widget took: a tab, or on the map a hold of the box or the map. */
 	private boolean pressed(double x, double y, int button) {
@@ -615,10 +615,10 @@ public final class ExportScreen extends Screen {
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
-	*///?}
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+	//?}
 		if (x < SIDEBAR || y >= this.previewHeight()) {
 			return false;
 		}
@@ -649,7 +649,7 @@ public final class ExportScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

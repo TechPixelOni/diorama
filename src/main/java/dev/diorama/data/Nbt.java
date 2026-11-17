@@ -3,8 +3,8 @@ package dev.diorama.data;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 //? if <1.21.5 {
-/*import net.minecraft.nbt.Tag;
-*///?}
+import net.minecraft.nbt.Tag;
+//?}
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,7 +16,7 @@ public final class Nbt {
 	}
 
 	//? if >=1.21.5 {
-	public static CompoundTag compound(CompoundTag tag, String name) {
+	/*public static CompoundTag compound(CompoundTag tag, String name) {
 		return tag.getCompoundOrEmpty(name);
 	}
 
@@ -47,8 +47,8 @@ public final class Nbt {
 	public static long @Nullable [] longs(CompoundTag tag, String name) {
 		return tag.getLongArray(name).orElse(null);
 	}
-	//?} else {
-	/*public static CompoundTag compound(CompoundTag tag, String name) {
+	*///?} else {
+	public static CompoundTag compound(CompoundTag tag, String name) {
 		return tag.getCompound(name);
 	}
 
@@ -79,5 +79,5 @@ public final class Nbt {
 	public static long @Nullable [] longs(CompoundTag tag, String name) {
 		return tag.contains(name, Tag.TAG_LONG_ARRAY) ? tag.getLongArray(name) : null;
 	}
-	*///?}
+	//?}
 }

@@ -274,7 +274,7 @@ final class WebClaims {
 			if (job == null) {
 				Map<String, Boolean> shown = new HashMap<>();
 				for (ServerLevel level : this.server.getAllLevels()) {
-					shown.put(level.dimension().identifier().toString(), !this.leftOut.test(level));
+					shown.put(level.dimension().location().toString(), !this.leftOut.test(level));
 				}
 				job = source.begin(this.server, id -> shown.getOrDefault(id, false));
 			}
@@ -511,7 +511,7 @@ final class WebClaims {
 						Object key = FtbChunks.this.posDimension.invoke(pos);
 						Optional<String> dimension = dimensions.get(key);
 						if (dimension == null) {
-							String id = ((net.minecraft.resources.ResourceKey<?>) key).identifier().toString();
+							String id = ((net.minecraft.resources.ResourceKey<?>) key).location().toString();
 							dimension = shown.test(id) ? Optional.of(id) : Optional.empty();
 							dimensions.put(key, dimension);
 						}
@@ -622,8 +622,8 @@ final class WebClaims {
 			this.claimSub = claim.getMethod("getSubConfigIndex");
 			this.claimForceloadable = claim.getMethod("isForceloadable");
 			try {
-				this.fullName = manager.getMethod("getFullName", claim, net.minecraft.resources.Identifier.class, boolean.class);
-				this.colour = manager.getMethod("getColor", claim, net.minecraft.resources.Identifier.class);
+				this.fullName = manager.getMethod("getFullName", claim, net.minecraft.resources.ResourceLocation.class, boolean.class);
+				this.colour = manager.getMethod("getColor", claim, net.minecraft.resources.ResourceLocation.class);
 			} catch (NoSuchMethodException e) {
 				// Older versions.
 				this.fullName = null;

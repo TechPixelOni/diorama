@@ -237,7 +237,7 @@ final class RegionTables {
 			return;
 		}
 		ChunkTags.Summary summary = ChunkTags.summaryOf(surface, solid);
-		table.finished[index] = summary.maxY() > this.level.getMinY();
+		table.finished[index] = summary.maxY() > this.level.getMinBuildHeight();
 		table.top[index] = (short) summary.maxY();
 		table.floor[index] = (short) Math.max(Short.MIN_VALUE, summary.floorY());
 		table.visited[index] = Nbt.longValue(tag, "InhabitedTime") > 0;

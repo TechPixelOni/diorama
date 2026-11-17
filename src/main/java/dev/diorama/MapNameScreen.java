@@ -1,7 +1,7 @@
 package dev.diorama;
 
 import dev.diorama.waypoint.Waypoints;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -96,27 +96,27 @@ public final class MapNameScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
 		int left = this.left();
 		int top = this.top();
-		graphics.centeredText(this.font, this.title, this.width / 2, top - 24, 0xFFFFFFFF);
-		graphics.centeredText(this.font, Waypoints.dimensionName(this.dimension), this.width / 2, top - 12, LABEL);
-		graphics.text(this.font, Component.translatable("diorama.maps.name"), left, top + 5, LABEL, true);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, top - 24, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, Waypoints.dimensionName(this.dimension), this.width / 2, top - 12, LABEL);
+		graphics.drawString(this.font, Component.translatable("diorama.maps.name"), left, top + 5, LABEL, true);
 		if (this.problem != null) {
-			graphics.text(this.font, this.problem, left, top + 42, RED, true);
+			graphics.drawString(this.font, this.problem, left, top + 42, RED, true);
 		} else if (this.existing == null) {
-			graphics.text(this.font, Component.translatable("diorama.maps.new_hint"), left, top + 42, LABEL, true);
+			graphics.drawString(this.font, Component.translatable("diorama.maps.new_hint"), left, top + 42, LABEL, true);
 		}
 	}
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

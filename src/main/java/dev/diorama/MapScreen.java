@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -39,19 +39,19 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.MenuTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientLevel;
 //? if >=1.21.6 {
-import net.minecraft.client.renderer.RenderPipelines;
-//?} else if >=1.21.2 {
+/*import net.minecraft.client.renderer.RenderPipelines;
+*///?} else if >=1.21.2 {
 /*import net.minecraft.client.renderer.RenderType;
 *///?}
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 //? if >=1.21.9 {
-import net.minecraft.client.input.KeyEvent;
+/*import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+*///?}
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
@@ -96,14 +96,14 @@ public final class MapScreen extends Screen {
 	private static final String STATUS_GAP = "   ·   ";
 	/** One press of a zoom button: two notches of the mouse wheel. */
 	private static final int ZOOM_BUTTON_STEPS = 2;
-	private static final Identifier TAB = Identifier.withDefaultNamespace("widget/tab");
-	private static final Identifier TAB_HIGHLIGHTED = Identifier.withDefaultNamespace("widget/tab_highlighted");
-	private static final Identifier TAB_SELECTED = Identifier.withDefaultNamespace("widget/tab_selected");
-	private static final Identifier TAB_SELECTED_HIGHLIGHTED = Identifier.withDefaultNamespace("widget/tab_selected_highlighted");
+	private static final ResourceLocation TAB = new net.minecraft.resources.ResourceLocation("widget/tab");
+	private static final ResourceLocation TAB_HIGHLIGHTED = new net.minecraft.resources.ResourceLocation("widget/tab_highlighted");
+	private static final ResourceLocation TAB_SELECTED = new net.minecraft.resources.ResourceLocation("widget/tab_selected");
+	private static final ResourceLocation TAB_SELECTED_HIGHLIGHTED = new net.minecraft.resources.ResourceLocation("widget/tab_selected_highlighted");
 	//? if <1.21 {
-	/*// 1.20.1's tab buttons draw all four looks from rows of one texture.
-	private static final Identifier TAB_BUTTON = Identifier.withDefaultNamespace("textures/gui/tab_button.png");
-	*///?}
+	// 1.20.1's tab buttons draw all four looks from rows of one texture.
+	private static final ResourceLocation TAB_BUTTON = new net.minecraft.resources.ResourceLocation("textures/gui/tab_button.png");
+	//?}
 	private static final Component[] TAB_NAMES = {Component.translatable("diorama.map.surface"), Component.translatable("diorama.map.caves")};
 
 	private final MapViewport viewport = new MapViewport();
@@ -226,14 +226,14 @@ public final class MapScreen extends Screen {
 			if (this.otherDimension != null) {
 				maps.show(this.otherDimension, null);
 			}
-			this.minecraft.gui.setScreen(maps);
+			this.minecraft.setScreen(maps);
 		}).size(64, BAR).build());
 		this.mapsButton.visible = settings.mapMapsButton;
 		this.mapsButton.active = Maps.get() != null;
 		this.waypointsButton = this.addRenderableWidget(Button.builder(Component.translatable("diorama.map.waypoints"), b -> this.openWaypoints()).size(64, BAR).build());
 		this.waypointsButton.visible = settings.mapWaypointsButton;
 		this.settingsButton = this.addRenderableWidget(Button.builder(Component.translatable("diorama.settings.button"), b ->
-			this.minecraft.gui.setScreen(new SettingsScreen(this))).size(64, BAR).build());
+			this.minecraft.setScreen(new SettingsScreen(this))).size(64, BAR).build());
 		this.settingsButton.visible = settings.mapSettingsButton;
 		int right = this.width;
 		for (Button button : List.of(this.settingsButton, this.waypointsButton, this.mapsButton)) {
@@ -245,7 +245,7 @@ public final class MapScreen extends Screen {
 		}
 		this.export = this.addRenderableWidget(Button.builder(Component.empty(), b -> {
 			this.menu = null;
-			this.minecraft.gui.setScreen(new ExportScreen(this, this.centerU, this.centerV, this.zoom, this.layer, this.width, this.height));
+			this.minecraft.setScreen(new ExportScreen(this, this.centerU, this.centerV, this.zoom, this.layer, this.width, this.height));
 		}).size(20, 20).createNarration(n -> Component.translatable("diorama.export.title")).build());
 		this.zoomIn = this.addRenderableWidget(Button.builder(Component.literal("+"), b -> this.zoomButton(ZOOM_BUTTON_STEPS))
 			.size(20, 20).createNarration(n -> Component.translatable("diorama.map.zoom_in")).build());
@@ -282,8 +282,8 @@ public final class MapScreen extends Screen {
 			return List.of();
 		}
 		// Not the ones with the map off: what was mapped there before stays out of sight too.
-		List<String> saved = maps.saved(this.minecraft.level.dimension().identifier().toString(),
-			connection.levels().stream().map(level -> level.identifier().toString()).toList())
+		List<String> saved = maps.saved(this.minecraft.level.dimension().location().toString(),
+			connection.levels().stream().map(level -> level.location().toString()).toList())
 			.stream().filter(dimension -> !ServerRules.mapOff(dimension)).toList();
 		// The one shown stays a stop even if nothing is left in it, or there'd be no way off it.
 		if (this.otherDimension == null || saved.contains(this.otherDimension)) {
@@ -304,7 +304,7 @@ public final class MapScreen extends Screen {
 		String next = dimensions.get(Math.floorMod(dimensions.indexOf(this.dimension()) + step, dimensions.size()));
 		this.draw.leaveDimension();
 		this.closeOtherMap();
-		this.otherDimension = next.equals(this.minecraft.level.dimension().identifier().toString()) ? null : next;
+		this.otherDimension = next.equals(this.minecraft.level.dimension().location().toString()) ? null : next;
 		this.viewChanged();
 	}
 
@@ -332,7 +332,7 @@ public final class MapScreen extends Screen {
 			return session.map();
 		}
 		// Or the player turned the map off in the dimension shown, in Settings over this screen.
-		if (maps == null || this.minecraft.level == null || other.equals(this.minecraft.level.dimension().identifier().toString()) || ServerRules.mapOff(other)) {
+		if (maps == null || this.minecraft.level == null || other.equals(this.minecraft.level.dimension().location().toString()) || ServerRules.mapOff(other)) {
 			this.draw.leaveDimension();
 			this.closeOtherMap();
 			this.otherDimension = null;
@@ -366,7 +366,7 @@ public final class MapScreen extends Screen {
 	 * too, but nothing says so until the player is there.
 	 */
 	private double scaleToShown() {
-		String here = this.minecraft.level == null ? "" : this.minecraft.level.dimension().identifier().toString();
+		String here = this.minecraft.level == null ? "" : this.minecraft.level.dimension().location().toString();
 		return dimensionScale(here) / dimensionScale(this.dimension());
 	}
 
@@ -448,21 +448,21 @@ public final class MapScreen extends Screen {
 		this.sliceDown.visible = caves;
 		ClientLevel level = this.minecraft.level;
 		if (caves && level != null) {
-			this.sliceUp.active = this.layer < level.getMaxY() + 1;
-			this.sliceDown.active = this.layer > level.getMinY() + DepthGauge.STEP;
+			this.sliceUp.active = this.layer < (level.getMaxBuildHeight() - 1) + 1;
+			this.sliceDown.active = this.layer > level.getMinBuildHeight() + DepthGauge.STEP;
 		}
 	}
 
 	// No blurred, dimmed world behind the map. On 1.20.1 a screen draws no background unless it
 	// asks for one, so there's nothing to turn off.
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 	}
-	//?}
+	*///?}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		this.tooltipLines = null;
 		if (!ServerRules.minimapAllowed()) {
 			// The server can switch maps off while this screen is open.
@@ -536,11 +536,11 @@ public final class MapScreen extends Screen {
 			int avoidTop = this.drawButton.getY() - 2;
 			int avoidBottom = this.recenter.getY() + this.recenter.getHeight() + 2;
 			//? if >=1.21.2 {
-			this.gauge.draw(graphics, this.font, pos.y, this.layer, avoidX, avoidTop, avoidBottom);
-			//?} else {
-			/*// Each fill would be its own draw call otherwise.
+			/*this.gauge.draw(graphics, this.font, pos.y, this.layer, avoidX, avoidTop, avoidBottom);
+			*///?} else {
+			// Each fill would be its own draw call otherwise.
 			graphics.drawManaged(() -> this.gauge.draw(graphics, this.font, pos.y, this.layer, avoidX, avoidTop, avoidBottom));
-			*///?}
+			//?}
 		} else {
 			this.gauge.cancel();
 		}
@@ -554,17 +554,17 @@ public final class MapScreen extends Screen {
 				if (tip != null) {
 					// Placed like a button's own tooltip: below the control, or above where there's no room.
 					//? if >=1.21.6 {
-					graphics.setTooltipForNextFrame(this.font, tip.lines(), new MenuTooltipPositioner(tip.control()), mouseX, mouseY, false);
-					//?} else if >=1.21 {
+					/*graphics.setTooltipForNextFrame(this.font, tip.lines(), new MenuTooltipPositioner(tip.control()), mouseX, mouseY, false);
+					*///?} else if >=1.21 {
 					/*this.setTooltipForNextRenderPass(tip.lines(), new MenuTooltipPositioner(tip.control()), false);
 					*///?} else {
-					/*// 1.20.1's positioner takes a widget, of which it reads only the top and height, and
+					// 1.20.1's positioner takes a widget, of which it reads only the top and height, and
 					// the tabs aren't widgets: a button over the control stands in for it.
 					ScreenRectangle control = tip.control();
 					Button stand = Button.builder(Component.empty(), b -> {
 					}).bounds(control.left(), control.top(), control.width(), control.height()).build();
 					this.setTooltipForNextRenderPass(tip.lines(), new MenuTooltipPositioner(stand), false);
-					*///?}
+					//?}
 				}
 			} else if (hovered != null && hovered.kind() == Radar.Kind.PLAYER) {
 				this.tooltipLines = withClaim(Radar.describe(hovered, viewer), hovered.entity().getBlockX(), hovered.entity().getBlockZ());
@@ -579,7 +579,7 @@ public final class MapScreen extends Screen {
 				this.tooltipLines = this.spotTooltip(mouseX, mouseY);
 			}
 			if (this.tooltipLines != null) {
-				graphics.setTooltipForNextFrame(this.font, this.tooltipLines, mouseX, mouseY);
+				this.setTooltipForNextRenderPass(this.tooltipLines);
 			}
 		}
 
@@ -588,13 +588,13 @@ public final class MapScreen extends Screen {
 		this.drawTabs(graphics, mouseX, mouseY);
 		int statusX = this.tabsEnd + 8;
 		this.statusShown = this.statusText(shown, viewer, caves, this.buttonsStart() - 2 - statusX);
-		graphics.text(this.font, this.statusShown, statusX, 4, 0xFFFFFFFF, false);
+		graphics.drawString(this.font, this.statusShown, statusX, 4, 0xFFFFFFFF, false);
 		graphics.fill(0, this.height - BOTTOM_BAR, this.width, this.height, 0x90000000);
 		String help = (this.draw.active() ? this.draw.help() : HELP).getString();
-		graphics.text(this.font, help, 6, this.height - 11, 0xFFC8D0DA, false);
+		graphics.drawString(this.font, help, 6, this.height - 11, 0xFFC8D0DA, false);
 		this.drawMapName(graphics, 6 + this.font.width(help) + 12);
 		// Widgets (the buttons) draw over the map, then the icons on them.
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		super.render(graphics, mouseX, mouseY, a);
 		Markers.player(graphics, this.recenter.getX() + 10, this.recenter.getY() + 10.5F, 180, 5);
 		DrawMode.icon(graphics, DrawMode.PENCIL_ICON, this.drawButton.getX(), this.drawButton.getY(), 0xFFFFFFFF);
 		if (this.draw.active()) {
@@ -614,16 +614,16 @@ public final class MapScreen extends Screen {
 		if (this.menu != null) {
 			// Over everything drawn so far, text included.
 			//? if >=1.21.6 {
-			graphics.nextStratum();
+			/*graphics.nextStratum();
 			this.menu.draw(graphics, mouseX, mouseY);
-			//?} else {
-			/*graphics.flush();
+			*///?} else {
+			graphics.flush();
 			var pose = graphics.pose();
 			pose.pushPose();
 			pose.translate(0, 0, 400);
 			this.menu.draw(graphics, mouseX, mouseY);
 			pose.popPose();
-			*///?}
+			//?}
 		}
 	}
 
@@ -638,7 +638,7 @@ public final class MapScreen extends Screen {
 		boolean elsewhere = this.otherDimension != null;
 		String roof = !caves && shown.roofless() ? Component.translatable("diorama.map.under_roof").getString() : null;
 		String position = elsewhere
-			? Component.translatable("diorama.map.you_are_in", Waypoints.dimensionName(viewer.level().dimension().identifier().toString())).getString()
+			? Component.translatable("diorama.map.you_are_in", Waypoints.dimensionName(viewer.level().dimension().location().toString())).getString()
 			: String.format("%d, %d, %d", viewer.getBlockX(), viewer.getBlockY(), viewer.getBlockZ());
 		String chunks = elsewhere ? null : Component.translatable("diorama.map.chunks", shown.chunkCount()).getString();
 		SavedChunkImport job = elsewhere ? null : MapSession.get().savedChunks();
@@ -666,7 +666,7 @@ public final class MapScreen extends Screen {
 	 * The name of the dimension's map in use, at the right end of the bottom bar, once the dimension
 	 * has more than one. Shortened to fit after the help text, or left out if even a little won't.
 	 */
-	private void drawMapName(GuiGraphicsExtractor graphics, int left) {
+	private void drawMapName(GuiGraphics graphics, int left) {
 		Maps maps = Maps.get();
 		if (maps == null || this.minecraft.level == null) {
 			return;
@@ -684,7 +684,7 @@ public final class MapScreen extends Screen {
 			}
 			name = this.font.plainSubstrByWidth(name, room - this.font.width(ellipsis)) + ellipsis;
 		}
-		graphics.text(this.font, name, this.width - 6 - this.font.width(name), this.height - 11, 0xFFFFFFFF, false);
+		graphics.drawString(this.font, name, this.width - 6 - this.font.width(name), this.height - 11, 0xFFFFFFFF, false);
 	}
 
 	/** Where the buttons at the top right start: the status line has to end before them. */
@@ -701,7 +701,7 @@ public final class MapScreen extends Screen {
 	// Mouse and key events came as separate numbers before 1.21.9. Each override hands them to a
 	// method below that both versions share.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		this.draw.anyPress(event.x(), event.y());
 		return this.boundPressed(event.button(), DioramaClient.WAYPOINT_LIST.matchesMouse(event), DioramaClient.OPEN_MAP.matchesMouse(event), DioramaClient.TOGGLE_DIMENSION.matchesMouse(event))
@@ -723,8 +723,8 @@ public final class MapScreen extends Screen {
 		return this.keyDown(event.key(), DioramaClient.WAYPOINT_LIST.matches(event), DioramaClient.OPEN_MAP.matches(event), DioramaClient.TOGGLE_DIMENSION.matches(event))
 			|| super.keyPressed(event);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean mouseClicked(double x, double y, int button) {
 		this.draw.anyPress(x, y);
 		return this.boundPressed(button, DioramaClient.WAYPOINT_LIST.matchesMouse(button), DioramaClient.OPEN_MAP.matchesMouse(button), DioramaClient.TOGGLE_DIMENSION.matchesMouse(button))
@@ -746,7 +746,7 @@ public final class MapScreen extends Screen {
 		return this.keyDown(key, DioramaClient.WAYPOINT_LIST.matches(key, scancode), DioramaClient.OPEN_MAP.matches(key, scancode), DioramaClient.TOGGLE_DIMENSION.matches(key, scancode))
 			|| super.keyPressed(key, scancode, modifiers);
 	}
-	*///?}
+	//?}
 
 	/**
 	 * A mouse button bound to one of the map's keys, checked before the menu and the widgets as a key
@@ -866,7 +866,7 @@ public final class MapScreen extends Screen {
 		if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 			WaypointOverlay.Pin pin = WaypointOverlay.under(this.pins, x, y);
 			if (pin != null && pin.waypoint().editable()) {
-				this.minecraft.gui.setScreen(new WaypointEditScreen(this, pin.waypoint().source(), false));
+				this.minecraft.setScreen(new WaypointEditScreen(this, pin.waypoint().source(), false));
 			} else if (pin != null) {
 				// A waystone can't be edited here: its menu instead.
 				this.openMenu(x, y);
@@ -989,13 +989,13 @@ public final class MapScreen extends Screen {
 		items.add(MapMenu.Item.info(this.where(x, y, z)));
 		items.add(MapMenu.Item.action(Component.translatable("diorama.menu.teleport_here"), Waypoints.canTeleport(dimension), () -> {
 			Waypoints.teleport(dimension, x, y, z);
-			this.minecraft.gui.setScreen(null);
+			this.minecraft.setScreen(null);
 		}));
 		if (Settings.get().mapAddWaypoints) {
 			items.add(MapMenu.Item.action(Component.translatable("diorama.menu.add_waypoint"), true, () -> {
 				Waypoint waypoint = Waypoints.at(spot, dimension);
 				if (waypoint != null) {
-					this.minecraft.gui.setScreen(new WaypointEditScreen(this, waypoint, true));
+					this.minecraft.setScreen(new WaypointEditScreen(this, waypoint, true));
 				}
 			}));
 			items.add(MapMenu.Item.action(Component.translatable("diorama.menu.add_temporary"), true, () -> Waypoints.addTemporary(spot, dimension)));
@@ -1005,7 +1005,7 @@ public final class MapScreen extends Screen {
 		items.add(MapMenu.Item.confirmed(Component.translatable("diorama.menu.share_location"), Component.translatable("diorama.menu.share_confirm"), () -> {
 			Waypoint location = new Waypoint(Component.translatable("diorama.menu.shared_location").getString(), x, y, z, dimension, Waypoint.PALETTE[0]);
 			if (WaypointShare.send(location)) {
-				this.minecraft.gui.setScreen(null);
+				this.minecraft.setScreen(null);
 			}
 		}));
 		return items;
@@ -1023,16 +1023,16 @@ public final class MapScreen extends Screen {
 		items.add(MapMenu.Item.info(this.where(shown.x, shown.y, shown.z)));
 		if (waypoint.editable()) {
 			items.add(MapMenu.Item.action(Component.translatable("diorama.waypoints.edit"), true, () ->
-				this.minecraft.gui.setScreen(new WaypointEditScreen(this, waypoint, false))));
+				this.minecraft.setScreen(new WaypointEditScreen(this, waypoint, false))));
 		}
 		items.add(MapMenu.Item.action(Component.translatable("diorama.waypoint.teleport"), Waypoints.canTeleport(waypoint.dimension), () -> {
 			Waypoints.teleport(waypoint.dimension, waypoint.x, waypoint.y, waypoint.z);
-			this.minecraft.gui.setScreen(null);
+			this.minecraft.setScreen(null);
 		}));
 		items.add(this.copyItem(shown.x + " " + shown.y + " " + shown.z));
 		items.add(MapMenu.Item.confirmed(Component.translatable("diorama.waypoint.share"), Component.translatable("diorama.menu.share_confirm"), () -> {
 			if (WaypointShare.send(waypoint)) {
-				this.minecraft.gui.setScreen(null);
+				this.minecraft.setScreen(null);
 			}
 		}));
 		if (waypoint.kind == Waypoint.Kind.TEMPORARY) {
@@ -1130,10 +1130,10 @@ public final class MapScreen extends Screen {
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
-	*///?}
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+	//?}
 		this.menu = null;
 		double before = this.zoom;
 		double after = Math.max(this.minZoom(), Math.min(MAX_ZOOM, before * Math.pow(1.25, scrollY)));
@@ -1224,7 +1224,7 @@ public final class MapScreen extends Screen {
 		if (this.otherDimension != null) {
 			list.showDimension(this.otherDimension);
 		}
-		this.minecraft.gui.setScreen(list);
+		this.minecraft.setScreen(list);
 	}
 
 	/** Between the surface and the slice at the player's feet, as C and the tabs do. */
@@ -1255,7 +1255,7 @@ public final class MapScreen extends Screen {
 			}
 			this.layer = playerSlice(viewer);
 		}
-		this.layer = Math.max(this.minecraft.level.getMinY() + 4, Math.min(this.minecraft.level.getMaxY() + 1, this.layer + delta));
+		this.layer = Math.max(this.minecraft.level.getMinBuildHeight() + 4, Math.min((this.minecraft.level.getMaxBuildHeight() - 1) + 1, this.layer + delta));
 		this.layerPicked = true;
 	}
 
@@ -1308,7 +1308,7 @@ public final class MapScreen extends Screen {
 	}
 
 	/** Surface and Caves as the game's tabs, the open one taller and underlined. */
-	private void drawTabs(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	private void drawTabs(GuiGraphics graphics, int mouseX, int mouseY) {
 		int x = 2;
 		for (int i = 0; i < this.tabs(); i++) {
 			boolean selected = (i == 1) == (this.layer != TileKey.SURFACE);
@@ -1322,12 +1322,12 @@ public final class MapScreen extends Screen {
 				// The selected tab's sprite is open in the middle; the game puts its menu backdrop there.
 				// 1.20.1's tab texture is filled in, so it needs none.
 				//? if >=1.21 {
-				graphics.fill(x + 2, 2, x + w - 2, h, 0x40000000);
-				//?}
+				/*graphics.fill(x + 2, 2, x + w - 2, h, 0x40000000);
+				*///?}
 				int underline = nameWidth - 1;
 				graphics.fill(x + (w - underline) / 2, h - 3, x + (w - underline) / 2 + underline, h - 2, 0xFFFFFFFF);
 			}
-			graphics.text(this.font, name, x + w / 2 - nameWidth / 2, selected ? 4 : 6, selected ? 0xFFFFFFFF : 0xFFE0E0E0, true);
+			graphics.drawString(this.font, name, x + w / 2 - nameWidth / 2, selected ? 4 : 6, selected ? 0xFFFFFFFF : 0xFFE0E0E0, true);
 			this.tabX[i] = x;
 			this.tabWidth[i] = w;
 			x += w;
@@ -1354,28 +1354,28 @@ public final class MapScreen extends Screen {
 	}
 
 	/** One of the game's tabs, as the map's Surface and Caves are drawn. */
-	static void tab(GuiGraphicsExtractor graphics, boolean selected, boolean hovered, int x, int y, int w, int h) {
+	static void tab(GuiGraphics graphics, boolean selected, boolean hovered, int x, int y, int w, int h) {
 		sprite(graphics, selected ? (hovered ? TAB_SELECTED_HIGHLIGHTED : TAB_SELECTED) : (hovered ? TAB_HIGHLIGHTED : TAB), x, y, w, h);
 	}
 
-	private static void sprite(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int w, int h) {
+	private static void sprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int w, int h) {
 		//? if >=1.21.6 {
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h);
-		//?} else if >=1.21.2 {
+		/*graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h);
+		*///?} else if >=1.21.2 {
 		/*graphics.blitSprite(RenderType::guiTextured, sprite, x, y, w, h);
 		*///?} else if >=1.21 {
 		/*graphics.blitSprite(sprite, x, y, w, h);
 		*///?} else {
-		/*// From 1.20.1's tab texture, one 24 pixel row per state. Its tabs are always 24 tall; these
+		// From 1.20.1's tab texture, one 24 pixel row per state. Its tabs are always 24 tall; these
 		// are shorter, so they take the top h rows and slice only the 2 pixel sides (1.20.1's
 		// nine-slice divides by the bottom border when the height differs, and the tabs have none).
 		int row = sprite == TAB_SELECTED ? 0 : sprite == TAB_SELECTED_HIGHLIGHTED ? 1 : sprite == TAB ? 2 : 3;
 		graphics.blitNineSliced(TAB_BUTTON, x, y, w, h, 2, 2, 2, 0, 130, h, 0, row * 24);
-		*///?}
+		//?}
 	}
 
 	/** The dimension button's face: its icon, or for a modded dimension the first letter of its name. */
-	private void drawDimensionIcon(GuiGraphicsExtractor graphics) {
+	private void drawDimensionIcon(GuiGraphics graphics) {
 		int x = this.dimensionButton.getX();
 		int y = this.dimensionButton.getY();
 		String[] icon = switch (this.dimension()) {
@@ -1390,7 +1390,7 @@ public final class MapScreen extends Screen {
 		}
 		String name = this.dimensionName().getString();
 		String letter = name.isEmpty() ? "?" : name.substring(0, name.offsetByCodePoints(0, 1));
-		graphics.text(this.font, letter, x + 10 - this.font.width(letter) / 2, y + 6, 0xFFFFFFFF, true);
+		graphics.drawString(this.font, letter, x + 10 - this.font.width(letter) / 2, y + 6, 0xFFFFFFFF, true);
 	}
 
 	/** The Overworld on the dimension button: a tree, 11 by 9. */
@@ -1444,7 +1444,7 @@ public final class MapScreen extends Screen {
 	};
 
 	/** A small up or down arrow on a slice button, grey when it can't go further. */
-	private void caret(GuiGraphicsExtractor graphics, Button button, boolean down) {
+	private void caret(GuiGraphics graphics, Button button, boolean down) {
 		int colour = button.active ? 0xFFFFFFFF : 0xFFA0A0A0;
 		int cx = button.getX() + button.getWidth() / 2;
 		int y = button.getY() + (button.getHeight() - 3) / 2;
@@ -1671,7 +1671,7 @@ public final class MapScreen extends Screen {
 			}
 		}
 		return biome == null ? null : biome.unwrapKey()
-			.map(k -> (Component) Component.translatableWithFallback(k.identifier().toLanguageKey("biome"), k.identifier().getPath()))
+			.map(k -> (Component) Component.translatableWithFallback(k.location().toLanguageKey("biome"), k.location().getPath()))
 			.orElse(null);
 	}
 
@@ -1686,7 +1686,7 @@ public final class MapScreen extends Screen {
 			return null;
 		}
 		String name = session.seenBiomes().at(pos.getX(), pos.getZ());
-		Identifier id = name == null ? null : Identifier.tryParse(name);
+		ResourceLocation id = name == null ? null : ResourceLocation.tryParse(name);
 		return id == null ? null : Component.translatableWithFallback(id.toLanguageKey("biome"), id.getPath());
 	}
 
@@ -1702,10 +1702,10 @@ public final class MapScreen extends Screen {
 	/** A fixed key's name in the player's keyboard layout and language. */
 	private static Component keyName(int key) {
 		//? if >=26.3 {
-		return InputConstants.Type.KEYBOARD.getOrCreate(key).getDisplayName();
-		//?} else {
-		/*return InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName();
-		*///?}
+		/*return InputConstants.Type.KEYBOARD.getOrCreate(key).getDisplayName();
+		*///?} else {
+		return InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName();
+		//?}
 	}
 
 	/** For tests on versions without a tick freeze: the map pauses a singleplayer world while it's open. */
@@ -1733,7 +1733,7 @@ public final class MapScreen extends Screen {
 		if (this.otherDimension != null) {
 			return this.otherDimension;
 		}
-		return this.minecraft.level == null ? "" : this.minecraft.level.dimension().identifier().toString();
+		return this.minecraft.level == null ? "" : this.minecraft.level.dimension().location().toString();
 	}
 
 	/** For tests: draw mode. */

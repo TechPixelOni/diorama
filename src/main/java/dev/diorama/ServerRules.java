@@ -117,7 +117,7 @@ public final class ServerRules {
 	/** Whether the map is off in the dimension the player is in. */
 	public static boolean mapOffHere() {
 		net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
-		return level != null && mapOff(level.dimension().identifier().toString());
+		return level != null && mapOff(level.dimension().location().toString());
 	}
 
 	/**
@@ -128,16 +128,16 @@ public final class ServerRules {
 		if (mc.level == null || !mapOffHere()) {
 			return false;
 		}
-		String here = mc.level.dimension().identifier().toString();
+		String here = mc.level.dimension().location().toString();
 		Component message = Component.translatable(!mapOffByServer(here) ? "diorama.map_off.here"
 			: mc.hasSingleplayerServer() ? "diorama.map_off.here_file" : "diorama.map_off.here_server");
 		lastMapOffMessage = message.getString();
 		mapOffMessages++;
 		//? if >=26.1 {
-		mc.gui.hud.setOverlayMessage(message, false);
-		//?} else {
 		/*mc.gui.setOverlayMessage(message, false);
-		*///?}
+		*///?} else {
+		mc.gui.setOverlayMessage(message, false);
+		//?}
 		return true;
 	}
 

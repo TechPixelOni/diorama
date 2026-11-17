@@ -187,7 +187,7 @@ final class PortalPinsTest {
 	 */
 	static void netherRoof(ClientGameTestContext context, TestSingleplayerContext world) {
 		context.runOnClient(mc -> Settings.get().portalMarkers = true);
-		String from = context.computeOnClient(mc -> mc.level.dimension().identifier().toString());
+		String from = context.computeOnClient(mc -> mc.level.dimension().location().toString());
 		BlockPos start = context.computeOnClient(mc -> mc.player.blockPosition());
 		world.getServer().runCommand("execute in minecraft:the_nether run tp @a 0 70 0");
 		context.waitFor(mc -> MapSession.get() != null && mc.level.dimension() == net.minecraft.world.level.Level.NETHER
@@ -245,7 +245,7 @@ final class PortalPinsTest {
 		context.runOnClient(mc -> Settings.get().portalMarkers = false);
 		// Back where the player was: the tests after this one expect the dimension they'd have had.
 		world.getServer().runCommand("execute in " + from + " run tp @a " + start.getX() + " " + start.getY() + " " + start.getZ());
-		context.waitFor(mc -> mc.level != null && mc.level.dimension().identifier().toString().equals(from) && mc.gui.screen() == null
+		context.waitFor(mc -> mc.level != null && mc.level.dimension().location().toString().equals(from) && mc.screen == null
 			&& MapSession.get() != null && MapSession.get().map().chunkCount() > 200, 2400);
 		DioramaClientTest.settle(context, 100);
 	}
@@ -258,7 +258,7 @@ final class PortalPinsTest {
 	 */
 	static void unlit(ClientGameTestContext context, TestSingleplayerContext world) {
 		context.runOnClient(mc -> Settings.get().portalMarkers = true);
-		String from = context.computeOnClient(mc -> mc.level.dimension().identifier().toString());
+		String from = context.computeOnClient(mc -> mc.level.dimension().location().toString());
 		String mode = context.computeOnClient(mc -> mc.gameMode.getPlayerMode().getName());
 		BlockPos start = context.computeOnClient(mc -> mc.player.blockPosition());
 		// The portal room of the nearest stronghold, as the game made it: {minX, minY, minZ, maxX, maxY, maxZ}.
@@ -361,7 +361,7 @@ final class PortalPinsTest {
 		world.getServer().runCommand("gamemode " + mode + " @a");
 		// Back where the player was: the tests after this one expect the place they'd have had.
 		world.getServer().runCommand("execute in " + from + " run tp @a " + start.getX() + " " + start.getY() + " " + start.getZ());
-		context.waitFor(mc -> mc.level != null && mc.level.dimension().identifier().toString().equals(from) && mc.gui.screen() == null
+		context.waitFor(mc -> mc.level != null && mc.level.dimension().location().toString().equals(from) && mc.screen == null
 			&& MapSession.get() != null && MapSession.get().map().chunkCount() > 200, 2400);
 		DioramaClientTest.settle(context, 100);
 	}
@@ -439,8 +439,8 @@ final class PortalPinsTest {
 		context.setScreen(() -> new WaypointEditScreen(null, waypoint, false));
 		context.waitTicks(3);
 		double[] save = context.computeOnClient(mc -> {
-			mc.gui.screen().children().stream().filter(EditBox.class::isInstance).map(EditBox.class::cast).findFirst().orElseThrow().setValue(name);
-			Button button = mc.gui.screen().children().stream().filter(Button.class::isInstance).map(Button.class::cast)
+			mc.screen.children().stream().filter(EditBox.class::isInstance).map(EditBox.class::cast).findFirst().orElseThrow().setValue(name);
+			Button button = mc.screen.children().stream().filter(Button.class::isInstance).map(Button.class::cast)
 				.filter(b -> b.getMessage().getString().equals(Component.translatable("diorama.waypoint.save").getString())).findFirst().orElseThrow();
 			double scale = mc.getWindow().getGuiScale();
 			return new double[] {(button.getX() + button.getWidth() / 2.0) * scale, (button.getY() + button.getHeight() / 2.0) * scale};
@@ -575,7 +575,7 @@ final class PortalPinsTest {
 			context.setScreen(MapScreen::new);
 			context.getInput().setCursorPos(1300, 30);
 			double v = Projection.v(y, z);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(floor + 2.5, v, 3.0, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(floor + 2.5, v, 3.0, TileKey.SURFACE));
 			settle(context, 100);
 			context.takeScreenshot("portal-plugin-map");
 			context.setScreen(() -> null);
@@ -658,13 +658,13 @@ final class PortalPinsTest {
 		context.setScreen(MapScreen::new);
 		context.getInput().setCursorPos(1300, 30);
 		double v = Projection.v(base + 12, cz + 20);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 3.2, TileKey.SURFACE));
 		settle(context, 200);
 		context.takeScreenshot("portal-pins-off");
 		context.runOnClient(mc -> Settings.get().portalMarkers = true);
 		settle(context, 5);
 		context.takeScreenshot("portal-pins-on");
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(cx + 0.5, v, 1.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(cx + 0.5, v, 1.0, TileKey.SURFACE));
 		settle(context, 80);
 		context.takeScreenshot("portal-pins-far");
 		context.setScreen(() -> null);

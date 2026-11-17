@@ -3,7 +3,7 @@ package dev.diorama.waypoint;
 import com.mojang.blaze3d.platform.InputConstants;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import org.jspecify.annotations.Nullable;
 
@@ -106,7 +106,7 @@ public final class FolderMenu {
 		this.scroll = Math.max(0, Math.min(this.scroll - (int) Math.signum(amount), this.entries.size() - this.shown));
 	}
 
-	public void draw(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	public void draw(GuiGraphics graphics, int mouseX, int mouseY) {
 		int height = this.height();
 		graphics.fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + height + 1, 0xFF3A4048);
 		graphics.fill(this.x, this.y, this.x + this.width, this.y + height, 0xF0101418);
@@ -122,11 +122,11 @@ public final class FolderMenu {
 			int room = right - (this.x + PAD + 2);
 			if (entry.count() >= 0) {
 				String count = Integer.toString(entry.count());
-				graphics.text(this.font, count, right - this.font.width(count), top + 2, COUNT, false);
+				graphics.drawString(this.font, count, right - this.font.width(count), top + 2, COUNT, false);
 				room -= this.font.width(count) + 6;
 			}
 			int colour = entry.key().equals(this.current) ? CURRENT : entry.hidden() ? HIDDEN : TEXT;
-			graphics.text(this.font, this.fit(entry.name(), room), this.x + PAD + 2, top + 2, colour, false);
+			graphics.drawString(this.font, this.fit(entry.name(), room), this.x + PAD + 2, top + 2, colour, false);
 		}
 		if (scrolls) {
 			int track = height - 2;

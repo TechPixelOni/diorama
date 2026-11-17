@@ -76,10 +76,10 @@ public final class WaypointShare {
 		Optional<String> text = format(waypoint);
 		if (text.isEmpty()) {
 			//? if >=26.1 {
-			mc.gui.hud.getChat().addClientSystemMessage(Component.translatable("diorama.share.too_long"));
-			//?} else {
-			/*mc.gui.getChat().addMessage(Component.translatable("diorama.share.too_long"));
-			*///?}
+			/*mc.gui.getChat().addClientSystemMessage(Component.translatable("diorama.share.too_long"));
+			*///?} else {
+			mc.gui.getChat().addMessage(Component.translatable("diorama.share.too_long"));
+			//?}
 			return false;
 		}
 		if (mc.player != null) {
@@ -158,8 +158,8 @@ public final class WaypointShare {
 		String command = addCommand(shared, y);
 		return Component.translatable("diorama.share.add").withStyle(style -> style
 			.withColor(ChatFormatting.GREEN)
-			.withClickEvent(new ClickEvent.RunCommand(command))
-			.withHoverEvent(new HoverEvent.ShowText(Component.translatable("diorama.share.add_hover", shared.name(), shared.x(), y, shared.z()))));
+			.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command))
+			.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("diorama.share.add_hover", shared.name(), shared.x(), y, shared.z()))));
 	}
 
 	/**
@@ -186,7 +186,7 @@ public final class WaypointShare {
 	private static <S> int list(CommandContext<S> context) {
 		Minecraft mc = Minecraft.getInstance();
 		// Queued for later: a chat click puts the chat screen back right after running this.
-		mc.schedule(() -> mc.gui.setScreen(new WaypointListScreen(null)));
+		mc.tell(() -> mc.setScreen(new WaypointListScreen(null)));
 		return 1;
 	}
 
@@ -206,7 +206,7 @@ public final class WaypointShare {
 		}
 		Minecraft mc = Minecraft.getInstance();
 		// Queued for later: a chat click puts the chat screen back right after running this.
-		mc.schedule(() -> mc.gui.setScreen(new WaypointEditScreen(null, waypoint, true)));
+		mc.tell(() -> mc.setScreen(new WaypointEditScreen(null, waypoint, true)));
 		return 1;
 	}
 	/** Xaero's colours are the 16 chat colours, the first 16 {@link ChatFormatting} values; the nearest one to a waypoint colour. */

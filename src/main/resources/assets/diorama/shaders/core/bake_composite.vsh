@@ -3,17 +3,17 @@
 // between stages by location; before it, OpenGL compiles this text as it is and binds by name.
 // (Kept here rather than in the include, which isn't processed per version.)
 //? if >=26.3 {
-#extension GL_ARB_separate_shader_objects : require
-#define LOC(n) layout(location = n)
-#define VERTEX_INDEX gl_VertexIndex
-
-#include <diorama:bake.glsl>
+//#extension GL_ARB_separate_shader_objects : require
+//#define LOC(n) layout(location = n)
+//#define VERTEX_INDEX gl_VertexIndex
+//
+//#include <diorama:bake.glsl>
 //?} else {
-/*#define LOC(n)
+#define LOC(n)
 #define VERTEX_INDEX gl_VertexID
 
 #moj_import <diorama:bake.glsl>
-*///?}
+//?}
 
 // One triangle over the whole target, like vanilla's screenquad.
 void main() {

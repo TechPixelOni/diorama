@@ -52,7 +52,7 @@ final class MinimapTextSizeTest {
 			settings.minimapSize = 128;
 		});
 		// Before 1.21.2 the client only works out that it's dark when the minimap asks for the time.
-		context.waitFor(mc -> mc.level.isDarkOutside(), 400);
+		context.waitFor(mc -> mc.level.isNight(), 400);
 		// Big enough for a GUI scale of 4, which a smaller window clamps to 3. Long enough for the commands' chat lines to fade.
 		context.getInput().resizeWindow(1920, 1080);
 		context.waitTicks(220);

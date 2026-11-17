@@ -1,12 +1,12 @@
 //? if >=1.21.6 {
-package dev.diorama.render;
+/*package dev.diorama.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import java.util.Arrays;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.jspecify.annotations.Nullable;
 
 // Many GUI quads as one piece of GUI render state (1.21.6 on), so they draw in one go: corners
@@ -49,21 +49,21 @@ public record QuadsElement(
 	}
 
 	//? if >=1.21.9 {
-	@Override
+	/^@Override
 	public void buildVertices(VertexConsumer consumer) {
 		for (int i = 0; i < this.quads * 4; i++) {
 			this.vertex(consumer.addVertex(this.xyz[i * 3], this.xyz[i * 3 + 1], 0), i);
 		}
 	}
-	//?} else {
-	/*// GUI elements were drawn at a depth the renderer handed in.
+	^///?} else {
+	// GUI elements were drawn at a depth the renderer handed in.
 	@Override
 	public void buildVertices(VertexConsumer consumer, float z) {
 		for (int i = 0; i < this.quads * 4; i++) {
 			this.vertex(consumer.addVertex(this.xyz[i * 3], this.xyz[i * 3 + 1], z), i);
 		}
 	}
-	*///?}
+	//?}
 
 	private void vertex(VertexConsumer vertex, int i) {
 		if (this.uvs != null) {
@@ -72,4 +72,4 @@ public record QuadsElement(
 		vertex.setColor(this.colors[i / 4]);
 	}
 }
-//?}
+*///?}

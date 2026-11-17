@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jspecify.annotations.Nullable;
@@ -58,7 +58,7 @@ public final class WaypointIcons {
 	public static List<String> all() {
 		List<String> ids = new ArrayList<>(OFFERED);
 		List<String> added = new ArrayList<>();
-		for (Identifier file : Minecraft.getInstance().getResourceManager().listResources("textures/waypoint_icons", file -> file.getPath().endsWith(".png")).keySet()) {
+		for (ResourceLocation file : Minecraft.getInstance().getResourceManager().listResources("textures/waypoint_icons", file -> file.getPath().endsWith(".png")).keySet()) {
 			String id = file.getNamespace() + ":" + file.getPath().substring(FOLDER.length(), file.getPath().length() - ".png".length());
 			if (!ids.contains(id)) {
 				added.add(id);
@@ -70,11 +70,11 @@ public final class WaypointIcons {
 	}
 
 	private static PinArt.@Nullable Image load(String id, ResourceManager manager) {
-		Identifier name = Identifier.tryParse(id);
+		ResourceLocation name = ResourceLocation.tryParse(id);
 		if (name == null) {
 			return null;
 		}
-		Identifier file = Identifier.fromNamespaceAndPath(name.getNamespace(), FOLDER + name.getPath() + ".png");
+		ResourceLocation file = new net.minecraft.resources.ResourceLocation(name.getNamespace(), FOLDER + name.getPath() + ".png");
 		Optional<Resource> resource = manager.getResource(file);
 		if (resource.isEmpty()) {
 			return null;
@@ -122,12 +122,12 @@ public final class WaypointIcons {
 	/** An image's pixel as ARGB. */
 	static int argb(NativeImage image, int x, int y) {
 		//? if >=1.21.2 {
-		return image.getPixel(x, y);
-		//?} else {
-		/*// Only the ABGR getter existed; swap red and blue.
+		/*return image.getPixel(x, y);
+		*///?} else {
+		// Only the ABGR getter existed; swap red and blue.
 		int abgr = image.getPixelRGBA(x, y);
 		return (abgr & 0xFF00FF00) | (abgr >> 16 & 0xFF) | (abgr & 0xFF) << 16;
-		*///?}
+		//?}
 	}
 
 	/** The icon centred on a {@link #TILE}, shrunk by a whole factor first if it's bigger, so every pin is the same size. */

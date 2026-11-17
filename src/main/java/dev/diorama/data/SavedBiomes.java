@@ -111,9 +111,9 @@ public final class SavedBiomes {
 		if (sections == null) {
 			return null;
 		}
-		int minQuart = this.level.getMinSectionY() << 2;
+		int minQuart = this.level.getMinSection() << 2;
 		int y = Mth.clamp(quartY, minQuart, minQuart + (sections.length << 2) - 1);
-		PalettedContainerRO<Holder<Biome>> section = sections[(y >> 2) - this.level.getMinSectionY()];
+		PalettedContainerRO<Holder<Biome>> section = sections[(y >> 2) - this.level.getMinSection()];
 		return section == null ? null : section.get(quartX & 3, y & 3, quartZ & 3);
 	}
 

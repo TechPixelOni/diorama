@@ -84,13 +84,13 @@ public final class GpuTileBaker {
 	/** Made on the first frame after a tile is queued, so a session without GPU baking never sets one up. */
 	private static final class Backend {
 		//? if >=26.2 {
-		// Raw OpenGL can be picked here too, on the OpenGL backend, to try it where the game is quick to run.
+		/*// Raw OpenGL can be picked here too, on the OpenGL backend, to try it where the game is quick to run.
 		static final BakeBackend INSTANCE = "gl".equals(System.getProperty("diorama.gpuBakeBackend", System.getenv("DIORAMA_GPU_BAKE_BACKEND")))
 			? new GlBakeBackend()
 			: new BlazeBakeBackend();
-		//?} else {
-		/*static final BakeBackend INSTANCE = new GlBakeBackend();
-		*///?}
+		*///?} else {
+		static final BakeBackend INSTANCE = new GlBakeBackend();
+		//?}
 	}
 
 	private static final ConcurrentLinkedQueue<Job> QUEUE = new ConcurrentLinkedQueue<>();

@@ -276,7 +276,7 @@ public final class SavedChunks implements ChunkSave {
 	@Override
 	public ChunkTags.@Nullable Summary summary(int chunkX, int chunkZ) {
 		ChunkTags.Summary summary = this.summarize(chunkX, chunkZ);
-		short top = summary == null || !summary.finished() || summary.maxY() <= this.level.getMinY() ? NONE : (short) summary.maxY();
+		short top = summary == null || !summary.finished() || summary.maxY() <= this.level.getMinBuildHeight() ? NONE : (short) summary.maxY();
 		this.tops.computeIfAbsent(regionKey(chunkX >> 5, chunkZ >> 5), k -> {
 			short[] tops = new short[1024];
 			java.util.Arrays.fill(tops, UNKNOWN);
@@ -365,10 +365,10 @@ public final class SavedChunks implements ChunkSave {
 			return false;
 		}
 		//? if >=1.21 {
-		return server.getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
-		//?} else {
-		/*return server.getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
-		*///?}
+		/*return server.getAverageTickTimeNanos() > SERVER_BEHIND_NANOS;
+		*///?} else {
+		return server.getAverageTickTime() * 1_000_000 > SERVER_BEHIND_NANOS;
+		//?}
 	}
 
 	private @Nullable SavedChunk load(int chunkX, int chunkZ) {

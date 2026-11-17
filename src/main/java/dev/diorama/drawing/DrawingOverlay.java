@@ -6,7 +6,7 @@ import dev.diorama.render.gpu.MapCanvas;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,7 +46,7 @@ public final class DrawingOverlay {
 	 * Draws {@code drawings}, then {@code preview} (one being drawn), and {@code highlighted} (the
 	 * one the eraser would take) lit up. Notes only when {@code notes}.
 	 */
-	public void draw(GuiGraphicsExtractor graphics, Font font, MapViewport.View view, List<Drawing> drawings, @Nullable Drawing preview,
+	public void draw(GuiGraphics graphics, Font font, MapViewport.View view, List<Drawing> drawings, @Nullable Drawing preview,
 		@Nullable Drawing highlighted, boolean notes) {
 		this.circle = view.round() ? Circle.in(view) : null;
 		this.quads = 0;
@@ -361,7 +361,7 @@ public final class DrawingOverlay {
 		return new float[] {x - 2, y - 2, x + width + 1, y + 9, x, y};
 	}
 
-	private void note(GuiGraphicsExtractor graphics, Font font, MapViewport.View view, Drawing note, boolean lit) {
+	private void note(GuiGraphics graphics, Font font, MapViewport.View view, Drawing note, boolean lit) {
 		float[] plate = plate(font, view, note);
 		if (plate[2] < view.x() || plate[0] > view.x() + view.width() || plate[3] < view.y() || plate[1] > view.y() + view.height()) {
 			return;
@@ -374,6 +374,6 @@ public final class DrawingOverlay {
 			graphics.fill(x0 - 1, y0 - 1, x1 + 1, y1 + 1, 0xFFFFFFFF);
 		}
 		graphics.fill(x0, y0, x1, y1, PLATE);
-		graphics.text(font, note.text, (int) plate[4], (int) plate[5], 0xFF000000 | note.color, true);
+		graphics.drawString(font, note.text, (int) plate[4], (int) plate[5], 0xFF000000 | note.color, true);
 	}
 }

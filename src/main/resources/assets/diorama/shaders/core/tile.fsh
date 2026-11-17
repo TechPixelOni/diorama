@@ -1,6 +1,6 @@
-#version 330
+#version 150
 //? if >=26.3 {
-#extension GL_ARB_separate_shader_objects : require
+//#extension GL_ARB_separate_shader_objects : require
 //?}
 
 // A map tile shown no larger than its pixels are crisp at. The GPU's own filter blurs here: it
@@ -14,16 +14,16 @@ uniform sampler2D Sampler0;
 
 // From the fog's vertex shader, which passes both through: the place on the tile, and its tint.
 //? if >=26.3 {
-layout(location = 0) in vec2 maskUv;
-layout(location = 1) in vec4 params;
-
-layout(location = 0) out vec4 fragColor;
+//layout(location = 0) in vec2 maskUv;
+//layout(location = 1) in vec4 params;
+//
+//layout(location = 0) out vec4 fragColor;
 //?} else {
-/*in vec2 maskUv;
+in vec2 maskUv;
 in vec4 params;
 
 out vec4 fragColor;
-*///?}
+//?}
 
 const float LAST_LEVEL = 5.0;
 

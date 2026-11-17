@@ -29,7 +29,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -142,7 +142,7 @@ public final class Lights {
 	 * {@code radar} is on and it would show them: a light gives its holder away no more than
 	 * their face would.
 	 */
-	public void draw(GuiGraphicsExtractor graphics, MapViewport.View view, float partialTick, float opacity, boolean radar) {
+	public void draw(GuiGraphics graphics, MapViewport.View view, float partialTick, float opacity, boolean radar) {
 		Player self = Minecraft.getInstance().player;
 		Entity viewer = MapSession.viewer();
 		if (view.layer() == TileKey.SURFACE || this.map.roofless() || self == null || viewer == null) {

@@ -88,21 +88,21 @@ public final class ModelFaces {
 		}
 		// The world draws with this same model, so everything that's moved to read it is put back.
 		//? if >=1.21.2 {
-		List<ModelPart> touched = parts(model.root());
-		//?} else {
-		/*List<ModelPart> touched = parts(head);
-		*///?}
+		/*List<ModelPart> touched = parts(model.root());
+		*///?} else {
+		List<ModelPart> touched = parts(head);
+		//?}
 		List<Held> held = new ArrayList<>(touched.size());
 		for (ModelPart part : touched) {
 			held.add(Held.of(part));
 		}
 		try {
 			//? if >=1.21.2 {
-			if (state != null && model instanceof net.minecraft.client.model.EntityModel entityModel) {
+			/*if (state != null && model instanceof net.minecraft.client.model.EntityModel entityModel) {
 				// The model as this mob shows it: which of its parts are there.
 				entityModel.setupAnim((net.minecraft.client.renderer.entity.state.EntityRenderState) state);
 			}
-			//?}
+			*///?}
 			List<ModelPart> headParts = parts(head);
 			BitSet shown = new BitSet(headParts.size() * 2);
 			for (int i = 0; i < headParts.size(); i++) {
@@ -148,9 +148,9 @@ public final class ModelFaces {
 			return headed.getHead();
 		}
 		//? if >=1.21.2 {
-		ModelPart root = model.root();
-		//?} else {
-		/*// Models had no root of their own yet. A mod's model keeps its field names in the game, so
+		/*ModelPart root = model.root();
+		*///?} else {
+		// Models had no root of their own yet. A mod's model keeps its field names in the game, so
 		// its head is the field named head, or a part with a head below it. Minecraft's own fields
 		// are numbered in a release jar, so there, failing both, its head is the field shaped like
 		// a head.
@@ -183,12 +183,12 @@ public final class ModelFaces {
 				return shaped;
 			}
 		}
-		*///?}
+		//?}
 		return headBelow(root);
 	}
 
 	//? if <1.21.2 {
-	/*private static java.util.@Nullable Set<String> headShapes;
+	private static java.util.@Nullable Set<String> headShapes;
 
 	// The shape of every head in Minecraft's own model layers, which still name their parts in a
 	// release jar. Read once: the layers are built in code, so a resource reload doesn't change them.
@@ -221,7 +221,7 @@ public final class ModelFaces {
 			.append(cube.maxX).append(',').append(cube.maxY).append(',').append(cube.maxZ).append(';'));
 		return shape.toString();
 	}
-	*///?}
+	//?}
 
 	/**
 	 * The head somewhere below a model's root, by the names models give it. Models exported from
@@ -302,10 +302,10 @@ public final class ModelFaces {
 	/** A part and every part below it. */
 	private static List<ModelPart> parts(ModelPart top) {
 		//? if >=1.21.6 {
-		return top.getAllParts();
-		//?} else {
-		/*return top.getAllParts().toList();
-		*///?}
+		/*return top.getAllParts();
+		*///?} else {
+		return top.getAllParts().toList();
+		//?}
 	}
 
 	/**
@@ -320,10 +320,10 @@ public final class ModelFaces {
 		}
 		Corners corners = new Corners();
 		//? if >=1.21 {
-		cube.compile(pose, corners, 0, 0, -1);
-		//?} else {
-		/*cube.compile(pose, corners, 0, 0, 1, 1, 1, 1);
-		*///?}
+		/*cube.compile(pose, corners, 0, 0, -1);
+		*///?} else {
+		cube.compile(pose, corners, 0, 0, 1, 1, 1, 1);
+		//?}
 		for (int q = 0; q + 4 <= corners.count; q += 4) {
 			if (corners.at[q * Corners.SIZE + 7] > -FACING) {
 				continue;
@@ -378,9 +378,9 @@ public final class ModelFaces {
 
 		@Override
 		//? if >=1.21 {
-		public void addVertex(float x, float y, float z, int color, float u, float v, int overlay, int light, float nx, float ny, float nz) {
-		//?} else {
-		/*public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float u, float v, int overlay, int light, float nx, float ny, float nz) {
+		/*public void addVertex(float x, float y, float z, int color, float u, float v, int overlay, int light, float nx, float ny, float nz) {
+		*///?} else {
+		public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float u, float v, int overlay, int light, float nx, float ny, float nz) {
 			// From 1.21 the game hands a box's normals over at unit length; before, a part scaled
 			// unevenly left them longer or shorter, and its front could fail the FACING test.
 			float length = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
@@ -389,7 +389,7 @@ public final class ModelFaces {
 				ny /= length;
 				nz /= length;
 			}
-		*///?}
+		//?}
 			if ((this.count + 1) * SIZE > this.at.length) {
 				this.at = java.util.Arrays.copyOf(this.at, this.at.length * 2);
 			}
@@ -406,7 +406,7 @@ public final class ModelFaces {
 
 		// The rest of what a vertex consumer takes, none of which a box's shape needs.
 		//? if >=1.21 {
-		@Override
+		/*@Override
 		public VertexConsumer addVertex(float x, float y, float z) {
 			return this;
 		}
@@ -447,8 +447,8 @@ public final class ModelFaces {
 		public VertexConsumer setLineWidth(float width) {
 			return this;
 		}
-		//?} else {
-		/*@Override
+		*///?} else {
+		@Override
 		public VertexConsumer vertex(double x, double y, double z) {
 			return this;
 		}
@@ -489,7 +489,7 @@ public final class ModelFaces {
 		@Override
 		public void unsetDefaultColor() {
 		}
-		*///?}
+		//?}
 	}
 
 	/**

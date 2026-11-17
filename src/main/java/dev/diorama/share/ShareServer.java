@@ -109,7 +109,7 @@ public final class ShareServer {
 
 	/** Whether this server's settings turn the map off in a level's dimension. */
 	public static boolean mapOff(ServerLevel level) {
-		return locks(level.getServer()).mapOffDimensions().contains(level.dimension().identifier().toString());
+		return locks(level.getServer()).mapOffDimensions().contains(level.dimension().location().toString());
 	}
 
 	/** The map settings this server decides for its players; {@link ServerLocks#NONE} if it locks none. */
@@ -425,7 +425,7 @@ public final class ShareServer {
 		ServerLevel level = (ServerLevel) session.player.level();
 		// Under a roof the map's view is a cave view, and caves stay each player's own.
 		// And where the server turns the map off, there's none to share.
-		return level.dimension().identifier().toString().equals(dimension) && !level.dimensionType().hasCeiling() && !mapOff(level) ? level : null;
+		return level.dimension().location().toString().equals(dimension) && !level.dimensionType().hasCeiling() && !mapOff(level) ? level : null;
 	}
 
 	private RegionTables tables(ServerLevel level) {
@@ -662,19 +662,19 @@ public final class ShareServer {
 	/** What saving a loaded chunk would write, taken on the server thread. */
 	private static Object copy(ServerLevel level, LevelChunk chunk) {
 		//? if >=1.21.2 {
-		return net.minecraft.world.level.chunk.storage.SerializableChunkData.copyOf(level, chunk);
-		//?} else {
-		/*return net.minecraft.world.level.chunk.storage.ChunkSerializer.write(level, chunk);
-		*///?}
+		/*return net.minecraft.world.level.chunk.storage.SerializableChunkData.copyOf(level, chunk);
+		*///?} else {
+		return net.minecraft.world.level.chunk.storage.ChunkSerializer.write(level, chunk);
+		//?}
 	}
 
 	/** The tag of a {@link #copy}, off the server thread. */
 	private static CompoundTag written(Object copy) {
 		//? if >=1.21.2 {
-		return ((net.minecraft.world.level.chunk.storage.SerializableChunkData) copy).write();
-		//?} else {
-		/*return (CompoundTag) copy;
-		*///?}
+		/*return ((net.minecraft.world.level.chunk.storage.SerializableChunkData) copy).write();
+		*///?} else {
+		return (CompoundTag) copy;
+		//?}
 	}
 
 	private interface Writer {

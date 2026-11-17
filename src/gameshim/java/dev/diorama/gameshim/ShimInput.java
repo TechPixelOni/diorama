@@ -15,13 +15,13 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 //? if >=1.21.9 {
-import net.minecraft.client.input.CharacterEvent;
+/*import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
-//?}
+*///?}
 //? if >=26.3 {
-import org.lwjgl.sdl.SDLKeyboard;
-//?}
+/*import org.lwjgl.sdl.SDLKeyboard;
+*///?}
 
 /**
  * Simulated input, after Fabric API's TestInputImpl: events go straight into the game's keyboard
@@ -151,12 +151,12 @@ final class ShimInput implements TestInput {
 		context.runOnClient(minecraft -> chars.codePoints().forEach(c -> {
 			KeyboardHandlerAccessor keyboard = (KeyboardHandlerAccessor) minecraft.keyboardHandler;
 			//? if >=26.1 {
-			keyboard.diorama$charTyped(window(minecraft), new CharacterEvent(c));
-			//?} else if >=1.21.9 {
+			/*keyboard.diorama$charTyped(window(minecraft), new CharacterEvent(c));
+			*///?} else if >=1.21.9 {
 			/*keyboard.diorama$charTyped(window(minecraft), new CharacterEvent(c, 0));
 			*///?} else {
-			/*keyboard.diorama$charTyped(window(minecraft), c, 0);
-			*///?}
+			keyboard.diorama$charTyped(window(minecraft), c, 0);
+			//?}
 		}));
 	}
 
@@ -205,45 +205,45 @@ final class ShimInput implements TestInput {
 	/** A key code ({@code InputConstants.KEY_*}) as a key. */
 	private static InputConstants.Key keyboardKey(int key) {
 		//? if >=26.3 {
-		return InputConstants.Type.KEYBOARD.getOrCreate(key);
-		//?} else {
-		/*return InputConstants.Type.KEYSYM.getOrCreate(key);
-		*///?}
+		/*return InputConstants.Type.KEYBOARD.getOrCreate(key);
+		*///?} else {
+		return InputConstants.Type.KEYSYM.getOrCreate(key);
+		//?}
 	}
 
 	private static void key(Minecraft minecraft, InputConstants.Key key, int action) {
 		//? if >=26.3 {
-		// Keys are scancodes, with the key code they make on this keyboard layout.
+		/*// Keys are scancodes, with the key code they make on this keyboard layout.
 		KeyEvent event = new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(key.getValue(), (short) 0, false), 0);
 		((KeyboardHandlerAccessor) minecraft.keyboardHandler).diorama$keyPress(window(minecraft), action, event);
-		//?} else if >=1.21.9 {
+		*///?} else if >=1.21.9 {
 		/*KeyEvent event = key.getType() == InputConstants.Type.SCANCODE
 			? new KeyEvent(InputConstants.UNKNOWN.getValue(), key.getValue(), 0)
 			: new KeyEvent(key.getValue(), 0, 0);
 		((KeyboardHandlerAccessor) minecraft.keyboardHandler).diorama$keyPress(window(minecraft), action, event);
 		*///?} else {
-		/*if (key.getType() == InputConstants.Type.SCANCODE) {
+		if (key.getType() == InputConstants.Type.SCANCODE) {
 			minecraft.keyboardHandler.keyPress(window(minecraft), InputConstants.UNKNOWN.getValue(), key.getValue(), action, 0);
 		} else {
 			minecraft.keyboardHandler.keyPress(window(minecraft), key.getValue(), 0, action, 0);
 		}
-		*///?}
+		//?}
 	}
 
 	private static void mouseButton(Minecraft minecraft, int button, int action) {
 		//? if >=1.21.9 {
-		mouse(minecraft).diorama$onButton(window(minecraft), new MouseButtonInfo(button, 0), action);
-		//?} else {
-		/*mouse(minecraft).diorama$onPress(window(minecraft), button, action, 0);
-		*///?}
+		/*mouse(minecraft).diorama$onButton(window(minecraft), new MouseButtonInfo(button, 0), action);
+		*///?} else {
+		mouse(minecraft).diorama$onPress(window(minecraft), button, action, 0);
+		//?}
 	}
 
 	private static void moveTo(Minecraft minecraft, double x, double y) {
 		//? if >=26.3 {
-		mouse(minecraft).diorama$onMove(window(minecraft), x, y, x - minecraft.mouseHandler.xpos(), y - minecraft.mouseHandler.ypos());
-		//?} else {
-		/*mouse(minecraft).diorama$onMove(window(minecraft), x, y);
-		*///?}
+		/*mouse(minecraft).diorama$onMove(window(minecraft), x, y, x - minecraft.mouseHandler.xpos(), y - minecraft.mouseHandler.ypos());
+		*///?} else {
+		mouse(minecraft).diorama$onMove(window(minecraft), x, y);
+		//?}
 	}
 
 	private static MouseHandlerAccessor mouse(Minecraft minecraft) {
@@ -252,9 +252,9 @@ final class ShimInput implements TestInput {
 
 	private static long window(Minecraft minecraft) {
 		//? if >=1.21.9 {
-		return minecraft.getWindow().handle();
-		//?} else {
-		/*return minecraft.getWindow().getWindow();
-		*///?}
+		/*return minecraft.getWindow().handle();
+		*///?} else {
+		return minecraft.getWindow().getWindow();
+		//?}
 	}
 }

@@ -25,11 +25,11 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.Nullable;
 //? if >=1.21.4 && fabric {
-import dev.diorama.web.WebMap;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+/*import dev.diorama.web.WebMap;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
 import net.fabricmc.loader.api.FabricLoader;
-//?}
+*///?}
 
 /**
  * The web map on a dedicated server, with a player exploring it (opt-in: DIORAMA_TESTS=web-map).
@@ -94,13 +94,13 @@ final class WebMapTest {
 			return;
 		}
 		//? if >=1.21.4 && fabric {
-		Path config = FabricLoader.getInstance().getConfigDir().resolve("diorama-server.properties");
+		/*Path config = FabricLoader.getInstance().getConfigDir().resolve("diorama-server.properties");
 		write(config, settings);
 		try (TestDedicatedServerContext server = context.worldBuilder()
 			.setUseConsistentSettings(false)
 			.adjustSettings(s -> s.setSeed("diorama"))
 			.createServer(DioramaClientTest.serverProperties())) {
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				if (WebMap.get() == null) {
 					throw new AssertionError("The web map didn't start on the dedicated server");
 				}
@@ -112,9 +112,9 @@ final class WebMapTest {
 			} catch (IOException ignored) {
 			}
 		}
-		//?} else {
-		/*throw new AssertionError("web-map needs a dedicated server: run it with --env DIORAMA_REAL_SERVER=1");
-		*///?}
+		*///?} else {
+		throw new AssertionError("web-map needs a dedicated server: run it with --env DIORAMA_REAL_SERVER=1");
+		//?}
 	}
 
 	/** The control run: the player explores and the server saves, as in {@link #explore}, with no web map. */
@@ -156,7 +156,7 @@ final class WebMapTest {
 			DioramaClientTest.settle(context, 60);
 			// The ground under the spot, once the client has its chunk: before, it reads as the world's bottom.
 			context.waitFor(mc -> mc.level != null && mc.level.hasChunk(spot[0] >> 4, spot[1] >> 4)
-				&& mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, spot[0], spot[1]) > mc.level.getMinY(), 1200);
+				&& mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, spot[0], spot[1]) > mc.level.getMinBuildHeight(), 1200);
 			int y = context.computeOnClient(mc -> mc.level.getHeight(Heightmap.Types.MOTION_BLOCKING, spot[0], spot[1]));
 			want[i] = Math.floorDiv(spot[0], Projection.TILE_UNITS) + "_" + (int) Math.floor(Projection.v(y, spot[1]) / Projection.TILE_UNITS);
 		}

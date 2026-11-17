@@ -708,7 +708,7 @@ public final class SavedChunkImport {
 	 */
 	public static boolean playing() {
 		Minecraft mc = Minecraft.getInstance();
-		return !mc.isPaused() && !(mc.gui.screen() instanceof MapScreen);
+		return !mc.isPaused() && !(mc.screen instanceof MapScreen);
 	}
 
 	/** A tile is drawn or needs no drawing: the chunks that were only waiting for it are done. */

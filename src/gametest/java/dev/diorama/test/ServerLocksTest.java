@@ -230,12 +230,12 @@ final class ServerLocksTest {
 	private static void settings(ClientGameTestContext context, int tab, String key, String name) {
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(5);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(tab));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(tab));
 		context.waitTicks(5);
 		boolean locked = !name.startsWith("none") && !name.equals("old-server");
 		String label = net.minecraft.network.chat.Component.translatable("diorama.settings." + key).getString();
 		double[] at = context.computeOnClient(mc -> {
-			for (GuiEventListener child : mc.gui.screen().children()) {
+			for (GuiEventListener child : mc.screen.children()) {
 				if (child instanceof AbstractWidget widget && widget.visible && widget.getMessage().getString().equals(label)) {
 					if (widget.active == locked) {
 						throw new AssertionError(label + " is " + (widget.active ? "" : "not ") + "active with " + (locked ? "" : "no ") + "lock (" + name + ")");
@@ -287,7 +287,7 @@ final class ServerLocksTest {
 
 	private static int mapLayer(ClientGameTestContext context) {
 		return context.computeOnClient(mc -> {
-			if (!(mc.gui.screen() instanceof MapScreen map)) {
+			if (!(mc.screen instanceof MapScreen map)) {
 				throw new AssertionError("The map isn't open");
 			}
 			try {

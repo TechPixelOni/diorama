@@ -1,12 +1,12 @@
 package dev.diorama.render.gpu;
 
 //? if >=26.3 {
-import com.mojang.renderpearl.backend.opengl.GlStateManager;
-//?} else if >=1.21.5 {
+/*import com.mojang.renderpearl.backend.opengl.GlStateManager;
+*///?} else if >=1.21.5 {
 /*import com.mojang.blaze3d.opengl.GlStateManager;
 *///?} else {
-/*import com.mojang.blaze3d.platform.GlStateManager;
-*///?}
+import com.mojang.blaze3d.platform.GlStateManager;
+//?}
 
 /**
  * The OpenGL state Minecraft keeps a copy of, which the raw OpenGL bake changes only through
@@ -31,7 +31,7 @@ final class GlState {
 
 	static void blend(boolean on) {
 		//? if >=26.2 {
-		// Blending is kept per attachment; the bake draws to at most two.
+		/*// Blending is kept per attachment; the bake draws to at most two.
 		for (int i = 0; i < 2; i++) {
 			if (on) {
 				GlStateManager._enableBlend(i);
@@ -39,13 +39,13 @@ final class GlState {
 				GlStateManager._disableBlend(i);
 			}
 		}
-		//?} else {
-		/*if (on) {
+		*///?} else {
+		if (on) {
 			GlStateManager._enableBlend();
 		} else {
 			GlStateManager._disableBlend();
 		}
-		*///?}
+		//?}
 	}
 
 	static void blendFuncSeparate(int srcColor, int dstColor, int srcAlpha, int dstAlpha) {
@@ -70,10 +70,10 @@ final class GlState {
 
 	static void colorMaskAll() {
 		//? if >=26.1 {
-		GlStateManager._colorMask(15);
-		//?} else {
-		/*GlStateManager._colorMask(true, true, true, true);
-		*///?}
+		/*GlStateManager._colorMask(15);
+		*///?} else {
+		GlStateManager._colorMask(true, true, true, true);
+		//?}
 	}
 
 	static void noCullNoScissor() {
@@ -99,29 +99,29 @@ final class GlState {
 
 	static void colorMask(boolean red, boolean green, boolean blue, boolean alpha) {
 		//? if >=26.1 {
-		GlStateManager._colorMask((red ? 1 : 0) | (green ? 2 : 0) | (blue ? 4 : 0) | (alpha ? 8 : 0));
-		//?} else {
-		/*GlStateManager._colorMask(red, green, blue, alpha);
-		*///?}
+		/*GlStateManager._colorMask((red ? 1 : 0) | (green ? 2 : 0) | (blue ? 4 : 0) | (alpha ? 8 : 0));
+		*///?} else {
+		GlStateManager._colorMask(red, green, blue, alpha);
+		//?}
 	}
 
 	/** Blending as it was on the first two attachments; before 26.2 there is one switch for all. */
 	static void restoreBlend(boolean first, boolean second) {
 		//? if >=26.2 {
-		for (int i = 0; i < 2; i++) {
+		/*for (int i = 0; i < 2; i++) {
 			if (i == 0 ? first : second) {
 				GlStateManager._enableBlend(i);
 			} else {
 				GlStateManager._disableBlend(i);
 			}
 		}
-		//?} else {
-		/*if (first) {
+		*///?} else {
+		if (first) {
 			GlStateManager._enableBlend();
 		} else {
 			GlStateManager._disableBlend();
 		}
-		*///?}
+		//?}
 	}
 
 	static void viewport(int width, int height) {
@@ -143,7 +143,7 @@ final class GlState {
 	/** Before 1.21.5 vanilla's immediate-mode uploader remembers the last buffer it bound. */
 	static void forgetBuffers() {
 		//? if <1.21.5 {
-		/*com.mojang.blaze3d.vertex.BufferUploader.invalidate();
-		*///?}
+		com.mojang.blaze3d.vertex.BufferUploader.invalidate();
+		//?}
 	}
 }

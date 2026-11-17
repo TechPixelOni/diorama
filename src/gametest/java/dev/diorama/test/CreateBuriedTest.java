@@ -108,7 +108,7 @@ final class CreateBuriedTest {
 			context.getInput().setCursorPos(1595, 250);
 			for (double zoom : new double[] {4, 2, 1, 0.5, 0.25}) {
 				context.runOnClient(mc -> {
-					if (mc.gui.screen() instanceof MapScreen screen) {
+					if (mc.screen instanceof MapScreen screen) {
 						screen.lookAt(u, v, zoom, TileKey.SURFACE);
 					}
 				});

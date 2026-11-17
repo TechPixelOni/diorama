@@ -82,7 +82,7 @@ final class FacingTest {
 		context.setScreen(MapScreen::new);
 		for (Facing facing : Facing.values()) {
 			if (facing != Facing.NORTH) {
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(1));
+				context.runOnClient(mc -> ((MapScreen) mc.screen).turn(1));
 			}
 			double[] face = faces[facing.turns];
 			double[] shown = context.computeOnClient(mc -> note.shown());
@@ -93,7 +93,7 @@ final class FacingTest {
 			}
 			double u = context.computeOnClient(mc -> Projection.u(face[0], face[1]));
 			double v = context.computeOnClient(mc -> Projection.v(face[0], midY, face[1]));
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(u, v, 4, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(u, v, 4, TileKey.SURFACE));
 			TileKey tile = new TileKey(TileKey.SURFACE, (int) Math.floor(u / Projection.TILE_UNITS), (int) Math.floor(v / Projection.TILE_UNITS));
 			int px = Math.floorMod((int) Math.floor(u * Projection.PIXELS_PER_UNIT), Projection.TILE_PIXELS);
 			int py = Math.floorMod((int) Math.floor(v * Projection.PIXELS_PER_UNIT), Projection.TILE_PIXELS);
@@ -141,7 +141,7 @@ final class FacingTest {
 		heldLight(context, world);
 
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(1));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).turn(1));
 		context.waitTicks(10);
 		context.takeScreenshot("facing-north-again");
 
@@ -151,13 +151,13 @@ final class FacingTest {
 		context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().roofless() && MapSession.get().map().chunkCount() > 100, 2400);
 		context.waitFor(mc -> MapSession.get().map().savedMap().saved(0).stream().anyMatch(key -> Math.abs(key.tileU()) < 3 && Math.abs(key.tileV()) < 3), 2400);
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(2));
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(mc.player.getX(), mc.player.getZ()), Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ()), 2, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).turn(2));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(mc.player.getX(), mc.player.getZ()), Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ()), 2, TileKey.SURFACE));
 		context.waitFor(mc -> MapSession.get().map().importFolder().getFileName().toString().endsWith("-south"), 200);
 		context.waitTicks(200);
 		context.takeScreenshot("facing-nether-south");
 		// East is what the world is left on: see reopened.
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(-1));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).turn(-1));
 		context.setScreen(() -> null);
 		context.runOnClient(mc -> {
 			DrawingStore.get().remove(note);
@@ -182,7 +182,7 @@ final class FacingTest {
 		context.waitTicks(120);
 		int layer = context.computeOnClient(mc -> MapSession.caveLayerFor(mc.player.getY()));
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(mc.player.getX(), mc.player.getZ()), Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ()), 4, layer));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(mc.player.getX(), mc.player.getZ()), Projection.v(mc.player.getX(), mc.player.getY(), mc.player.getZ()), 4, layer));
 		context.waitTicks(80);
 		context.takeScreenshot("facing-west-cave-dark");
 		world.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:torch");
@@ -202,7 +202,7 @@ final class FacingTest {
 			throw new AssertionError("The reopened world's map isn't its east one");
 		}
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(-1));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).turn(-1));
 		context.setScreen(() -> null);
 	}
 

@@ -2,10 +2,10 @@ package dev.diorama.mixin;
 
 import dev.diorama.MinimapHud;
 //? if >=26.2 {
-import net.minecraft.client.gui.Hud;
-//?} else {
-/*import net.minecraft.client.gui.Gui;
-*///?}
+/*import net.minecraft.client.gui.Hud;
+*///?} else {
+import net.minecraft.client.gui.Gui;
+//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,16 +19,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * never reached. Xaero's Minimap moves out of the way on the same signal.
  */
 //? if >=26.2 {
-@Mixin(Hud.class)
-//?} else {
-/*@Mixin(Gui.class)
-*///?}
+/*@Mixin(Hud.class)
+*///?} else {
+@Mixin(Gui.class)
+//?}
 public abstract class EffectIconsMixin {
 	//? if >=26.1 {
-	@Inject(method = "extractEffects", at = @At("RETURN"))
-	//?} else {
-	/*@Inject(method = "renderEffects", at = @At("RETURN"))
-	*///?}
+	/*@Inject(method = "extractEffects", at = @At("RETURN"))
+	*///?} else {
+	@Inject(method = "renderEffects", at = @At("RETURN"))
+	//?}
 	private void diorama$effectIconsDrawn(CallbackInfo ci) {
 		MinimapHud.effectIconsDrawn();
 	}

@@ -18,13 +18,13 @@ import dev.diorama.waypoint.WaypointStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import dev.diorama.compat.HudElement;
 //? if >=1.21 {
-import net.minecraft.client.DeltaTracker;
-//?}
+/*import net.minecraft.client.DeltaTracker;
+*///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -89,14 +89,14 @@ public final class MinimapHud implements HudElement {
 
 	@Override
 	//? if >=1.21 {
-	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+	/*public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
 		float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
-	//?} else {
-	/*public void extractRenderState(GuiGraphicsExtractor graphics, float partialTick) {
-	*///?}
+	*///?} else {
+	public void render(GuiGraphics graphics, float partialTick) {
+	//?}
 		Minecraft mc = Minecraft.getInstance();
 		Settings settings = Settings.get();
-		Screen screen = mc.gui.screen();
+		Screen screen = mc.screen;
 		// The minimap comes after the vanilla HUD on every loader, so this is this frame's icons.
 		// Taken whether or not the minimap draws, so a frame with no icons can't reuse an old answer.
 		boolean effectIcons = effectIconsDrawn;
@@ -107,10 +107,10 @@ public final class MinimapHud implements HudElement {
 		// The position screen shows it over the world, even switched off, to be put in place.
 		boolean placing = screen instanceof MinimapPositionScreen;
 		//? if >=26.2 {
-		if (!placing && (!settings.minimap || mc.gui.hud.isHidden()
-		//?} else {
-		/*if (!placing && (!settings.minimap || mc.options.hideGui
-		*///?}
+		/*if (!placing && (!settings.minimap || mc.gui.isHidden()
+		*///?} else {
+		if (!placing && (!settings.minimap || mc.options.hideGui
+		//?}
 			|| screen != null && !(screen instanceof ChatScreen) || Cobblemon.inBattle()
 			|| debugScreenOpen(mc)) || !this.canDraw(mc)) {
 			// Not drawn under any screen but chat, the way Xaero's Minimap and JourneyMap do it:
@@ -158,7 +158,7 @@ public final class MinimapHud implements HudElement {
 	 * screen where the settings leave room. A left corner shows on the right at the same height.
 	 * Switched off, it still draws, dimmed, so the other minimap settings can be seen.
 	 */
-	public void preview(GuiGraphicsExtractor graphics, float partialTick) {
+	public void preview(GuiGraphics graphics, float partialTick) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!this.canDraw(mc)) {
 			return;
@@ -168,11 +168,11 @@ public final class MinimapHud implements HudElement {
 		int[] bounds = this.draw(graphics, partialTick, new Anchor(true, top, false, MARGIN, MARGIN), NO_EFFECTS, 0, settings.minimapSize);
 		if (!settings.minimap) {
 			//? if <1.21.6 {
-			/*// Text sits a little above 0 and the GUI depth-tests, so lift the dimming over it.
+			// Text sits a little above 0 and the GUI depth-tests, so lift the dimming over it.
 			var pose = graphics.pose();
 			pose.pushPose();
 			pose.translate(0, 0, 1);
-			*///?}
+			//?}
 			if (settings.minimapShape == Settings.Shape.ROUND) {
 				// The disc with its frame, then the lines under it, so the corners beside it stay undimmed.
 				MapCanvas.of(graphics).solid(new Circle(bounds[4] + bounds[6] / 2.0F, bounds[5] + bounds[6] / 2.0F, bounds[6] / 2.0F + 2).disc(), 0xB0101418);
@@ -183,8 +183,8 @@ public final class MinimapHud implements HudElement {
 				graphics.fill(bounds[0], bounds[1], bounds[2], bounds[3], 0xB0101418);
 			}
 			//? if <1.21.6 {
-			/*pose.popPose();
-			*///?}
+			pose.popPose();
+			//?}
 		}
 	}
 
@@ -200,12 +200,12 @@ public final class MinimapHud implements HudElement {
 	 */
 	private static boolean debugScreenOpen(Minecraft mc) {
 		//? if >=1.21.9 {
-		return mc.debugEntries.isOverlayVisible();
-		//?} else if >=1.21 {
+		/*return mc.debugEntries.isF3Visible();
+		*///?} else if >=1.21 {
 		/*return mc.getDebugOverlay().showDebugScreen();
 		*///?} else {
-		/*return mc.options.renderDebug;
-		*///?}
+		return mc.options.renderDebug;
+		//?}
 	}
 
 	private boolean canDraw(Minecraft mc) {
@@ -218,7 +218,7 @@ public final class MinimapHud implements HudElement {
 	 * {@link #effectCounts}) and below the boss bars, which reach down to {@code bossBars}. Returns what it covers, x0, y0, x1, y1, then the map's own x, y and
 	 * size, and its height with the lines under it.
 	 */
-	private int[] draw(GuiGraphicsExtractor graphics, float partialTick, Anchor anchor, int[] effects, int bossBars, int wanted) {
+	private int[] draw(GuiGraphics graphics, float partialTick, Anchor anchor, int[] effects, int bossBars, int wanted) {
 		Minecraft mc = Minecraft.getInstance();
 		MapSession session = MapSession.get();
 		Entity viewer = MapSession.viewer();
@@ -257,7 +257,7 @@ public final class MinimapHud implements HudElement {
 		}
 		DrawingStore drawings = DrawingStore.get();
 		if (drawings != null && settings.drawings == Settings.DrawingsShown.ALWAYS) {
-			this.drawings.draw(graphics, font, view, drawings.in(mc.level.dimension().identifier().toString()), null, null, false);
+			this.drawings.draw(graphics, font, view, drawings.in(mc.level.dimension().location().toString()), null, null, false);
 		}
 		// Over the map, since a resource pack's frame can reach in over its edge, and under what's marked on it.
 		MinimapFrames.draw(graphics, settings.minimapFrame, round, x, y, size);
@@ -265,7 +265,7 @@ public final class MinimapHud implements HudElement {
 		Radar.draw(graphics, view, blips, false, false);
 		WaypointStore store = WaypointStore.get();
 		if (store != null && settings.waypointsOnMap) {
-			List<Waypoint> near = store.shownIn(mc.level.dimension().identifier().toString()).stream().filter(w -> WaypointStore.isNear(w, viewer)).toList();
+			List<Waypoint> near = store.shownIn(mc.level.dimension().location().toString()).stream().filter(w -> WaypointStore.isNear(w, viewer)).toList();
 			WaypointOverlay.draw(graphics, view, WaypointOverlay.layout(view, near, false), false, null);
 		}
 		Radar.draw(graphics, view, blips, false, true);
@@ -282,11 +282,11 @@ public final class MinimapHud implements HudElement {
 			// Centred on a whole GUI pixel, rounded down as the game's own text size always was.
 			float tx = anchor.centered() ? x + (float) Math.floor((size - w) / 2) : anchor.right() ? x + size - w : x;
 			tx = TextSize.snap(Math.max(1, Math.min(tx, graphics.guiWidth() - 1 - w)));
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(tx, textY);
-			graphics.pose().scale(text);
-			graphics.text(font, line.text(), 0, 0, line.color(), true);
-			graphics.pose().popMatrix();
+			graphics.pose().pushPose();
+			graphics.pose().translate(tx, textY, 0);
+			graphics.pose().scale(text, text, 1);
+			graphics.drawString(font, line.text(), 0, 0, line.color(), true);
+			graphics.pose().popPose();
 			left = Math.min(left, tx - 1);
 			textRight = Math.max(textRight, tx + w + 1);
 			textY += 10 * text;
@@ -390,7 +390,7 @@ public final class MinimapHud implements HudElement {
 	}
 
 	/** Letters on the frame, by which way the map faces. At another size each grows in from its edge. */
-	private void compass(GuiGraphicsExtractor graphics, Font font, int x, int y, int size, float text) {
+	private void compass(GuiGraphics graphics, Font font, int x, int y, int size, float text) {
 		String[] letters = {"N", "E", "S", "W"};
 		int turns = Projection.facing().turns;
 		for (int i = 0; i < 4; i++) {
@@ -418,12 +418,12 @@ public final class MinimapHud implements HudElement {
 					by = y + size / 2 - 5 + h / 2.0F - h * text / 2;
 				}
 			}
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(TextSize.snap(bx), TextSize.snap(by));
-			graphics.pose().scale(text);
+			graphics.pose().pushPose();
+			graphics.pose().translate(TextSize.snap(bx), TextSize.snap(by), 0);
+			graphics.pose().scale(text, text, 1);
 			graphics.fill(0, 0, w, h, 0xA0101418);
-			graphics.text(font, letters[i], 2, 1, i == 0 ? 0xFFFF6B6B : 0xFFFFFFFF, false);
-			graphics.pose().popMatrix();
+			graphics.drawString(font, letters[i], 2, 1, i == 0 ? 0xFFFF6B6B : 0xFFFFFFFF, false);
+			graphics.pose().popPose();
 		}
 	}
 
@@ -435,16 +435,16 @@ public final class MinimapHud implements HudElement {
 		}
 		if (settings.biome) {
 			mc.level.getBiome(pos).unwrapKey().ifPresent(key ->
-				lines.add(new InfoLine(Component.translatable(key.identifier().toLanguageKey("biome")).getString(), INFO_COLOR)));
+				lines.add(new InfoLine(Component.translatable(key.location().toLanguageKey("biome")).getString(), INFO_COLOR)));
 		}
 		if (settings.gameTime != Settings.GameTime.OFF) {
 			//? if <1.21.2 {
-			/*// Until 1.21.2 the client worked this out only when a level loaded.
+			// Until 1.21.2 the client worked this out only when a level loaded.
 			mc.level.updateSkyBrightness();
-			*///?}
+			//?}
 			// The Overworld's clock in every dimension, as Xaero's Minimap reads it: the Nether and
 			// the End have no day of their own, and this is when the player's bed would work.
-			lines.add(new InfoLine(gameTime(settings.gameTime, mc.level.getOverworldClockTime()), mc.level.isDarkOutside() ? BED_TIME_COLOR : INFO_COLOR));
+			lines.add(new InfoLine(gameTime(settings.gameTime, mc.level.getDayTime()), mc.level.isNight() ? BED_TIME_COLOR : INFO_COLOR));
 		}
 		return lines;
 	}
@@ -494,7 +494,7 @@ public final class MinimapHud implements HudElement {
 			if (!effect.showIcon()) {
 				continue;
 			}
-			if (effect.getEffect().value().isBeneficial()) {
+			if (effect.getEffect().isBeneficial()) {
 				beneficial++;
 			} else {
 				harmful++;

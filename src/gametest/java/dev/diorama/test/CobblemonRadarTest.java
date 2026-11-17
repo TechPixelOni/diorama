@@ -97,7 +97,7 @@ final class CobblemonRadarTest {
 	}
 
 	private static void lookAtPlayer(net.minecraft.client.Minecraft mc, double zoom) {
-		if (mc.gui.screen() instanceof MapScreen screen && mc.player != null) {
+		if (mc.screen instanceof MapScreen screen && mc.player != null) {
 			screen.lookAt(mc.player.getX(), dev.diorama.Projection.v(mc.player.getY(), mc.player.getZ()), zoom, TileKey.SURFACE);
 		}
 	}

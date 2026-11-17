@@ -25,7 +25,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
@@ -124,8 +124,8 @@ public final class OpenPartiesAndClaims {
 		manager = Objects.requireNonNull(clientApi.getMethod("getClaimsManager").invoke(api), "claims manager");
 		Class<?> claims = Class.forName(API + "client.claims.api.IClientClaimsManagerAPI");
 		Class<?> claim = Class.forName(API + "common.claims.player.api.IPlayerChunkClaimAPI");
-		claimAt = claims.getMethod("get", Identifier.class, int.class, int.class);
-		dimensionOf = claims.getMethod("getDimension", Identifier.class);
+		claimAt = claims.getMethod("get", ResourceLocation.class, int.class, int.class);
+		dimensionOf = claims.getMethod("getDimension", ResourceLocation.class);
 		dimensionStream = claims.getMethod("getDimensionStream");
 		Class<?> dimension = Class.forName(API + "client.claims.api.IClientDimensionClaimsManagerAPI");
 		dimensionId = dimension.getMethod("getDimension");
@@ -139,8 +139,8 @@ public final class OpenPartiesAndClaims {
 		claimSub = claim.getMethod("getSubConfigIndex");
 		claimForceloadable = claim.getMethod("isForceloadable");
 		try {
-			fullName = claims.getMethod("getFullName", claim, Identifier.class, boolean.class);
-			colour = claims.getMethod("getColor", claim, Identifier.class);
+			fullName = claims.getMethod("getFullName", claim, ResourceLocation.class, boolean.class);
+			colour = claims.getMethod("getColor", claim, ResourceLocation.class);
 			moderatorMode = claims.getMethod("isModeratorMode");
 		} catch (NoSuchMethodException e) {
 			// Older versions.
@@ -296,7 +296,7 @@ public final class OpenPartiesAndClaims {
 	}
 
 	private static ResourceKey<Level> key(Object id) {
-		return ResourceKey.create(Registries.DIMENSION, (Identifier) id);
+		return ResourceKey.create(Registries.DIMENSION, (ResourceLocation) id);
 	}
 
 	private static @Nullable Owner owner(@Nullable Object state, Object dimension) throws ReflectiveOperationException {

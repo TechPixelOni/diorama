@@ -52,8 +52,8 @@ final class TallWorldTest {
 		}
 		writePack(save.getSaveDirectory());
 		try (TestSingleplayerContext world = save.open()) {
-			if (context.computeOnClient(mc -> mc.level.getMaxY()) != 2031) {
-				throw new AssertionError("The data pack didn't make the world taller: top " + context.computeOnClient(mc -> mc.level.getMaxY()));
+			if (context.computeOnClient(mc -> (mc.level.getMaxBuildHeight() - 1)) != 2031) {
+				throw new AssertionError("The data pack didn't make the world taller: top " + context.computeOnClient(mc -> (mc.level.getMaxBuildHeight() - 1)));
 			}
 			context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 100, 1200);
 			// Up before the client has any of its chunks, as on a server someone else built on.
@@ -83,7 +83,7 @@ final class TallWorldTest {
 			}
 			context.setScreen(MapScreen::new);
 			context.runOnClient(mc -> {
-				if (mc.gui.screen() instanceof MapScreen screen) {
+				if (mc.screen instanceof MapScreen screen) {
 					screen.lookAt(X, Projection.v(STATION_Y, 0), 1.0, TileKey.SURFACE);
 				}
 			});
@@ -130,7 +130,7 @@ final class TallWorldTest {
 		context.waitFor(mc -> MapSession.get().map().chunk(X >> 4, seenZ >> 4) != null, 1200);
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(X, Projection.v(ground, seenZ), 1.0, TileKey.SURFACE);
 			}
 		});
@@ -142,7 +142,7 @@ final class TallWorldTest {
 		double v = Projection.v(ground, z + 0.5);
 		context.setScreen(MapScreen::new);
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(X, v, 1.0, TileKey.SURFACE);
 			}
 		});

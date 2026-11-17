@@ -369,7 +369,7 @@ final class ShowcaseScene {
 				if (mainPath || crossPath) {
 					set(x, base, z, random.nextFloat() < 0.3F ? "gravel" : "dirt_path");
 				} else if (random.nextFloat() < 0.08F) {
-					set(x, base + 1, z, random.nextBoolean() ? "short_grass" : "poppy");
+					set(x, base + 1, z, random.nextBoolean() ? "grass" : "poppy");
 				}
 			}
 		}

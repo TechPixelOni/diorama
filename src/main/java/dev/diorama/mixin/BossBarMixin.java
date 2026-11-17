@@ -1,7 +1,7 @@
 package dev.diorama.mixin;
 
 import dev.diorama.MinimapHud;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,11 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class BossBarMixin {
 	// The overload that draws one whole bar; it calls the other for the bar's background and its fill.
 	//? if >=26.1 {
-	@Inject(method = "extractBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
-	//?} else {
-	/*@Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
-	*///?}
-	private void diorama$bossBarDrawn(GuiGraphicsExtractor graphics, int x, int y, BossEvent event, CallbackInfo ci) {
+	/*@Inject(method = "extractBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
+	*///?} else {
+	@Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
+	//?}
+	private void diorama$bossBarDrawn(GuiGraphics graphics, int x, int y, BossEvent event, CallbackInfo ci) {
 		MinimapHud.bossBarDrawn(y);
 	}
 }

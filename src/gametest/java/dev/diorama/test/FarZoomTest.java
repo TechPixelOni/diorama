@@ -205,9 +205,9 @@ final class FarZoomTest {
 		};
 		for (int i = 0; i < steps.length; i++) {
 			double[] step = steps[i];
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(step[0], step[1], step[2], TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(step[0], step[1], step[2], TileKey.SURFACE));
 			context.waitTick();
-			double zoom = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).zoom());
+			double zoom = context.computeOnClient(mc -> ((MapScreen) mc.screen).zoom());
 			if (step[2] < furthest && Math.abs(zoom / furthest - 1) > 1e-9) {
 				throw new AssertionError("Expected the map to stop at " + furthest + " GUI pixels a block, a 512-block region a screen pixel; it's at " + zoom);
 			}

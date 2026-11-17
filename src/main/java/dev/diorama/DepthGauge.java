@@ -3,7 +3,7 @@ package dev.diorama;
 import dev.diorama.bake.BiomeTints;
 import dev.diorama.bake.BlockLooks;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
@@ -70,7 +70,7 @@ final class DepthGauge {
 		this.top = TOP;
 		this.bottom = Math.max(TOP + HEAD + 40, screenHeight - FROM_BOTTOM);
 		if (!this.dragging) {
-			this.lo = level.getMinY();
+			this.lo = level.getMinBuildHeight();
 			this.hi = Math.max(Math.max(this.columnTop + 1, feet.getY()), layer);
 		}
 	}
@@ -131,15 +131,15 @@ final class DepthGauge {
 		double span = this.bottom - (this.top + HEAD);
 		double wy = this.hi - (y - this.top - HEAD) / span * (this.hi - this.lo);
 		int layer = (int) Math.round((wy + STEP / 2.0) / STEP) * STEP;
-		int max = Math.min(level.getMaxY() + 1, (int) Math.ceil(this.hi / STEP) * STEP);
-		return Math.max(level.getMinY() + STEP, Math.min(max, layer));
+		int max = Math.min((level.getMaxBuildHeight() - 1) + 1, (int) Math.ceil(this.hi / STEP) * STEP);
+		return Math.max(level.getMinBuildHeight() + STEP, Math.min(max, layer));
 	}
 
 	/**
 	 * Draws the gauge. Labels whose height falls between {@code avoidTop} and {@code avoidBottom}
 	 * end at {@code avoidX} instead, to stay clear of the buttons beside the gauge.
 	 */
-	void draw(GuiGraphicsExtractor graphics, Font font, double feetY, int layer, int avoidX, int avoidTop, int avoidBottom) {
+	void draw(GuiGraphics graphics, Font font, double feetY, int layer, int avoidX, int avoidTop, int avoidBottom) {
 		int x1 = this.x0 + WIDTH;
 		int ground = (int) Math.round(this.screenY(this.columnTop + 1));
 		// A backing plate, then the column as a block: its top face, the cut front, a side in shade.
@@ -184,13 +184,13 @@ final class DepthGauge {
 	}
 
 	/** A label on a dark plate, centred on height {@code y}, its plate ending at {@code right}. */
-	private static void label(GuiGraphicsExtractor graphics, Font font, String text, int y, int right, int colour, int avoidX, int avoidTop, int avoidBottom) {
+	private static void label(GuiGraphics graphics, Font font, String text, int y, int right, int colour, int avoidX, int avoidTop, int avoidBottom) {
 		if (y + 5 > avoidTop && y - 5 < avoidBottom) {
 			right = Math.min(right, avoidX);
 		}
 		int w = font.width(text);
 		graphics.fill(right - 4 - w, y - 5, right, y + 5, PLATE);
-		graphics.text(font, text, right - 2 - w, y - 4, colour, false);
+		graphics.drawString(font, text, right - 2 - w, y - 4, colour, false);
 	}
 
 	/** The block height a screen row shows. */
@@ -208,11 +208,11 @@ final class DepthGauge {
 		this.readAt = feet.immutable();
 		this.readTick = tick;
 		BlockLooks looks = BlockLooks.get();
-		int minY = level.getMinY();
+		int minY = level.getMinBuildHeight();
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		// The ground: the first block from the top that isn't air, a plant or leaves.
 		int groundY = minY;
-		for (int y = level.getMaxY(); y >= minY; y--) {
+		for (int y = (level.getMaxBuildHeight() - 1); y >= minY; y--) {
 			BlockState state = level.getBlockState(pos.set(feet.getX(), y, feet.getZ()));
 			if (!open(looks, state) && !state.is(BlockTags.LEAVES)) {
 				groundY = y;

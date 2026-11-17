@@ -2,7 +2,7 @@ package dev.diorama.waypoint;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -58,24 +58,24 @@ final class XaeroWorldScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// A 1.20.1 screen draws its own background.
 		//? if <1.21 {
-		/*this.renderBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
-		graphics.centeredText(this.font, this.title, this.width / 2, 16, 0xFFFFFFFF);
-		graphics.centeredText(this.font, Component.translatable("diorama.xaero.pick_detail"), this.width / 2, 30, 0xFFA0A0A0);
+		this.renderBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, Component.translatable("diorama.xaero.pick_detail"), this.width / 2, 30, 0xFFA0A0A0);
 		for (int i = 0; i < this.visibleRows && this.scroll + i < this.worlds.size(); i++) {
 			XaeroImport.World world = this.worlds.get(this.scroll + i);
 			String names = world.entries().stream().limit(4).map(entry -> entry.waypoint().name).collect(Collectors.joining(", "));
 			if (world.entries().size() > 4) {
 				names += ", ...";
 			}
-			graphics.centeredText(this.font, names, this.width / 2, this.listTop + i * ROW + 23, 0xFF909090);
+			graphics.drawCenteredString(this.font, names, this.width / 2, this.listTop + i * ROW + 23, 0xFF909090);
 		}
 		if (this.parent.imported() != null) {
-			graphics.centeredText(this.font, this.parent.imported(), this.width / 2, this.height - 46, 0xFFA0E0A0);
+			graphics.drawCenteredString(this.font, this.parent.imported(), this.width / 2, this.height - 46, 0xFFA0E0A0);
 		}
 	}
 
@@ -95,10 +95,10 @@ final class XaeroWorldScreen extends Screen {
 	// The mouse wheel had only the one axis on 1.20.1.
 	@Override
 	//? if >=1.21 {
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-	//?} else {
-	/*public boolean mouseScrolled(double x, double y, double scrollY) {
-	*///?}
+	/*public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+	*///?} else {
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+	//?}
 		int next = Math.max(0, Math.min(this.scroll - (int) Math.signum(scrollY), this.worlds.size() - this.visibleRows));
 		if (next != this.scroll) {
 			this.scroll = next;
@@ -109,7 +109,7 @@ final class XaeroWorldScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

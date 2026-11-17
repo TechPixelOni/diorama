@@ -73,15 +73,15 @@ final class LongInitialsTest {
 		context.setScreen(MapScreen::new);
 		// Over the hint bar at the bottom, so no hover box covers the map.
 		context.getInput().setCursorPos(1500, 880);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 20), 4.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 20), 4.0, TileKey.SURFACE));
 		settle(context, 60);
 		context.takeScreenshot("initials-map");
 		// The cursor over the right end of a wide pin's head points at that pin.
 		String pointed = context.computeOnClient(mc -> {
-			for (WaypointOverlay.Pin pin : ((MapScreen) mc.gui.screen()).pins()) {
+			for (WaypointOverlay.Pin pin : ((MapScreen) mc.screen).pins()) {
 				if (pin.waypoint().initials.equals("WOOD") && !pin.clamped()) {
 					float end = pin.x() + (Pins.badgeWidth(pin.waypoint(), (int) pin.size()) / 2.0F - 2) * pin.scale();
-					WaypointOverlay.Pin under = WaypointOverlay.under(((MapScreen) mc.gui.screen()).pins(), end, pin.headY());
+					WaypointOverlay.Pin under = WaypointOverlay.under(((MapScreen) mc.screen).pins(), end, pin.headY());
 					return under == null ? "nothing" : under.waypoint().initials;
 				}
 			}
@@ -139,7 +139,7 @@ final class LongInitialsTest {
 		context.takeScreenshot("typed-initials-world");
 		context.setScreen(MapScreen::new);
 		context.getInput().setCursorPos(1500, 880);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 20), 4.0, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 20), 4.0, TileKey.SURFACE));
 		settle(context, 60);
 		context.takeScreenshot("typed-initials-map");
 		context.setScreen(() -> new WaypointListScreen(null));

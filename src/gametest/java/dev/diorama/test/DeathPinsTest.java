@@ -36,7 +36,7 @@ final class DeathPinsTest {
 
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(5);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(3));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(3));
 		context.waitTicks(5);
 		context.takeScreenshot("death-pins-0-setting");
 		context.setScreen(() -> null);

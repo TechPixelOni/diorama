@@ -112,10 +112,10 @@ final class FailingModelTest {
 	/** What the game's block models are kept in, which BlockLooks reads them from. */
 	private static Object models(Minecraft mc) {
 		//? if >=26.1 {
-		return mc.getModelManager().getBlockStateModelSet();
-		//?} else {
-		/*return mc.getModelManager().getBlockModelShaper();
-		*///?}
+		/*return mc.getModelManager().getBlockStateModelSet();
+		*///?} else {
+		return mc.getModelManager().getBlockModelShaper();
+		//?}
 	}
 
 	/**

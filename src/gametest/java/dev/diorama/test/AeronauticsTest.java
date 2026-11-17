@@ -161,7 +161,7 @@ final class AeronauticsTest {
 
 	private static void look(ClientGameTestContext context, double[] at) {
 		context.runOnClient(mc -> {
-			if (mc.gui.screen() instanceof MapScreen screen) {
+			if (mc.screen instanceof MapScreen screen) {
 				screen.lookAt(Projection.u(at[0], at[2]), Projection.v(at[0], at[1], at[2]), 8, TileKey.SURFACE);
 			}
 		});

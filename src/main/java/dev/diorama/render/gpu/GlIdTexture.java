@@ -1,5 +1,5 @@
 //? if <1.21.5 {
-/*package dev.diorama.render.gpu;
+package dev.diorama.render.gpu;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -71,4 +71,4 @@ final class GlIdTexture implements LegacyTexture {
 		TextureUtil.releaseTextureId(this.id);
 	}
 }
-*///?}
+//?}

@@ -9,16 +9,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 //? if >=1.21.6 {
-import org.joml.Vector2f;
-//?} else {
-/*import org.joml.Matrix4f;
+/*import org.joml.Vector2f;
+*///?} else {
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
-*///?}
+//?}
 
 /**
  * Where the radar draws its icons: fills, game texture blits and the mod's own textures, each in
@@ -62,7 +62,7 @@ public final class IconBatch {
 	 */
 	private static final int KEEP_QUADS = 4096;
 
-	private GuiGraphicsExtractor graphics;
+	private GuiGraphics graphics;
 	/** Whether pieces are recorded rather than drawn as they come. */
 	private final boolean batched;
 	/** Whether recorded pieces are never drawn. */
@@ -74,7 +74,7 @@ public final class IconBatch {
 	private int[] textureIds = new int[0];
 	private int[] runs = new int[0];
 	private int quads;
-	/** Index 0 is "no texture"; each texture is an Identifier or a MapTexture with its sampling. */
+	/** Index 0 is "no texture"; each texture is an ResourceLocation or a MapTexture with its sampling. */
 	private final List<Object> textures = new ArrayList<>();
 	private final Map<Object, Integer> textureIndex = new HashMap<>();
 	/** The first quad of each finished icon, then the end of the last one. */
@@ -82,10 +82,10 @@ public final class IconBatch {
 	private int run;
 	private int lastTexture = -1;
 	//? if >=1.21.6 {
-	private final Vector2f at = new Vector2f();
-	//?} else {
-	/*private final Vector3f at = new Vector3f();
-	*///?}
+	/*private final Vector2f at = new Vector2f();
+	*///?} else {
+	private final Vector3f at = new Vector3f();
+	//?}
 	// Scratch for draw(): the quads' order, each icon's bounds and layer, and one draw's quads.
 	private long[] order = new long[0];
 	private float[] bounds = new float[0];
@@ -104,7 +104,7 @@ public final class IconBatch {
 	private final List<ItemDraw> items = new ArrayList<>();
 	private int itemsDrawn;
 
-	private IconBatch(GuiGraphicsExtractor graphics, boolean batched, boolean measuring) {
+	private IconBatch(GuiGraphics graphics, boolean batched, boolean measuring) {
 		this.graphics = graphics;
 		this.batched = batched;
 		this.measuring = measuring;
@@ -112,21 +112,21 @@ public final class IconBatch {
 	}
 
 	/** Draws everything as it comes. */
-	public static IconBatch direct(GuiGraphicsExtractor graphics) {
+	public static IconBatch direct(GuiGraphics graphics) {
 		return new IconBatch(graphics, false, false);
 	}
 
 	/** Collects icons until {@link #draw()}. */
-	public static IconBatch batched(GuiGraphicsExtractor graphics) {
+	public static IconBatch batched(GuiGraphics graphics) {
 		return kept(graphics, false);
 	}
 
 	/** Draws nothing; see {@link #inside} and {@link #clear}. End it with {@link #draw()} all the same, to hand it back. */
-	public static IconBatch measuring(GuiGraphicsExtractor graphics) {
+	public static IconBatch measuring(GuiGraphics graphics) {
 		return kept(graphics, true);
 	}
 
-	private static IconBatch kept(GuiGraphicsExtractor graphics, boolean measuring) {
+	private static IconBatch kept(GuiGraphics graphics, boolean measuring) {
 		IconBatch batch = (measuring ? SPARE_MEASURING : SPARE).poll();
 		if (batch == null) {
 			return new IconBatch(graphics, true, measuring);
@@ -159,7 +159,7 @@ public final class IconBatch {
 		(this.measuring ? SPARE_MEASURING : SPARE).push(this);
 	}
 
-	public GuiGraphicsExtractor graphics() {
+	public GuiGraphics graphics() {
 		return this.graphics;
 	}
 
@@ -173,7 +173,7 @@ public final class IconBatch {
 	}
 
 	/** {@link MapCanvas#blit}: a {@code w} x {@code h} rectangle of a game texture at (u, v), drawn at (x, y) the same size. */
-	public void blit(Identifier texture, int x, int y, int u, int v, int w, int h, int texW, int texH, int argb) {
+	public void blit(ResourceLocation texture, int x, int y, int u, int v, int w, int h, int texW, int texH, int argb) {
 		if (!this.batched) {
 			MapCanvas.of(this.graphics).blit(texture, x, y, u, v, w, h, texW, texH, argb);
 			return;
@@ -241,23 +241,23 @@ public final class IconBatch {
 	}
 
 	private void drawItem(ItemStack stack, float x, float y, float scale) {
-		GuiGraphicsExtractor graphics = this.graphics;
-		graphics.pose().pushMatrix();
-		graphics.pose().translate(x, y);
-		graphics.pose().scale(scale);
+		GuiGraphics graphics = this.graphics;
+		graphics.pose().pushPose();
+		graphics.pose().translate(x, y, 0);
+		graphics.pose().scale(scale, scale, 1);
 		//? if <1.21.6 {
-		/*// Every item drew at the same depth, and items test and write depth: each later one goes a
+		// Every item drew at the same depth, and items test and write depth: each later one goes a
 		// step nearer, so an earlier block item doesn't hide part of a later item over it. (The
 		// icons' own pieces don't test depth, so they cover items in their order anyway.)
 		com.mojang.blaze3d.vertex.PoseStack pose = graphics.pose();
 		pose.translate(0, 0, 10 * Math.min(this.itemsDrawn++, 800));
-		*///?}
+		//?}
 		//? if >=26.1 {
-		graphics.item(stack, 0, 0);
-		//?} else {
-		/*graphics.renderItem(stack, 0, 0);
-		*///?}
-		graphics.pose().popMatrix();
+		/*graphics.item(stack, 0, 0);
+		*///?} else {
+		graphics.renderItem(stack, 0, 0);
+		//?}
+		graphics.pose().popPose();
 	}
 
 	/** Ends an icon: everything since the last call is one icon. */
@@ -304,16 +304,16 @@ public final class IconBatch {
 	private void corner(int q, int i, float x, float y, float u, float v) {
 		int p = (q * 4 + i) * 3;
 		//? if >=1.21.6 {
-		Vector2f at = this.graphics.pose().transformPosition(x, y, this.at);
+		/*Vector2f at = this.graphics.pose().transformPosition(x, y, this.at);
 		this.xyz[p] = at.x;
 		this.xyz[p + 1] = at.y;
-		//?} else {
-		/*Matrix4f pose = this.graphics.pose().last().pose();
+		*///?} else {
+		Matrix4f pose = this.graphics.pose().last().pose();
 		Vector3f at = pose.transformPosition(x, y, 0, this.at);
 		this.xyz[p] = at.x;
 		this.xyz[p + 1] = at.y;
 		this.xyz[p + 2] = at.z;
-		*///?}
+		//?}
 		int t = (q * 4 + i) * 2;
 		this.uvs[t] = u;
 		this.uvs[t + 1] = v;
@@ -404,7 +404,7 @@ public final class IconBatch {
 			Object texture = this.textures.get(texture0);
 			if (texture == null) {
 				canvas.solids(groupXyz, groupColors, count);
-			} else if (texture instanceof Identifier id) {
+			} else if (texture instanceof ResourceLocation id) {
 				canvas.blits(id, groupXyz, groupUvs, groupColors, count);
 			} else {
 				SampledTexture sampled = (SampledTexture) texture;

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jspecify.annotations.Nullable;
 
 /** Shapes drawn on top of the map. */
@@ -47,7 +47,7 @@ public final class Markers {
 		return yawDegrees - 90 * Projection.facing().turns;
 	}
 
-	public static void player(GuiGraphicsExtractor graphics, float x, float y, float yawDegrees, float size) {
+	public static void player(GuiGraphics graphics, float x, float y, float yawDegrees, float size) {
 		int heading = Math.floorMod(Math.round(yawDegrees / (360.0F / HEADINGS)), HEADINGS);
 		dev.diorama.Settings settings = dev.diorama.Settings.get();
 		int accent = settings.arrowRgb();
@@ -132,7 +132,7 @@ public final class Markers {
 	}
 
 	/** The flat arrow, drawn while the voxel one isn't ready. North-south distances look shorter under the tilted camera. */
-	private static void flat(GuiGraphicsExtractor graphics, float x, float y, float yawDegrees, float size, int accent) {
+	private static void flat(GuiGraphics graphics, float x, float y, float yawDegrees, float size, int accent) {
 		double yaw = Math.toRadians(yawDegrees);
 		double dx = -Math.sin(yaw);
 		double dy = Math.cos(yaw) * Projection.sin();
@@ -144,7 +144,7 @@ public final class Markers {
 		quad(graphics, x, y, dx, dy, size * 0.55F, 0xFF000000 | accent);
 	}
 
-	private static void quad(GuiGraphicsExtractor graphics, float x, float y, double dx, double dy, float size, int color) {
+	private static void quad(GuiGraphics graphics, float x, float y, double dx, double dy, float size, int color) {
 		double px = -dy;
 		double py = dx;
 		float tipX = (float) (x + dx * size);

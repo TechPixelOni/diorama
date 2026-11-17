@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 //? if <1.21.9 {
-/*import net.minecraft.client.gui.screens.Screen;
-*///?}
+import net.minecraft.client.gui.screens.Screen;
+//?}
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
@@ -519,18 +519,18 @@ public final class DrawMode {
 
 	private static boolean controlDown() {
 		//? if >=1.21.9 {
-		return Minecraft.getInstance().hasControlDown();
-		//?} else {
-		/*return Screen.hasControlDown();
-		*///?}
+		/*return Minecraft.getInstance().hasControlDown();
+		*///?} else {
+		return Screen.hasControlDown();
+		//?}
 	}
 
 	public static boolean shiftDown() {
 		//? if >=1.21.9 {
-		return Minecraft.getInstance().hasShiftDown();
-		//?} else {
-		/*return Screen.hasShiftDown();
-		*///?}
+		/*return Minecraft.getInstance().hasShiftDown();
+		*///?} else {
+		return Screen.hasShiftDown();
+		//?}
 	}
 
 	private void finishShape(String dimension) {
@@ -596,7 +596,7 @@ public final class DrawMode {
 	}
 
 	/** The drawings, what's being drawn, and the eraser's target lit up. */
-	public void drawMap(GuiGraphicsExtractor graphics, Font font, MapViewport.View view, List<Drawing> drawings, double mouseX, double mouseY, boolean overMap) {
+	public void drawMap(GuiGraphics graphics, Font font, MapViewport.View view, List<Drawing> drawings, double mouseX, double mouseY, boolean overMap) {
 		Drawing preview = null;
 		Drawing target = null;
 		if (this.active && !this.points.isEmpty()) {
@@ -622,7 +622,7 @@ public final class DrawMode {
 	}
 
 	/** The icons on the column's buttons and the open palette, over the widgets. */
-	public void drawControls(GuiGraphicsExtractor graphics) {
+	public void drawControls(GuiGraphics graphics) {
 		if (!this.active) {
 			return;
 		}
@@ -695,7 +695,7 @@ public final class DrawMode {
 	 * pixels in a row. A fill per pixel cost a GUI element each, every frame the map is open.
 	 * Before 1.21.6 the runs stay vanilla fills, whose depth test the map's own shapes don't share.
 	 */
-	public static void icon(GuiGraphicsExtractor graphics, String[] rows, int x, int y, int argb) {
+	public static void icon(GuiGraphics graphics, String[] rows, int x, int y, int argb) {
 		int h = rows.length;
 		int w = rows[0].length();
 		int x0 = x + (BUTTON - w) / 2;
@@ -741,16 +741,16 @@ public final class DrawMode {
 			}
 		}
 		//? if >=1.21.6 {
-		MapCanvas.of(graphics).solid(corners, argb);
-		//?} else {
-		/*for (int i = 0; i < corners.length; i += 8) {
+		/*MapCanvas.of(graphics).solid(corners, argb);
+		*///?} else {
+		for (int i = 0; i < corners.length; i += 8) {
 			graphics.fill((int) corners[i], (int) corners[i + 1], (int) corners[i + 4], (int) corners[i + 5], argb);
 		}
-		*///?}
+		//?}
 	}
 
 	/** A one-pixel frame like a vanilla button's highlight. */
-	public static void outline(GuiGraphicsExtractor graphics, int x, int y, int w, int h, int argb) {
+	public static void outline(GuiGraphics graphics, int x, int y, int w, int h, int argb) {
 		graphics.fill(x, y, x + w, y + 1, argb);
 		graphics.fill(x, y + h - 1, x + w, y + h, argb);
 		graphics.fill(x, y + 1, x + 1, y + h - 1, argb);

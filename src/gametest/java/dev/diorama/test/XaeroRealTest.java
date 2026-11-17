@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+/*import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-//?}
+*///?}
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -45,11 +45,11 @@ final class XaeroRealTest {
 	static void reopened(ClientGameTestContext context) {
 		requireXaero(context);
 		followNotice(context, "sp", "Xaero's Minimap has 3 waypoints for this world that aren't in Diorama yet. [Import]");
-		String label = context.computeOnClient(mc -> importLabel(mc.gui.screen()));
+		String label = context.computeOnClient(mc -> importLabel(mc.screen));
 		if (!"Import from Xaero's Minimap (3)".equals(label)) {
 			throw new AssertionError("The link's waypoint list offers " + label);
 		}
-		context.runOnClient(mc -> press(button(mc.gui.screen(), label)));
+		context.runOnClient(mc -> press(button(mc.screen, label)));
 		context.waitTicks(5);
 		context.takeScreenshot("xaero-real-sp-06-imported");
 		assertImported(context);
@@ -57,18 +57,18 @@ final class XaeroRealTest {
 	}
 
 	//? if >=1.21.4 && fabric {
-	/**
+	/*/^*
 	 * A server: Xaero's makes waypoints on the first visit, the line comes on the next and its link
 	 * opens the list, and on the visit after that the line doesn't come again, though nothing was
 	 * imported; the list's picker still imports them.
-	 */
+	 ^/
 	static void server(ClientGameTestContext context) {
 		requireXaero(context);
 		try (TestDedicatedServerContext server = context.worldBuilder()
 			.setUseConsistentSettings(false)
 			.adjustSettings(s -> s.setSeed("diorama-xaero-real"))
 			.createServer(DioramaClientTest.serverProperties())) {
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 50, 2400);
 				String early = context.computeOnClient(XaeroRealTest::noticeLine);
 				if (early != null) {
@@ -77,11 +77,11 @@ final class XaeroRealTest {
 				makeXaeroWaypoints(context, "server");
 				look(context, "server");
 			}
-			context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			context.runOnClient(mc -> mc.gui.getChat().clearMessages(false));
+			try (TestServerConnection connection = server.connect()) {
 				context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 50, 2400);
 				followNotice(context, "server", "Xaero's Minimap has waypoints for this server that aren't in Diorama yet. [Import]");
-				String label = context.computeOnClient(mc -> importLabel(mc.gui.screen()));
+				String label = context.computeOnClient(mc -> importLabel(mc.screen));
 				if (!"Import from Xaero's Minimap...".equals(label)) {
 					throw new AssertionError("The link's waypoint list offers " + label);
 				}
@@ -90,8 +90,8 @@ final class XaeroRealTest {
 			}
 			// Shown once per world: not on the next visit, though Xaero's waypoints still aren't
 			// in Diorama. The list still offers them.
-			context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(false));
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			context.runOnClient(mc -> mc.gui.getChat().clearMessages(false));
+			try (TestServerConnection connection = server.connect()) {
 				context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 50, 2400);
 				context.waitTicks(200);
 				String again = context.computeOnClient(XaeroRealTest::noticeLine);
@@ -99,24 +99,24 @@ final class XaeroRealTest {
 					throw new AssertionError("The Xaero's import line came again on the next visit: " + again);
 				}
 				String label = context.computeOnClient(mc -> {
-					mc.gui.setScreen(new WaypointListScreen(null));
-					return importLabel(mc.gui.screen());
+					mc.setScreen(new WaypointListScreen(null));
+					return importLabel(mc.screen);
 				});
 				if (!"Import from Xaero's Minimap...".equals(label)) {
 					throw new AssertionError("On the next visit the waypoint list offers " + label);
 				}
 				context.waitTicks(5);
-				context.runOnClient(mc -> press(button(mc.gui.screen(), label)));
+				context.runOnClient(mc -> press(button(mc.screen, label)));
 				context.waitTicks(5);
 				context.takeScreenshot("xaero-real-server-06-picker");
 				context.runOnClient(mc -> {
-					for (var child : mc.gui.screen().children()) {
+					for (var child : mc.screen.children()) {
 						if (child instanceof Button button && button.getMessage().getString().endsWith(": 3 new")) {
 							press(button);
 							return;
 						}
 					}
-					throw new AssertionError("The picker has no world with 3 new waypoints: " + describe(mc.gui.screen()));
+					throw new AssertionError("The picker has no world with 3 new waypoints: " + describe(mc.screen));
 				});
 				context.waitTicks(5);
 				context.takeScreenshot("xaero-real-server-07-imported");
@@ -125,7 +125,7 @@ final class XaeroRealTest {
 			}
 		}
 	}
-	//?}
+	*///?}
 
 	/** Waits for the chat line, checks its text, and clicks its link the way a player does. */
 	private static void followNotice(ClientGameTestContext context, String where, String expected) {
@@ -136,9 +136,9 @@ final class XaeroRealTest {
 		}
 		context.takeScreenshot("xaero-real-" + where + "-04-chat-line");
 		//? if >=26.3 {
-		// Open chat with T and click [Import] with the mouse.
+		/*// Open chat with T and click [Import] with the mouse.
 		context.getInput().pressKey(InputConstants.KEY_T);
-		context.waitFor(mc -> mc.gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen, 100);
+		context.waitFor(mc -> mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen, 100);
 		context.waitTicks(5);
 		double[] at = context.computeOnClient(XaeroRealTest::linkPosition);
 		if (at == null) {
@@ -148,18 +148,18 @@ final class XaeroRealTest {
 		context.waitTicks(2);
 		context.takeScreenshot("xaero-real-" + where + "-05-chat-open");
 		context.getInput().pressMouse(InputConstants.MOUSE_BUTTON_LEFT);
-		//?} else if >=1.21.6 {
+		*///?} else if >=1.21.6 {
 		/*context.runOnClient(mc -> mc.player.connection.sendUnattendedCommand(dev.diorama.waypoint.XaeroNotice.COMMAND.substring(1), null));
 		*///?} else {
-		/*context.runOnClient(mc -> mc.player.connection.sendUnsignedCommand(dev.diorama.waypoint.XaeroNotice.COMMAND.substring(1)));
-		*///?}
-		context.waitFor(mc -> mc.gui.screen() instanceof WaypointListScreen, 200);
+		context.runOnClient(mc -> mc.player.connection.sendUnsignedCommand(dev.diorama.waypoint.XaeroNotice.COMMAND.substring(1)));
+		//?}
+		context.waitFor(mc -> mc.screen instanceof WaypointListScreen, 200);
 		context.waitTicks(5);
 		context.takeScreenshot("xaero-real-" + where + "-05-link-opened-list");
 	}
 
 	//? if >=26.3 {
-	/** Where on the window, in its pixels, the chat screen has the [Import] link, or null. */
+	/*/^* Where on the window, in its pixels, the chat screen has the [Import] link, or null. ^/
 	private static double[] linkPosition(Minecraft mc) {
 		int height = mc.getWindow().getGuiScaledHeight();
 		int width = mc.getWindow().getGuiScaledWidth();
@@ -167,7 +167,7 @@ final class XaeroRealTest {
 		for (int y = height - 1; y > height / 2; y--) {
 			for (int x = 0; x < width; x += 2) {
 				net.minecraft.client.gui.ActiveTextCollector.ClickableStyleFinder finder = new net.minecraft.client.gui.ActiveTextCollector.ClickableStyleFinder(mc.font, x, y);
-				mc.gui.hud.getChat().captureClickableText(finder, height, mc.gui.hud.getGuiTicks(), net.minecraft.client.gui.components.ChatComponent.DisplayMode.FOREGROUND);
+				mc.gui.getChat().captureClickableText(finder, height, mc.gui.getGuiTicks(), net.minecraft.client.gui.components.ChatComponent.DisplayMode.FOREGROUND);
 				net.minecraft.network.chat.Style style = finder.result();
 				if (style != null && style.getClickEvent() instanceof net.minecraft.network.chat.ClickEvent.RunCommand run
 					&& run.command().equals(dev.diorama.waypoint.XaeroNotice.COMMAND)) {
@@ -177,7 +177,7 @@ final class XaeroRealTest {
 		}
 		return null;
 	}
-	//?}
+	*///?}
 
 	/** The text of the Xaero's import line in chat, or null if there's none. */
 	private static String noticeLine(Minecraft mc) {
@@ -216,20 +216,20 @@ final class XaeroRealTest {
 		context.getInput().pressKey(InputConstants.KEY_U);
 		context.waitTicks(10);
 		context.takeScreenshot("xaero-real-" + where + "-01-u-key");
-		log(context, where + " U key", mc -> describe(mc.gui.screen()));
+		log(context, where + " U key", mc -> describe(mc.screen));
 		context.setScreen(() -> null);
 		context.waitTicks(5);
 		context.getInput().pressKey(InputConstants.KEY_B);
 		context.waitTicks(10);
 		context.takeScreenshot("xaero-real-" + where + "-02-b-key");
-		log(context, where + " B key", mc -> describe(mc.gui.screen()));
+		log(context, where + " B key", mc -> describe(mc.screen));
 		context.setScreen(() -> null);
 		context.waitTicks(5);
 		log(context, where + " Xaero's files", mc -> files(mc.gameDirectory.toPath().resolve("xaero").resolve("minimap")));
 		context.setScreen(() -> new WaypointListScreen(null));
 		context.waitTicks(10);
 		context.takeScreenshot("xaero-real-" + where + "-03-diorama-list");
-		log(context, where + " Diorama's list", mc -> describe(mc.gui.screen()) + ", import button: " + importLabel(mc.gui.screen()));
+		log(context, where + " Diorama's list", mc -> describe(mc.screen) + ", import button: " + importLabel(mc.screen));
 		context.setScreen(() -> null);
 		context.waitTicks(5);
 	}
@@ -332,10 +332,10 @@ final class XaeroRealTest {
 
 	private static void press(Button button) {
 		//? if >=1.21.9 {
-		button.onPress(null);
-		//?} else {
-		/*button.onPress();
-		*///?}
+		/*button.onPress(null);
+		*///?} else {
+		button.onPress();
+		//?}
 	}
 
 	private static String files(Path base) {

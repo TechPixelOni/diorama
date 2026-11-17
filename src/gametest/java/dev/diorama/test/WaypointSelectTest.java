@@ -33,7 +33,7 @@ final class WaypointSelectTest {
 		List<Waypoint> spots = context.computeOnClient(mc -> {
 			WaypointStore store = WaypointStore.get();
 			store.setSort(WaypointSort.DISTANCE, false);
-			String here = mc.level.dimension().identifier().toString();
+			String here = mc.level.dimension().location().toString();
 			store.addFolder(CAMP);
 			store.addFolder(TRIP);
 			List<Waypoint> made = new ArrayList<>();
@@ -54,8 +54,8 @@ final class WaypointSelectTest {
 
 		context.setScreen(() -> new WaypointListScreen(null));
 		context.waitTicks(5);
-		for (int i = 0; i < 30 && !context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderName()).equals(CAMP); i++) {
-			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.gui.screen(), ">")));
+		for (int i = 0; i < 30 && !context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderName()).equals(CAMP); i++) {
+			DioramaClientTest.clickAt(context, context.computeOnClient(mc -> DioramaClientTest.buttonLabelled(mc.screen, ">")));
 		}
 
 		// One row, as before: Edit, Hide, Teleport, Delete, and no Move.
@@ -115,7 +115,7 @@ final class WaypointSelectTest {
 		// Move opens the folders; a pick sends all four there.
 		clickRowButton(context, "Move");
 		List<String> labels = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return menu == null ? List.<String>of() : menu.labels();
 		});
 		if (labels.size() < 3 || !labels.get(0).startsWith("Overworld ") || !labels.contains(CAMP + " 13") || !labels.contains(TRIP + " 0")) {
@@ -133,7 +133,7 @@ final class WaypointSelectTest {
 			wrong.add("Spot 2, taken out of the selection, moved too");
 		}
 		expect(context, wrong, "after Move", List.of());
-		if (!context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderName()).equals(CAMP)) {
+		if (!context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderName()).equals(CAMP)) {
 			wrong.add("the list left Camp after Move");
 		}
 		context.takeScreenshot("select-06-moved");
@@ -143,7 +143,7 @@ final class WaypointSelectTest {
 		click(context, spots.get(12), false, true);
 		expect(context, wrong, "Spot 5 and Nether spot", List.of("Spot 5", "Nether spot"));
 		clickRowButton(context, "Move");
-		String first = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).folderMenu().labels().get(0));
+		String first = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).folderMenu().labels().get(0));
 		if (!first.equals("Their own dimensions")) {
 			wrong.add("Move's first line for rows of two dimensions was " + first);
 		}
@@ -187,7 +187,7 @@ final class WaypointSelectTest {
 		click(context, spots.get(11), true, false);
 		clickRowButton(context, "Delete");
 		// Typed without a click on the search box, which would put Delete back by itself.
-		context.runOnClient(mc -> mc.gui.screen().setFocused(DioramaClientTest.editBoxes(mc.gui.screen()).get(0)));
+		context.runOnClient(mc -> mc.screen.setFocused(DioramaClientTest.editBoxes(mc.screen).get(0)));
 		context.getInput().typeChars("Spot 12");
 		context.waitTicks(2);
 		expect(context, wrong, "a search that leaves one selected row", List.of("Spot 12"));
@@ -215,11 +215,11 @@ final class WaypointSelectTest {
 		for (int i = 0; i < 12; i++) {
 			scroll(context, 1);
 		}
-		for (int i = 0; i < 12 && context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint)) == null; i++) {
+		for (int i = 0; i < 12 && context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(waypoint)) == null; i++) {
 			scroll(context, -1);
 		}
 		context.waitTicks(2);
-		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).rowCentre(waypoint));
+		int[] row = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).rowCentre(waypoint));
 		if (row == null) {
 			throw new AssertionError(waypoint.name + "'s row isn't in view");
 		}
@@ -244,15 +244,15 @@ final class WaypointSelectTest {
 	private static void scroll(ClientGameTestContext context, int direction) {
 		context.runOnClient(mc -> {
 			//? if >=1.21 {
-			mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, 0, direction);
-			//?} else {
-			/*mc.gui.screen().mouseScrolled(mc.gui.screen().width / 2.0, 120, direction);
-			*///?}
+			/*mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, 0, direction);
+			*///?} else {
+			mc.screen.mouseScrolled(mc.screen.width / 2.0, 120, direction);
+			//?}
 		});
 	}
 
 	private static void expect(ClientGameTestContext context, List<String> wrong, String what, List<String> names) {
-		List<String> selected = context.computeOnClient(mc -> ((WaypointListScreen) mc.gui.screen()).selection().stream().map(w -> w.name).toList());
+		List<String> selected = context.computeOnClient(mc -> ((WaypointListScreen) mc.screen).selection().stream().map(w -> w.name).toList());
 		if (!new java.util.HashSet<>(selected).equals(new java.util.HashSet<>(names)) || selected.size() != names.size()) {
 			wrong.add(what + " selected " + selected);
 		}
@@ -262,8 +262,8 @@ final class WaypointSelectTest {
 	private static List<String> rowButtons(ClientGameTestContext context) {
 		return context.computeOnClient(mc -> {
 			List<Button> buttons = new ArrayList<>();
-			for (var child : mc.gui.screen().children()) {
-				if (child instanceof Button button && button.visible && button.getY() > 70 && button.getY() < mc.gui.screen().height - 40) {
+			for (var child : mc.screen.children()) {
+				if (child instanceof Button button && button.visible && button.getY() > 70 && button.getY() < mc.screen.height - 40) {
 					buttons.add(button);
 				}
 			}
@@ -274,7 +274,7 @@ final class WaypointSelectTest {
 
 	private static void clickRowButton(ClientGameTestContext context, String label) {
 		DioramaClientTest.clickAt(context, context.computeOnClient(mc -> {
-			for (var child : mc.gui.screen().children()) {
+			for (var child : mc.screen.children()) {
 				if (child instanceof Button button && button.visible && button.getY() > 70 && button.getMessage().getString().equals(label)) {
 					return button;
 				}
@@ -286,7 +286,7 @@ final class WaypointSelectTest {
 
 	private static void hover(ClientGameTestContext context, String name) {
 		float[] line = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return menu == null ? null : menu.centreOf(name);
 		});
 		if (line != null) {
@@ -298,7 +298,7 @@ final class WaypointSelectTest {
 
 	private static void pick(ClientGameTestContext context, String name, List<String> wrong) {
 		float[] line = context.computeOnClient(mc -> {
-			FolderMenu menu = ((WaypointListScreen) mc.gui.screen()).folderMenu();
+			FolderMenu menu = ((WaypointListScreen) mc.screen).folderMenu();
 			return menu == null ? null : menu.centreOf(name);
 		});
 		if (line == null) {

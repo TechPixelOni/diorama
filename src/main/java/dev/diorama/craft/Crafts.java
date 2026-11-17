@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
@@ -273,7 +273,7 @@ public final class Crafts {
 	}
 
 	/** Draws the crafts and their shadows over a view of the map. Render thread. */
-	public void draw(GuiGraphicsExtractor graphics, MapViewport.View view, float partialTick, float opacity) {
+	public void draw(GuiGraphics graphics, MapViewport.View view, float partialTick, float opacity) {
 		this.painter.draw(graphics, view, this.crafts.values(), partialTick, opacity);
 	}
 }

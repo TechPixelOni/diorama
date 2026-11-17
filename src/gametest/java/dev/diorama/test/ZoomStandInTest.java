@@ -46,7 +46,7 @@ final class ZoomStandInTest {
 		};
 		for (int i = 0; i < steps.length; i++) {
 			double[] step = steps[i];
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(step[0], step[1], step[2], TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(step[0], step[1], step[2], TileKey.SURFACE));
 			String name = "zoom-" + i + "-" + step[2];
 			context.takeScreenshot(name + "-a-first");
 			log(context, step, name + " first frame");

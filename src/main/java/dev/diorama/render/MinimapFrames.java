@@ -13,8 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import org.jspecify.annotations.Nullable;
 
@@ -46,7 +46,7 @@ public final class MinimapFrames {
 	}
 
 	/** Draws the frame around a map {@code size} wide at (x, y). Only its rim, so a see-through map stays see-through. */
-	public static void draw(GuiGraphicsExtractor graphics, Settings.Frame frame, boolean round, int x, int y, int size) {
+	public static void draw(GuiGraphics graphics, Settings.Frame frame, boolean round, int x, int y, int size) {
 		if (frame == Settings.Frame.NONE) {
 			return;
 		}
@@ -128,7 +128,7 @@ public final class MinimapFrames {
 	}
 
 	private static @Nullable Picture load(String name) {
-		Identifier file = Identifier.fromNamespaceAndPath(Diorama.MOD_ID, FOLDER + name + ".png");
+		ResourceLocation file = new net.minecraft.resources.ResourceLocation(Diorama.MOD_ID, FOLDER + name + ".png");
 		Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(file);
 		if (resource.isEmpty()) {
 			return null;

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntSupplier;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -19,21 +19,21 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 //? if >=26.2 {
-import net.minecraft.client.gui.components.tabs.MenuTabBar;
-//?}
+/*import net.minecraft.client.gui.components.tabs.MenuTabBar;
+*///?}
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.KeyEvent;
-//?}
+/*import net.minecraft.client.input.KeyEvent;
+*///?}
 //? if >=1.21.6 {
-import net.minecraft.client.renderer.RenderPipelines;
-//?}
+/*import net.minecraft.client.renderer.RenderPipelines;
+*///?}
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -53,7 +53,7 @@ public final class SettingsScreen extends Screen {
 	/** How wide a text size slider is beside a button that keeps the rest of the row: room for "Text size: 200%". */
 	private static final int TEXT_SLIDER = 84;
 	private static final int TAB_BAR_HEIGHT = 24;
-	private static final Identifier LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+	private static final ResourceLocation LIST_BACKGROUND = new net.minecraft.resources.ResourceLocation("textures/gui/inworld_menu_list_background.png");
 
 	private final @Nullable Screen parent;
 	private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
@@ -88,7 +88,7 @@ public final class SettingsScreen extends Screen {
 		minimap.toggle("prefer_surface", () -> s.preferSurface, v -> s.preferSurface = v);
 		minimap.toggle("legible_caves", () -> s.legibleCaves, v -> s.legibleCaves = v);
 		minimap.toggle("enlarge_toggle", () -> s.minimapEnlargeToggle, v -> s.minimapEnlargeToggle = v);
-		minimap.open("position", MinimapPositionScreen.placeName(), () -> this.minecraft.gui.setScreen(new MinimapPositionScreen(this)));
+		minimap.open("position", MinimapPositionScreen.placeName(), () -> this.minecraft.setScreen(new MinimapPositionScreen(this)));
 		minimap.choice("game_time", Settings.GameTime.values(), () -> s.gameTime, v -> s.gameTime = v);
 		// Beside Position, so the tab doesn't grow.
 		minimap.lastTwoSideBySide();
@@ -134,7 +134,7 @@ public final class SettingsScreen extends Screen {
 		radar.choice("player_names", Settings.NameTags.values(), () -> s.playerNames, v -> s.playerNames = v);
 		int[] ranges = Settings.RANGES;
 		radar.slider("range", indexOf(ranges, s.radarRange), ranges.length, i -> s.radarRange = ranges[i], i -> Component.literal(ranges[i] + " m"));
-		radar.open("radar_categories", RadarCategoriesScreen.summary(), () -> this.minecraft.gui.setScreen(new RadarCategoriesScreen(this)));
+		radar.open("radar_categories", RadarCategoriesScreen.summary(), () -> this.minecraft.setScreen(new RadarCategoriesScreen(this)));
 		// Beside the range, so the tab doesn't grow.
 		radar.lastTwoSideBySide();
 
@@ -184,7 +184,7 @@ public final class SettingsScreen extends Screen {
 		waypoints.slider("waypoint_size_map", nearestIndex(pinSizes, s.waypointMapSize), pinSizes.length, i -> s.waypointMapSize = pinSizes[i], i -> Component.literal(pinSizes[i] + "%"));
 		waypoints.slider("waypoint_size_world", nearestIndex(pinSizes, s.waypointWorldSize), pinSizes.length, i -> s.waypointWorldSize = pinSizes[i], i -> Component.literal(pinSizes[i] + "%"));
 		waypoints.lastThreeSideBySide();
-		waypoints.open("teleport_command", Component.literal("/" + s.teleportCommand), () -> this.minecraft.gui.setScreen(new TeleportCommandScreen(this)));
+		waypoints.open("teleport_command", Component.literal("/" + s.teleportCommand), () -> this.minecraft.setScreen(new TeleportCommandScreen(this)));
 
 		SettingsTab look = new SettingsTab("diorama.settings.look");
 		look.toggle("outlines", () -> s.outlines, v -> s.outlines = v);
@@ -192,7 +192,7 @@ public final class SettingsScreen extends Screen {
 		look.toggle("rounded_fog", () -> s.roundedFog, v -> s.roundedFog = v);
 		look.toggle("fog_of_war", () -> s.alwaysFogOfWar, v -> s.alwaysFogOfWar = v, ServerRules.fogOfWarForced() ? true : null);
 		look.toggle("saved_chunks", () -> s.mapSavedChunks, v -> s.mapSavedChunks = v);
-		look.open("map_off", DimensionsScreen.summary(), () -> this.minecraft.gui.setScreen(new DimensionsScreen(this)));
+		look.open("map_off", DimensionsScreen.summary(), () -> this.minecraft.setScreen(new DimensionsScreen(this)));
 		Settings.Quality[] qualities = Settings.Quality.values();
 		look.cycle("quality", () -> s.quality.ordinal(), qualities.length, i -> s.quality = qualities[i],
 			i -> Component.translatable("diorama.settings.quality." + qualities[i].name().toLowerCase(Locale.ROOT)));
@@ -207,10 +207,10 @@ public final class SettingsScreen extends Screen {
 		this.gpuFailedShown = dev.diorama.render.gpu.GpuBakeCheck.failed();
 		look.cycle("arrow_color", () -> s.arrowColor, Settings.ARROW_COLORS.length, i -> s.arrowColor = i,
 			//? if >=1.21 {
-			i -> Component.translatable("diorama.settings.arrow_color." + Settings.ARROW_COLOR_NAMES[i]).withColor(Settings.ARROW_COLORS[i]));
-			//?} else {
-			/*i -> Component.translatable("diorama.settings.arrow_color." + Settings.ARROW_COLOR_NAMES[i]).withStyle(style -> style.withColor(Settings.ARROW_COLORS[i])));
-			*///?}
+			/*i -> Component.translatable("diorama.settings.arrow_color." + Settings.ARROW_COLOR_NAMES[i]).withColor(Settings.ARROW_COLORS[i]));
+			*///?} else {
+			i -> Component.translatable("diorama.settings.arrow_color." + Settings.ARROW_COLOR_NAMES[i]).withStyle(style -> style.withColor(Settings.ARROW_COLORS[i])));
+			//?}
 		int arrowSizes = (Settings.MAX_ARROW_SIZE - Settings.MIN_ARROW_SIZE) / Settings.ARROW_SIZE_STEP + 1;
 		look.slider("arrow_size", (Settings.snapArrowSize(s.arrowSize) - Settings.MIN_ARROW_SIZE) / Settings.ARROW_SIZE_STEP, arrowSizes,
 			i -> s.arrowSize = Settings.MIN_ARROW_SIZE + i * Settings.ARROW_SIZE_STEP, i -> Component.literal((Settings.MIN_ARROW_SIZE + i * Settings.ARROW_SIZE_STEP) + "%"));
@@ -220,16 +220,16 @@ public final class SettingsScreen extends Screen {
 		// Vanilla's tab bar, over the settings side instead of the whole screen. It's drawn by hand
 		// (extractRenderState), clipped to the side: its separator line runs on past the last tab.
 		//? if >=26.2 {
-		MenuTabBar bar = MenuTabBar.builder(this.tabManager, this.side).addTabs(minimap, radar, overlays, waypoints, look).build();
+		/*MenuTabBar bar = MenuTabBar.builder(this.tabManager, this.side).addTabs(minimap, radar, overlays, waypoints, look).build();
 		bar.arrangeElements(this.side);
-		//?} else if >=26.1 {
+		*///?} else if >=26.1 {
 		/*TabNavigationBar bar = TabNavigationBar.builder(this.tabManager, this.side).addTabs(minimap, radar, overlays, waypoints, look).build();
 		bar.updateWidth(this.side);
 		*///?} else {
-		/*TabNavigationBar bar = TabNavigationBar.builder(this.tabManager, this.side).addTabs(minimap, radar, overlays, waypoints, look).build();
+		TabNavigationBar bar = TabNavigationBar.builder(this.tabManager, this.side).addTabs(minimap, radar, overlays, waypoints, look).build();
 		bar.setWidth(this.side);
 		bar.arrangeElements();
-		*///?}
+		//?}
 		this.tabs = List.of(minimap, radar, overlays, waypoints, look);
 		this.tabBar = this.addWidget(bar);
 		this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> this.onClose())
@@ -462,7 +462,7 @@ public final class SettingsScreen extends Screen {
 	/** A checkbox no wider than {@code maxWidth} that saves the settings after telling {@code set} its new value. */
 	static Checkbox checkbox(Component label, net.minecraft.client.gui.Font font, boolean selected, int maxWidth, Consumer<Boolean> set) {
 		//? if >=1.21 {
-		return Checkbox.builder(label, font)
+		/*return Checkbox.builder(label, font)
 			.selected(selected)
 			.maxWidth(maxWidth)
 			.onValueChange((box, value) -> {
@@ -470,8 +470,8 @@ public final class SettingsScreen extends Screen {
 				Settings.get().save();
 			})
 			.build();
-		//?} else {
-		/*// 1.20.1's checkbox has no builder and tells no one it changed. It's a 20 pixel box with
+		*///?} else {
+		// 1.20.1's checkbox has no builder and tells no one it changed. It's a 20 pixel box with
 		// the label 4 pixels right of it, as wide as both, and no wider than the column.
 		return new Checkbox(0, 0, Math.min(24 + font.width(label), maxWidth), 20, label, selected) {
 			@Override
@@ -481,7 +481,7 @@ public final class SettingsScreen extends Screen {
 				Settings.get().save();
 			}
 		};
-		*///?}
+		//?}
 	}
 
 	/**
@@ -523,32 +523,32 @@ public final class SettingsScreen extends Screen {
 	}
 
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		super.extractBackground(graphics, mouseX, mouseY, a);
-	//?} else {
-	/*// A 1.20.1 screen draws its own background, from its render method below.
+	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+		super.renderBackground(graphics, mouseX, mouseY, a);
+	*///?} else {
+	// A 1.20.1 screen draws its own background, from its render method below.
 	private void drawBackground(GuiGraphics graphics) {
 		this.renderBackground(graphics);
-	*///?}
+	//?}
 		// After the blur, so the preview stays sharp. A big minimap would reach under the settings:
 		// it's cut off at their edge, which also keeps its depth (before 1.21.6) clear of them.
 		graphics.enableScissor(this.side, 0, this.width, this.height);
 		//? if >=1.21.2 {
-		this.preview.preview(graphics, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true));
-		//?} else if >=1.21 {
+		/*this.preview.preview(graphics, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true));
+		*///?} else if >=1.21 {
 		/*this.preview.preview(graphics, this.minecraft.getTimer().getGameTimeDeltaPartialTick(true));
 		*///?} else {
-		/*// The partial tick the frame is drawn with, the paused one while the game is paused.
+		// The partial tick the frame is drawn with, the paused one while the game is paused.
 		this.preview.preview(graphics, this.minecraft.getFrameTime());
-		*///?}
+		//?}
 		graphics.disableScissor();
 		// The settings side, as vanilla draws a list in a world.
 		//? if >=1.21.6 {
-		graphics.nextStratum();
+		/*graphics.nextStratum();
 		graphics.blit(RenderPipelines.GUI_TEXTURED, LIST_BACKGROUND, 0, TAB_BAR_HEIGHT, 0, 0, this.side, this.listBottom() - TAB_BAR_HEIGHT, 32, 32);
 		graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.INWORLD_FOOTER_SEPARATOR, 0, this.listBottom(), 0, 0, this.side, 2, 32, 2);
-		//?} else if >=1.21.2 {
+		*///?} else if >=1.21.2 {
 		/*graphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, LIST_BACKGROUND, 0, TAB_BAR_HEIGHT, 0, 0, this.side, this.listBottom() - TAB_BAR_HEIGHT, 32, 32);
 		graphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, Screen.INWORLD_FOOTER_SEPARATOR, 0, this.listBottom(), 0, 0, this.side, 2, 32, 2);
 		*///?} else if >=1.21 {
@@ -557,39 +557,39 @@ public final class SettingsScreen extends Screen {
 		graphics.blit(Screen.INWORLD_FOOTER_SEPARATOR, 0, this.listBottom(), 0, 0, this.side, 2, 32, 2);
 		com.mojang.blaze3d.systems.RenderSystem.disableBlend();
 		*///?} else {
-		/*// 1.20.1 has neither texture. Each is a flat colour per row, the same as ScreenArt fills.
+		// 1.20.1 has neither texture. Each is a flat colour per row, the same as ScreenArt fills.
 		graphics.fill(0, TAB_BAR_HEIGHT, this.side, this.listBottom(), 0x70000000);
 		graphics.fill(0, this.listBottom(), this.side, this.listBottom() + 1, 0xBF000000);
 		graphics.fill(0, this.listBottom() + 1, this.side, this.listBottom() + 2, 0x33FFFFFF);
-		*///?}
+		//?}
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		// Before 1.21.6 this draws the background too, so the tab bar goes after it.
 		//? if <1.21 {
-		/*this.drawBackground(graphics);
-		*///?}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		this.drawBackground(graphics);
+		//?}
+		super.render(graphics, mouseX, mouseY, a);
 		if (this.tabBar != null) {
 			graphics.enableScissor(0, 0, this.side, TAB_BAR_HEIGHT);
-			this.tabBar.extractRenderState(graphics, mouseX, mouseY, a);
+			this.tabBar.render(graphics, mouseX, mouseY, a);
 			graphics.disableScissor();
 		}
 	}
 
 	// Ctrl+Tab and Ctrl+1 to 5 switch tabs, as in vanilla's tabbed screens, whatever has focus.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean keyPressed(KeyEvent event) {
 		return this.tabBar != null && this.tabBar.keyPressed(event) || super.keyPressed(event);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean keyPressed(int key, int scanCode, int modifiers) {
 		return this.tabBar != null && this.tabBar.keyPressed(key) || super.keyPressed(key, scanCode, modifiers);
 	}
-	*///?}
+	//?}
 
 	@Override
 	public void removed() {
@@ -598,7 +598,7 @@ public final class SettingsScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override

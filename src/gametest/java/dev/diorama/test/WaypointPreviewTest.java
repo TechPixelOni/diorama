@@ -81,7 +81,7 @@ final class WaypointPreviewTest {
 		DioramaClientTest.settle(context, 40);
 
 		world.getServer().runCommand("execute in minecraft:overworld run tp @a " + home.getX() + " " + home.getY() + " " + home.getZ());
-		context.waitFor(mc -> mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD && mc.gui.screen() == null
+		context.waitFor(mc -> mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD && mc.screen == null
 			&& MapSession.get() != null && MapSession.get().map().chunkCount() > 400, 2400);
 		DioramaClientTest.settle(context, 100);
 		Waypoint near = add(context, new Waypoint("Near", home.getX(), home.getY(), home.getZ(), "minecraft:overworld", PIN));
@@ -109,12 +109,12 @@ final class WaypointPreviewTest {
 		for (int box = 2; box <= 4; box++) {
 			DioramaClientTest.typeInto(context, box, "");
 		}
-		context.runOnClient(mc -> mc.gui.screen().setFocused(null));
+		context.runOnClient(mc -> mc.screen.setFocused(null));
 		BufferedImage emptyShot = shoot(context, "waypoint-preview-6c-empty-boxes");
-		String hints = context.computeOnClient(mc -> hints(mc.gui.screen()));
+		String hints = context.computeOnClient(mc -> hints(mc.screen));
 		DioramaClientTest.clickButton(context, "diorama.waypoint.save");
 		context.waitTicks(3);
-		String emptied = context.computeOnClient(mc -> mc.gui.screen() == null ? unmapped.x + " " + unmapped.y + " " + unmapped.z : "editor still open");
+		String emptied = context.computeOnClient(mc -> mc.screen == null ? unmapped.x + " " + unmapped.y + " " + unmapped.z : "editor still open");
 		// A new Nether waypoint made in the Overworld with X and Z left empty lands an eighth of
 		// the way, at the player's Y left as typed.
 		Waypoint netherHere = new Waypoint("Nether here", 5, 70, 5, "minecraft:the_nether", PIN);
@@ -122,9 +122,9 @@ final class WaypointPreviewTest {
 		context.waitTicks(5);
 		DioramaClientTest.typeInto(context, 2, "");
 		DioramaClientTest.typeInto(context, 4, "");
-		context.runOnClient(mc -> mc.gui.screen().setFocused(null));
+		context.runOnClient(mc -> mc.screen.setFocused(null));
 		BufferedImage netherHereShot = shoot(context, "waypoint-preview-6d-nether-empty-x-z");
-		String netherHints = context.computeOnClient(mc -> hints(mc.gui.screen()));
+		String netherHints = context.computeOnClient(mc -> hints(mc.screen));
 		DioramaClientTest.clickButton(context, "diorama.waypoint.save");
 		context.waitTicks(3);
 		boolean netherSaved = context.computeOnClient(mc -> WaypointStore.get().all().contains(netherHere));

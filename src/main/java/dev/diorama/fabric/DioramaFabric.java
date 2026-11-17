@@ -23,17 +23,17 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.registry.RegistryIdRemapCallback;
 //? if >=1.21.6 {
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-//?} else {
-/*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-*///?}
+/*import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+*///?} else {
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+//?}
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.PackType;
@@ -49,10 +49,10 @@ public final class DioramaFabric implements ClientModInitializer {
 		ShareClient.init();
 		// The payload type is registered on both sides, in DioramaFabricCommon.
 		//? if >=1.21 {
-		ClientPlayNetworking.registerGlobalReceiver(ShareProtocol.TYPE, (packet, context) -> ShareProtocol.toClient(packet.data()));
+		/*ClientPlayNetworking.registerGlobalReceiver(ShareProtocol.TYPE, (packet, context) -> ShareProtocol.toClient(packet.data()));
 		ShareProtocol.toServer(data -> ClientPlayNetworking.send(new ShareProtocol.Packet(data)));
-		//?} else {
-		/*ClientPlayNetworking.registerGlobalReceiver(ShareProtocol.CHANNEL, (client, handler, buf, sender) -> {
+		*///?} else {
+		ClientPlayNetworking.registerGlobalReceiver(ShareProtocol.CHANNEL, (client, handler, buf, sender) -> {
 			// Read here: the buffer is only good until this returns. Handled on the client thread,
 			// unless the player has left by then.
 			byte[] data = ShareProtocol.read(buf).data();
@@ -67,18 +67,18 @@ public final class DioramaFabric implements ClientModInitializer {
 			buf.writeBytes(data);
 			ClientPlayNetworking.send(ShareProtocol.CHANNEL, buf);
 		});
-		*///?}
+		//?}
 		for (KeyMapping keyMapping : DioramaClient.KEY_MAPPINGS) {
-			KeyMappingHelper.registerKeyMapping(keyMapping);
+			KeyBindingHelper.registerKeyBinding(keyMapping);
 		}
 		// Waypoints in the world are part of the picture of the world, so they go under the whole
 		// vanilla HUD and every screen; the minimap goes over the HUD. Before 1.21.6
 		// GameRendererMixin draws the waypoints.
 		//? if >=1.21.6 {
-		HudElementRegistry.addFirst(Diorama.id("waypoints"), new WaypointHud());
+		/*HudElementRegistry.addFirst(Diorama.id("waypoints"), new WaypointHud());
 		HudElementRegistry.addLast(Diorama.id("minimap"), new MinimapHud());
-		//?} else {
-		/*// Drawn after the whole vanilla HUD, like addLast. Each vanilla HUD layer sits 200 deeper
+		*///?} else {
+		// Drawn after the whole vanilla HUD, like addLast. Each vanilla HUD layer sits 200 deeper
 		// than the one before and the GUI depth-tests, so lift the vanilla fills and text this
 		// draws above all of them.
 		MinimapHud minimapHud = new MinimapHud();
@@ -89,7 +89,7 @@ public final class DioramaFabric implements ClientModInitializer {
 			minimapHud.render(graphics, deltaTracker);
 			pose.popPose();
 		});
-		*///?}
+		//?}
 		ClientChunkEvents.CHUNK_LOAD.register(MapSession::chunkLoaded);
 		// Joining a server whose mods number block states differently renumbers them here, and leaving puts them back.
 		RegistryIdRemapCallback.event(BuiltInRegistries.BLOCK).register(state -> BlockLooks.invalidate());
@@ -124,14 +124,14 @@ public final class DioramaFabric implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STARTED.register(mc -> XaeroChannels.register());
 		// Radar icons from Xaero's Minimap's icon files, read again on every resource reload.
 		//? if >=26.1 {
-		net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(XaeroRadarIcons.ID, XaeroRadarIcons.LISTENER);
-		//?} else if >=1.21.9 {
+		/*net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(XaeroRadarIcons.ID, XaeroRadarIcons.LISTENER);
+		*///?} else if >=1.21.9 {
 		/*net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(XaeroRadarIcons.ID, XaeroRadarIcons.LISTENER);
 		*///?} else {
-		/*net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+		net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
 			new net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener() {
 				@Override
-				public net.minecraft.resources.Identifier getFabricId() {
+				public net.minecraft.resources.ResourceLocation getFabricId() {
 					return XaeroRadarIcons.ID;
 				}
 
@@ -140,7 +140,7 @@ public final class DioramaFabric implements ClientModInitializer {
 					XaeroRadarIcons.reload(manager);
 				}
 			});
-		*///?}
+		//?}
 		// Leaving a world saves the map on the next tick, but closing the window stops ticking first.
 		ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> MapSession.close());
 		ClientTickEvents.END_CLIENT_TICK.register(DioramaClient::tick);

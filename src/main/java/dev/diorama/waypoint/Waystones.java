@@ -224,7 +224,7 @@ public final class Waystones {
 	private static boolean blockThere(Waypoint waypoint) {
 		Minecraft mc = Minecraft.getInstance();
 		BlockPos pos = new BlockPos(waypoint.x, waypoint.y, waypoint.z);
-		if (mc.level == null || !mc.level.dimension().identifier().toString().equals(waypoint.dimension) || !mc.level.hasChunkAt(pos)) {
+		if (mc.level == null || !mc.level.dimension().location().toString().equals(waypoint.dimension) || !mc.level.hasChunkAt(pos)) {
 			return false;
 		}
 		return BuiltInRegistries.BLOCK.getKey(mc.level.getBlockState(pos).getBlock()).getNamespace().equals("waystones");
@@ -271,7 +271,7 @@ public final class Waystones {
 		BlockPos pos = (BlockPos) get(waystone, "getPos");
 		ResourceKey<?> dimension = (ResourceKey<?>) get(waystone, "getDimension");
 		String dye = kind.substring(kind.indexOf(':') + 1, kind.length() - (kind.endsWith("_sharestone") ? "_sharestone".length() : 0));
-		Waypoint waypoint = new Waypoint(name.getString(), pos.getX(), pos.getY(), pos.getZ(), dimension.identifier().toString(), DYES.getOrDefault(dye, COLOUR));
+		Waypoint waypoint = new Waypoint(name.getString(), pos.getX(), pos.getY(), pos.getZ(), dimension.location().toString(), DYES.getOrDefault(dye, COLOUR));
 		waypoint.id = (UUID) get(waystone, "getWaystoneUid");
 		waypoint.kind = Waypoint.Kind.WAYSTONE;
 		return waypoint;

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
@@ -77,7 +77,7 @@ public final class WaypointOverlay {
 		return pins;
 	}
 
-	public static void draw(GuiGraphicsExtractor graphics, MapViewport.View view, List<Pin> pins, boolean fullscreen, @Nullable Pin hovered) {
+	public static void draw(GuiGraphics graphics, MapViewport.View view, List<Pin> pins, boolean fullscreen, @Nullable Pin hovered) {
 		Minecraft mc = Minecraft.getInstance();
 		Font font = mc.font;
 		graphics.enableScissor(view.x(), view.y(), view.x() + view.width(), view.y() + view.height());
@@ -96,11 +96,11 @@ public final class WaypointOverlay {
 			if (fullscreen && !pin.clamped() && named) {
 				String name = waypoint.shownName();
 				int w = font.width(name);
-				graphics.pose().pushMatrix();
-				graphics.pose().translate(pin.x() - w / 2.0F, pin.y() + Pins.SHADOW * pin.scale());
+				graphics.pose().pushPose();
+				graphics.pose().translate(pin.x() - w / 2.0F, pin.y() + Pins.SHADOW * pin.scale(), 0);
 				graphics.fill(-2, -1, w + 2, 9, 0x90000000);
-				graphics.text(font, name, 0, 0, 0xFFFFFFFF, false);
-				graphics.pose().popMatrix();
+				graphics.drawString(font, name, 0, 0, 0xFFFFFFFF, false);
+				graphics.pose().popPose();
 			}
 		}
 		graphics.disableScissor();

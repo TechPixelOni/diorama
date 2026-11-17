@@ -1,14 +1,14 @@
 package dev.diorama;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 //? if >=1.21.9 {
-import net.minecraft.client.input.KeyEvent;
+/*import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+*///?}
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
@@ -96,13 +96,13 @@ public final class MinimapPositionScreen extends Screen {
 	private void done() {
 		this.kept = true;
 		Settings.get().save();
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	/** Esc and Cancel. */
 	@Override
 	public void onClose() {
-		this.minecraft.gui.setScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	/** Gone without Done, it's back where it was, as Xaero's Minimap drops a place that wasn't confirmed. */
@@ -120,29 +120,29 @@ public final class MinimapPositionScreen extends Screen {
 
 	// The world shows behind it, with the minimap on it; without a world there's nothing to move.
 	//? if >=1.21 {
-	@Override
-	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	/*@Override
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		if (MinimapHud.shown() == null) {
-			super.extractBackground(graphics, mouseX, mouseY, a);
+			super.renderBackground(graphics, mouseX, mouseY, a);
 		}
 	}
-	//?}
+	*///?}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
 		int[] box = MinimapHud.shown();
 		//? if <1.21 {
-		/*if (box == null) {
+		if (box == null) {
 			this.renderBackground(graphics);
 		}
-		*///?}
+		//?}
 		if (box != null) {
 			boolean hovered = this.over(box, mouseX, mouseY);
 			graphics.fill(box[0], box[1], box[0] + box[2], box[1] + box[3], this.dragging ? BOX_HELD : hovered ? BOX_HOVERED : BOX);
 		}
-		super.extractRenderState(graphics, mouseX, mouseY, a);
+		super.render(graphics, mouseX, mouseY, a);
 		Component message = Component.translatable(box == null ? "diorama.position.not_in_world" : "diorama.position.help");
-		graphics.centeredText(this.font, message, this.width / 2, this.height / 6 + 128, 0xFFFFFFFF);
+		graphics.drawCenteredString(this.font, message, this.width / 2, this.height / 6 + 128, 0xFFFFFFFF);
 	}
 
 	private boolean over(int[] box, double x, double y) {
@@ -216,7 +216,7 @@ public final class MinimapPositionScreen extends Screen {
 
 	// Mouse and key events came as separate numbers before 1.21.9.
 	//? if >=1.21.9 {
-	@Override
+	/*@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		return super.mouseClicked(event, doubleClick) || this.pressed(event.x(), event.y(), event.button());
 	}
@@ -235,8 +235,8 @@ public final class MinimapPositionScreen extends Screen {
 	public boolean keyPressed(KeyEvent event) {
 		return this.keyDown(event.key()) || super.keyPressed(event);
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public boolean mouseClicked(double x, double y, int button) {
 		return super.mouseClicked(x, y, button) || this.pressed(x, y, button);
 	}
@@ -255,7 +255,7 @@ public final class MinimapPositionScreen extends Screen {
 	public boolean keyPressed(int key, int scancode, int modifiers) {
 		return this.keyDown(key) || super.keyPressed(key, scancode, modifiers);
 	}
-	*///?}
+	//?}
 
 	@Override
 	public boolean isPauseScreen() {

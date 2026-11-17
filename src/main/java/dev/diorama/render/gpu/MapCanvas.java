@@ -1,8 +1,8 @@
 package dev.diorama.render.gpu;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Draws the map's own shapes into a GUI frame: quads with float corners and the mod's textures,
@@ -11,12 +11,12 @@ import net.minecraft.resources.Identifier;
  * one per draw call; it holds no GPU state. Positions are in the GUI's current pose.
  */
 public interface MapCanvas {
-	static MapCanvas of(GuiGraphicsExtractor graphics) {
+	static MapCanvas of(GuiGraphics graphics) {
 		//? if >=1.21.6 {
-		return new StateCanvas(graphics);
-		//?} else {
-		/*return new ImmediateCanvas(graphics);
-		*///?}
+		/*return new StateCanvas(graphics);
+		*///?} else {
+		return new ImmediateCanvas(graphics);
+		//?}
 	}
 
 	/**
@@ -53,7 +53,7 @@ public interface MapCanvas {
 	 * A {@code w} x {@code h} rectangle of a game texture (a mob's skin) at (u, v), drawn at (x, y)
 	 * the same size, in a texture of {@code texW} x {@code texH} pixels.
 	 */
-	void blit(Identifier texture, int x, int y, int u, int v, int w, int h, int texW, int texH, int argb);
+	void blit(ResourceLocation texture, int x, int y, int u, int v, int w, int h, int texW, int texH, int argb);
 
 	/**
 	 * Many untextured quads in one draw. Unlike the other calls these take their corners already
@@ -63,7 +63,7 @@ public interface MapCanvas {
 	void solids(float[] xyz, int[] colors, int quads);
 
 	/** Many quads of one game texture in one draw, like {@link #solids}, with u v for each corner. */
-	void blits(Identifier texture, float[] xyz, float[] uvs, int[] colors, int quads);
+	void blits(ResourceLocation texture, float[] xyz, float[] uvs, int[] colors, int quads);
 
 	/** Many quads of one of the mod's textures in one draw, like {@link #blits}. */
 	void rects(MapTexture texture, Sampling sampling, float[] xyz, float[] uvs, int[] colors, int quads);

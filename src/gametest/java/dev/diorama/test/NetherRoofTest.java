@@ -126,7 +126,7 @@ final class NetherRoofTest {
 
 	private static void go(ClientGameTestContext context, TestSingleplayerContext world, String dimension, int x, int y, int z) {
 		world.getServer().runCommand("execute in " + dimension + " run tp @a " + x + ".5 " + y + " " + z + ".5 0 20");
-		context.waitFor(mc -> mc.level != null && mc.player != null && mc.level.dimension().identifier().toString().equals(dimension)
+		context.waitFor(mc -> mc.level != null && mc.player != null && mc.level.dimension().location().toString().equals(dimension)
 			&& Math.abs(mc.player.getX() - x) < 2 && MapSession.get() != null, 600);
 		context.waitFor(mc -> MapSession.get() != null && MapSession.get().map().chunkCount() > 100, 2400);
 		context.waitTicks(60);
@@ -140,7 +140,7 @@ final class NetherRoofTest {
 		double u = Projection.u(x + 0.5, z + 0.5);
 		double v = Projection.v(y, z + 0.5);
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(u, v, 2.0, layer));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(u, v, 2.0, layer));
 		context.waitTicks(40);
 		DioramaClientTest.settle(context, 60);
 		String found = context.computeOnClient(mc -> {

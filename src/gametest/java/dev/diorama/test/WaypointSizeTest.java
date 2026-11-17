@@ -100,7 +100,7 @@ final class WaypointSizeTest {
 				context.setScreen(MapScreen::new);
 				// Over the hint bar at the bottom, so no hover box covers the map.
 				context.getInput().setCursorPos(1500, 1070);
-				context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 4), 3.0, TileKey.SURFACE));
+				context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(at.getX(), Projection.v(at.getY(), at.getZ() - 4), 3.0, TileKey.SURFACE));
 				settle(context, 30);
 				context.takeScreenshot("size-map-" + name);
 				pointing(context, size);
@@ -110,7 +110,7 @@ final class WaypointSizeTest {
 		DioramaClientTest.setGuiScale(context, 3);
 		context.setScreen(() -> new SettingsScreen(null));
 		context.waitTicks(3);
-		context.runOnClient(mc -> ((SettingsScreen) mc.gui.screen()).selectTab(3));
+		context.runOnClient(mc -> ((SettingsScreen) mc.screen).selectTab(3));
 		context.waitTicks(5);
 		context.takeScreenshot("size-settings");
 		context.setScreen(() -> null);
@@ -132,7 +132,7 @@ final class WaypointSizeTest {
 	/** The top of a pin's head answers the cursor, and just past it doesn't, whatever the size. */
 	private static void pointing(ClientGameTestContext context, int size) {
 		String wrong = context.computeOnClient(mc -> {
-			java.util.List<WaypointOverlay.Pin> pins = ((MapScreen) mc.gui.screen()).pins();
+			java.util.List<WaypointOverlay.Pin> pins = ((MapScreen) mc.screen).pins();
 			for (WaypointOverlay.Pin pin : pins) {
 				if (pin.clamped() || !pin.waypoint().initials.equals("P")) {
 					continue;

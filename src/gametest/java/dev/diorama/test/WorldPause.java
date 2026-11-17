@@ -24,7 +24,7 @@ final class WorldPause implements AutoCloseable {
 
 	static WorldPause pause(ClientGameTestContext context) {
 		//? if >=1.21 {
-		boolean paused = context.computeOnClient(mc -> {
+		/*boolean paused = context.computeOnClient(mc -> {
 			MinecraftServer server = mc.getSingleplayerServer();
 			// A world the test froze itself stays as the test left it.
 			if (server == null || server.tickRateManager().isFrozen()) {
@@ -33,12 +33,12 @@ final class WorldPause implements AutoCloseable {
 			server.execute(() -> server.tickRateManager().setFrozen(true));
 			return true;
 		});
-		//?} else {
-		/*boolean paused = context.computeOnClient(mc -> mc.getSingleplayerServer() != null);
+		*///?} else {
+		boolean paused = context.computeOnClient(mc -> mc.getSingleplayerServer() != null);
 		if (paused) {
 			context.runOnClient(mc -> dev.diorama.MapScreen.pauseForTests(true));
 		}
-		*///?}
+		//?}
 		return new WorldPause(context, paused);
 	}
 
@@ -48,7 +48,7 @@ final class WorldPause implements AutoCloseable {
 			return;
 		}
 		//? if >=1.21 {
-		this.context.runOnClient(mc -> {
+		/*this.context.runOnClient(mc -> {
 			MinecraftServer server = mc.getSingleplayerServer();
 			if (server != null) {
 				server.execute(() -> server.tickRateManager().setFrozen(false));
@@ -57,8 +57,8 @@ final class WorldPause implements AutoCloseable {
 		// Until the client hears the world runs again, so what the test does next finds it running.
 		// The shim's ticks don't wait for the server, so one tick isn't enough there.
 		this.context.waitFor(mc -> mc.level == null || !mc.level.tickRateManager().isFrozen(), 200);
-		//?} else {
-		/*this.context.runOnClient(mc -> dev.diorama.MapScreen.pauseForTests(false));
-		*///?}
+		*///?} else {
+		this.context.runOnClient(mc -> dev.diorama.MapScreen.pauseForTests(false));
+		//?}
 	}
 }

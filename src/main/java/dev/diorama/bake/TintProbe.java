@@ -3,15 +3,15 @@ package dev.diorama.bake;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 //? if >=26.1 {
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+/*import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.CardinalLighting;
-//?} else {
-/*import net.minecraft.core.Direction;
+*///?} else {
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
-*///?}
+//?}
 //? if <1.21.2 {
-/*import net.minecraft.world.level.LightLayer;
-*///?}
+import net.minecraft.world.level.LightLayer;
+//?}
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -54,10 +54,10 @@ final class TintProbe implements BlockAndTintGetter {
 			return BlockLooks.TINT_FOLIAGE;
 		}
 		//? if >=1.21.5 {
-		if (resolver == BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER) {
+		/*if (resolver == BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER) {
 			return BlockLooks.TINT_DRY_FOLIAGE;
 		}
-		//?}
+		*///?}
 		if (resolver == BiomeColors.WATER_COLOR_RESOLVER || resolver == BiomeTints.water()) {
 			return BlockLooks.TINT_WATER;
 		}
@@ -93,7 +93,7 @@ final class TintProbe implements BlockAndTintGetter {
 	}
 
 	//? if >=1.21.2 {
-	@Override
+	/*@Override
 	public int getMinY() {
 		return -64;
 	}
@@ -102,8 +102,8 @@ final class TintProbe implements BlockAndTintGetter {
 	public LevelLightEngine getLightEngine() {
 		return LevelLightEngine.EMPTY;
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public int getMinBuildHeight() {
 		return -64;
 	}
@@ -123,17 +123,17 @@ final class TintProbe implements BlockAndTintGetter {
 	public int getRawBrightness(BlockPos pos, int darkening) {
 		return 15 - darkening;
 	}
-	*///?}
+	//?}
 
 	//? if >=26.1 {
-	@Override
+	/*@Override
 	public CardinalLighting cardinalLighting() {
 		return CardinalLighting.DEFAULT;
 	}
-	//?} else {
-	/*@Override
+	*///?} else {
+	@Override
 	public float getShade(Direction direction, boolean shade) {
 		return 1.0F;
 	}
-	*///?}
+	//?}
 }

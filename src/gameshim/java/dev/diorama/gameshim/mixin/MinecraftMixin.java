@@ -33,7 +33,7 @@ public abstract class MinecraftMixin {
 	}
 
 	//? if <1.21.5 {
-	/*// The frame is drawn at the size the test set, and shown at the real window's size. From
+	// The frame is drawn at the size the test set, and shown at the real window's size. From
 	// 1.21.5 the OpenGL and Vulkan backends show it (GlPresentMixin, VulkanPresentMixin).
 	@ModifyArg(method = "runTick", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/pipeline/RenderTarget;blitToScreen(II)V"), index = 0)
 	private int diorama$showAtRealWidth(int width) {
@@ -44,10 +44,10 @@ public abstract class MinecraftMixin {
 	private int diorama$showAtRealHeight(int height) {
 		return ((WindowHooks) (Object) window).diorama$realFramebufferHeight();
 	}
-	*///?}
+	//?}
 
 	//? if >=26.2 {
-	// Exit code 1 if a test failed, 2 if the game closed before the tests finished. From 26.2 the
+	/*// Exit code 1 if a test failed, 2 if the game closed before the tests finished. From 26.2 the
 	// game leaves main() instead of calling System.exit, so the shim exits once it has closed.
 	@Inject(method = "exitWorldAndClose", at = @At("RETURN"))
 	private void diorama$testExitCode(CallbackInfo ci) {
@@ -56,11 +56,11 @@ public abstract class MinecraftMixin {
 			System.exit(code);
 		}
 	}
-	//?} else {
-	/*// Exit code 1 if a test failed, 2 if the game closed before the tests finished.
+	*///?} else {
+	// Exit code 1 if a test failed, 2 if the game closed before the tests finished.
 	@ModifyArg(method = "destroy", at = @At(value = "INVOKE", target = "Ljava/lang/System;exit(I)V", remap = false))
 	private int diorama$testExitCode(int code) {
 		return GameShim.exitCode(code);
 	}
-	*///?}
+	//?}
 }

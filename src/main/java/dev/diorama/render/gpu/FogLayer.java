@@ -1,22 +1,22 @@
 package dev.diorama.render.gpu;
 
 //? if >=1.21.6 {
-import com.mojang.blaze3d.systems.RenderSystem;
+/*import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.BufferBuilder.RenderedBuffer;
 import dev.diorama.render.DioramaPipelines;
 import org.joml.Matrix4f;
-//?}
+*///?}
 //? if >=26.2 {
-import com.mojang.renderpearl.api.buffers.GpuBuffer;
-import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
-import com.mojang.renderpearl.api.commands.RenderPass;
-import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+/*import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.PrimitiveTopology;
 import java.util.Optional;
 import org.joml.Vector4f;
-//?} else if >=1.21.6 {
+*///?} else if >=1.21.6 {
 /*import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
@@ -26,8 +26,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 *///?}
 //? if >=26.3 {
-import java.util.OptionalDouble;
-//?}
+/*import java.util.OptionalDouble;
+*///?}
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,9 +41,9 @@ public final class FogLayer implements AutoCloseable {
 	private @Nullable MapTexture target;
 	private int size;
 	//? if >=26.1 {
-	private final net.minecraft.client.renderer.ProjectionMatrixBuffer projection = new net.minecraft.client.renderer.ProjectionMatrixBuffer("diorama fog layer");
+	/*private final net.minecraft.client.renderer.ProjectionMatrixBuffer projection = new net.minecraft.client.renderer.ProjectionMatrixBuffer("diorama fog layer");
 	private final net.minecraft.client.renderer.Projection ortho = new net.minecraft.client.renderer.Projection();
-	//?} else if >=1.21.6 {
+	*///?} else if >=1.21.6 {
 	/*private final net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer projection =
 		new net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer("diorama fog layer", 1000, 11000, false);
 	*///?}
@@ -76,54 +76,54 @@ public final class FogLayer implements AutoCloseable {
 			this.size = need;
 		}
 		//? if >=1.21.6 {
-		var device = RenderSystem.getDevice();
+		/*var device = RenderSystem.getDevice();
 		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize() * 4)) {
 		//? if >=26.2 {
-		BufferBuilder mesh = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		//?} else {
-		/*BufferBuilder mesh = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		*///?}
+		/^BufferBuilder mesh = new BufferBuilder(bytes, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		^///?} else {
+		BufferBuilder mesh = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		//?}
 		quad(mesh, width, height, u0, v0, u1, v1, params);
-		try (MeshData data = mesh.buildOrThrow()) {
+		try (RenderedBuffer data = mesh.end()) {
 			GpuBuffer vertices = device.createBuffer(() -> "diorama fog layer quad", GpuBuffer.USAGE_VERTEX, data.vertexBuffer());
 			try {
 				//? if >=26.2 {
-				RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
-				//?} else {
-				/*RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-				*///?}
+				/^RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+				^///?} else {
+				RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+				//?}
 				GpuBuffer indexBuffer = indices.getBuffer(6);
 				// The GUI's own ortho, y up: the quad's top edge (v0) lands in the texture's first
 				// row, where the map reads v 0.
 				//? if >=26.1 {
-				this.ortho.setupOrtho(1000, 11000, this.size, this.size, false);
+				/^this.ortho.setupOrtho(1000, 11000, this.size, this.size, false);
 				GpuBufferSlice projectionSlice = this.projection.getBuffer(this.ortho);
-				//?} else {
-				/*GpuBufferSlice projectionSlice = this.projection.getBuffer(this.size, this.size);
-				*///?}
+				^///?} else {
+				GpuBufferSlice projectionSlice = this.projection.getBuffer(this.size, this.size);
+				//?}
 				Matrix4f modelView = new Matrix4f().setTranslation(0, 0, -11000);
 				//? if >=26.2 {
-				GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView);
-				//?} else if >=1.21.11 {
-				/*GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(1, 1, 1, 1), new Vector3f(), new Matrix4f());
-				*///?} else {
-				/*GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(1, 1, 1, 1), new Vector3f(), new Matrix4f(), 0);
-				*///?}
+				/^GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView);
+				^///?} else if >=1.21.11 {
+				/^GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(1, 1, 1, 1), new Vector3f(), new Matrix4f());
+				^///?} else {
+				GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, new Vector4f(1, 1, 1, 1), new Vector3f(), new Matrix4f(), 0);
+				//?}
 				StateTexture into = (StateTexture) this.target;
 				//? if >=26.3 {
-				try (RenderPass pass = device.createCommandEncoder().createRenderPass(
+				/^try (RenderPass pass = device.createCommandEncoder().createRenderPass(
 					() -> "diorama fog layer", into.view(), Optional.of(new Vector4f(0, 0, 0, 0)), null, OptionalDouble.empty())) {
 					pass.setPipeline(RenderSystem.getCompiledPipeline(DioramaPipelines.FOG_LAYER));
-				//?} else if >=26.2 {
-				/*try (RenderPass pass = device.createCommandEncoder().createRenderPass(
-					com.mojang.renderpearl.api.commands.RenderPassDescriptor.create(() -> "diorama fog layer")
+				^///?} else if >=26.2 {
+				/^try (RenderPass pass = device.createCommandEncoder().createRenderPass(
+					com.mojang.blaze3d.systems.RenderPassDescriptor.create(() -> "diorama fog layer")
 						.withColorAttachment(into.view(), Optional.of(new Vector4f(0, 0, 0, 0)))
 						.withRenderArea(new RenderPass.RenderArea(0, 0, this.size, this.size)))) {
 					pass.setPipeline(DioramaPipelines.FOG_LAYER);
-				*///?} else {
-				/*try (RenderPass pass = device.createCommandEncoder().createRenderPass(() -> "diorama fog layer", into.view(), OptionalInt.of(0))) {
+				^///?} else {
+				try (RenderPass pass = device.createCommandEncoder().createRenderPass(() -> "diorama fog layer", into.view(), OptionalInt.of(0))) {
 					pass.setPipeline(DioramaPipelines.FOG_LAYER);
-				*///?}
+				//?}
 					pass.setUniform("Projection", projectionSlice);
 					var globals = RenderSystem.getGlobalSettingsUniform();
 					if (globals != null) {
@@ -134,14 +134,14 @@ public final class FogLayer implements AutoCloseable {
 					bind(pass, "Sampler1", (StateTexture) noise, Sampling.REPEAT_LINEAR);
 					bind(pass, "Sampler2", (StateTexture) detail, Sampling.CLAMP_LINEAR);
 					//? if >=26.2 {
-					pass.setVertexBuffer(0, vertices.slice());
+					/^pass.setVertexBuffer(0, vertices.slice());
 					pass.setIndexBuffer(indexBuffer, indices.type());
 					pass.drawIndexed(6, 1, 0, 0, 0);
-					//?} else {
-					/*pass.setVertexBuffer(0, vertices);
+					^///?} else {
+					pass.setVertexBuffer(0, vertices);
 					pass.setIndexBuffer(indexBuffer, indices.type());
 					pass.drawIndexed(0, 0, 6, 1);
-					*///?}
+					//?}
 				}
 			} finally {
 				vertices.close();
@@ -149,13 +149,13 @@ public final class FogLayer implements AutoCloseable {
 		}
 		}
 		return true;
-		//?} else {
-		/*return ((ImmediateCanvas) canvas).fogLayer(this.target, this.size, mask, noise, detail, width, height, u0, v0, u1, v1, params);
-		*///?}
+		*///?} else {
+		return ((ImmediateCanvas) canvas).fogLayer(this.target, this.size, mask, noise, detail, width, height, u0, v0, u1, v1, params);
+		//?}
 	}
 
 	//? if >=1.21.6 {
-	/** The quad over the layer's texels, counter-clockwise in its y-up projection so it faces the camera. */
+	/*/^* The quad over the layer's texels, counter-clockwise in its y-up projection so it faces the camera. ^/
 	private static void quad(BufferBuilder mesh, int width, int height, float u0, float v0, float u1, float v1, int params) {
 		mesh.addVertex(0, 0, 0).setUv(u0, v0).setColor(params);
 		mesh.addVertex(width, 0, 0).setUv(u1, v0).setColor(params);
@@ -165,15 +165,15 @@ public final class FogLayer implements AutoCloseable {
 
 	private static void bind(RenderPass pass, String name, StateTexture texture, Sampling sampling) {
 		//? if >=26.3 {
-		pass.setUniform(name, texture.view(), StateTexture.samplerFor(sampling));
-		//?} else if >=1.21.11 {
-		/*pass.bindTexture(name, texture.view(), StateTexture.samplerFor(sampling));
-		*///?} else {
-		/*texture.sampleWith(sampling);
+		/^pass.setUniform(name, texture.view(), StateTexture.samplerFor(sampling));
+		^///?} else if >=1.21.11 {
+		/^pass.bindTexture(name, texture.view(), StateTexture.samplerFor(sampling));
+		^///?} else {
+		texture.sampleWith(sampling);
 		pass.bindSampler(name, texture.view());
-		*///?}
+		//?}
 	}
-	//?}
+	*///?}
 
 	/** The largest layer: half of a screen 8K wide. */
 	private static final int MAX_SIZE = 4096;
@@ -185,7 +185,7 @@ public final class FogLayer implements AutoCloseable {
 			this.target = null;
 		}
 		//? if >=1.21.6 {
-		this.projection.close();
-		//?}
+		/*this.projection.close();
+		*///?}
 	}
 }

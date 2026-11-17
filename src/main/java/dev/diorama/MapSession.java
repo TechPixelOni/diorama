@@ -37,7 +37,7 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -84,12 +84,12 @@ public final class MapSession {
 	private MapSession(ClientLevel level, @Nullable String key) {
 		this.level = level;
 		// The Nether's roof: its sky view looks down from just under it.
-		int roof = level.dimensionType().hasCeiling() ? level.getMinY() + level.dimensionType().logicalHeight() : MapLevel.NO_ROOF;
+		int roof = level.dimensionType().hasCeiling() ? level.getMinBuildHeight() + level.dimensionType().logicalHeight() : MapLevel.NO_ROOF;
 		// Before the map opens: the folder it saves in goes by which way it faces.
 		Projection.setFacing(key == null ? Facing.NORTH : Maps.of(key).facing());
 		Path folder = mapFolder(level, key);
-		this.map = new MapLevel(level.getMinY(), level.getMaxY() + 1, roof, folder);
-		this.mainMap = key != null && Maps.of(key).active(level.dimension().identifier().toString()).isEmpty();
+		this.map = new MapLevel(level.getMinBuildHeight(), (level.getMaxBuildHeight() - 1) + 1, roof, folder);
+		this.mainMap = key != null && Maps.of(key).active(level.dimension().location().toString()).isEmpty();
 		this.seenBiomes = folder == null || Minecraft.getInstance().getSingleplayerServer() != null ? null : new SeenBiomes(folder.resolve("biomes"));
 		this.crafts = new Crafts(level, this.map, folder, this::lookAgain);
 		this.lights = new Lights(level, this.map);
@@ -124,7 +124,7 @@ public final class MapSession {
 			return null;
 		}
 		Maps maps = Maps.of(key);
-		String dimension = level.dimension().identifier().toString();
+		String dimension = level.dimension().location().toString();
 		return maps.tileFolder(dimension, maps.active(dimension));
 	}
 
@@ -134,7 +134,7 @@ public final class MapSession {
 	 * loaded chunks maps what's around the player again.
 	 */
 	public static void mapChanged(String dimension) {
-		if (current != null && current.level.dimension().identifier().toString().equals(dimension)) {
+		if (current != null && current.level.dimension().location().toString().equals(dimension)) {
 			current.end();
 			current = null;
 		}
@@ -202,7 +202,7 @@ public final class MapSession {
 			if (rebake) {
 				session.map.colorsChanged();
 			}
-		} else if (BlockLooks.isStale() && mc.gui.overlay() == null) {
+		} else if (BlockLooks.isStale() && mc.getOverlay() == null) {
 			// Not while the reload is still going: the models change a step before Fabric hands its
 			// fluid handlers the new sprites, and the old ones' images are freed by then.
 			BlockLooks.build();
@@ -223,7 +223,7 @@ public final class MapSession {
 			current.end();
 			current = null;
 		}
-		if (level != null && ServerRules.mapOff(level.dimension().identifier().toString())) {
+		if (level != null && ServerRules.mapOff(level.dimension().location().toString())) {
 			// The map is off in this dimension: nothing is mapped or saved there, and what was
 			// mapped before stays as it is on disk.
 			if (current != null) {
@@ -267,8 +267,8 @@ public final class MapSession {
 		if (session == null) {
 			return;
 		}
-		int cx = chunk.getPos().x();
-		int cz = chunk.getPos().z();
+		int cx = chunk.getPos().x;
+		int cz = chunk.getPos().z;
 		session.schedule(cx, cz, LOAD_DELAY_MS, null);
 		// A neighbour snapshotted before this chunk loaded blended its tints along this edge against
 		// the game's fallback biome. Snapshot it again and re-bake that strip, as the game itself
@@ -283,8 +283,8 @@ public final class MapSession {
 				int x0 = around.chunkX << 4;
 				int z0 = around.chunkZ << 4;
 				int[] strip = {
-					dx < 0 ? x0 + 16 - reach : x0, level.getMinY(), dz < 0 ? z0 + 16 - reach : z0,
-					dx > 0 ? x0 + reach - 1 : x0 + 15, level.getMaxY(), dz > 0 ? z0 + reach - 1 : z0 + 15,
+					dx < 0 ? x0 + 16 - reach : x0, level.getMinBuildHeight(), dz < 0 ? z0 + 16 - reach : z0,
+					dx > 0 ? x0 + reach - 1 : x0 + 15, (level.getMaxBuildHeight() - 1), dz > 0 ? z0 + reach - 1 : z0 + 15,
 					MapLevel.CHANGED_SURFACE
 				};
 				session.schedule(around.chunkX, around.chunkZ, CHANGE_DELAY_MS, strip);
@@ -400,10 +400,10 @@ public final class MapSession {
 			int surface = current.map.spawnSpots() || current.map.roofless() ? MapLevel.CHANGED_SURFACE_LIGHT : 0;
 			int highest = blockLight.length() - 1;
 			if (highest >= 0 && current.keepsBlockLight()
-				&& current.reachesSurface(chunkX, chunkZ, ((level.getMinSectionY() - 1 + highest) << 4) + 15)) {
+				&& current.reachesSurface(chunkX, chunkZ, ((level.getMinSection() - 1 + highest) << 4) + 15)) {
 				surface |= MapLevel.CHANGED_BLOCK_LIGHT;
 			}
-			current.schedule(chunkX, chunkZ, CHANGE_DELAY_MS, new int[] {x0, level.getMinY(), z0, x0 + 15, level.getMaxY(), z0 + 15, surface});
+			current.schedule(chunkX, chunkZ, CHANGE_DELAY_MS, new int[] {x0, level.getMinBuildHeight(), z0, x0 + 15, (level.getMaxBuildHeight() - 1), z0 + 15, surface});
 		}
 	}
 
@@ -580,7 +580,7 @@ public final class MapSession {
 		int playerChunkZ = viewer == null ? 0 : viewer.blockPosition().getZ() >> 4;
 		long now = System.currentTimeMillis();
 		boolean fog = ServerRules.fogOfWar(this.level.dimension() == Level.NETHER, this.map.roofless());
-		String dimension = this.level.dimension().identifier().toString();
+		String dimension = this.level.dimension().location().toString();
 		// Under fog of war only what the player has seen shows, and these aren't that.
 		WaypointStore pins = fog ? null : WaypointStore.get();
 		List<Portals.Spot> saved = new ArrayList<>();
@@ -742,7 +742,7 @@ public final class MapSession {
 	/** Blocks between the eye and the first place open to the sky, or more than {@link #MAX_SKY_DEPTH}. */
 	private int depthToSky(BlockPos eye) {
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		int top = Math.min(this.level.getMaxY(), eye.getY() + MAX_SKY_DEPTH);
+		int top = Math.min((this.level.getMaxBuildHeight() - 1), eye.getY() + MAX_SKY_DEPTH);
 		for (int y = eye.getY(); y <= top; y++) {
 			if (this.level.getBrightness(LightLayer.SKY, pos.set(eye.getX(), y, eye.getZ())) >= 15) {
 				return y - eye.getY();

@@ -9,7 +9,7 @@ plugins {
 // The version the source files are written for. Keep it at the newest version: the renames below
 // only translate newest names to older ones, so the source can't be switched to an older version
 // and back. Version-specific code that isn't a rename goes in //? if blocks.
-stonecutter active "26.3"
+stonecutter active "1.20.1"
 
 // Game tests bake with the tracer unless a run asks otherwise with DIORAMA_GPU_BAKE: it's what they
 // were written against, and what boat.dev's graphics-free VMs can do at speed. 0 is the tracer, 1

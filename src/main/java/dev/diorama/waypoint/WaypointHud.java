@@ -6,13 +6,13 @@ import dev.diorama.Settings;
 import dev.diorama.render.Pins;
 import dev.diorama.render.TextSize;
 import java.util.List;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import dev.diorama.compat.HudElement;
 //? if >=1.21 {
-import net.minecraft.client.DeltaTracker;
-//?}
+/*import net.minecraft.client.DeltaTracker;
+*///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,18 +33,18 @@ public final class WaypointHud implements HudElement {
 
 	@Override
 	//? if >=1.21 {
-	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-	//?} else {
-	/*public void extractRenderState(GuiGraphicsExtractor graphics, float partialTick) {
-	*///?}
+	/*public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+	*///?} else {
+	public void render(GuiGraphics graphics, float partialTick) {
+	//?}
 		Minecraft mc = Minecraft.getInstance();
 		Entity viewer = MapSession.viewer();
 		WaypointStore store = WaypointStore.get();
 		//? if >=26.2 {
-		if (viewer == null || mc.level == null || store == null || !Settings.get().waypointsInWorld || mc.gui.hud.isHidden() || !ServerRules.minimapAllowed()) {
-		//?} else {
-		/*if (viewer == null || mc.level == null || store == null || !Settings.get().waypointsInWorld || mc.options.hideGui || !ServerRules.minimapAllowed()) {
-		*///?}
+		/*if (viewer == null || mc.level == null || store == null || !Settings.get().waypointsInWorld || mc.gui.isHidden() || !ServerRules.minimapAllowed()) {
+		*///?} else {
+		if (viewer == null || mc.level == null || store == null || !Settings.get().waypointsInWorld || mc.options.hideGui || !ServerRules.minimapAllowed()) {
+		//?}
 			return;
 		}
 		Vec3 eye = WorldProjection.camera();
@@ -54,7 +54,7 @@ public final class WaypointHud implements HudElement {
 		float width = graphics.guiWidth();
 		float height = graphics.guiHeight();
 		Font font = mc.font;
-		String dimension = mc.level.dimension().identifier().toString();
+		String dimension = mc.level.dimension().location().toString();
 		// Cobblemon Raid Dens Icons patches this method where it calls WaypointStore.in(String), to
 		// leave out its far raid markers, and the game doesn't start when that call is gone
 		// (0.10.0, #387). So the dimension's own waypoints are asked for here, with that call.
@@ -69,9 +69,9 @@ public final class WaypointHud implements HudElement {
 			// beam only where nothing stands in front of it.
 			float z = 0;
 			//? if <1.21.6 {
-			/*// Drawn straight away here, at the depth the pins are given.
+			// Drawn straight away here, at the depth the pins are given.
 			z = graphics.pose().last().pose().m32();
-			*///?}
+			//?}
 			this.beams.begin(mc.level, eye, width, height, z);
 			try {
 				for (Waypoint waypoint : waypoints) {
@@ -117,19 +117,19 @@ public final class WaypointHud implements HudElement {
 			}
 			// Keep the world anchor fractional: snapping it to GUI pixels makes markers jump
 			// by several framebuffer pixels at larger GUI scales. Move the entire marker together.
-			graphics.pose().pushMatrix();
-			graphics.pose().translate(sx, sy);
+			graphics.pose().pushPose();
+			graphics.pose().translate(sx, sy, 0);
 			try {
 				Pins.standing(graphics, waypoint, 0, 0, Pins.LARGE, scale);
 				if (text == null) {
 					continue;
 				}
-				graphics.pose().translate(-w * textScale / 2.0F, textScale + Pins.SHADOW * scale);
-				graphics.pose().scale(textScale);
+				graphics.pose().translate(-w * textScale / 2.0F, textScale + Pins.SHADOW * scale, 0);
+				graphics.pose().scale(textScale, textScale, 1);
 				graphics.fill(-2, -1, w + 2, 9, 0x80000000);
-				graphics.text(font, text, 0, 0, 0xFFFFFFFF, false);
+				graphics.drawString(font, text, 0, 0, 0xFFFFFFFF, false);
 			} finally {
-				graphics.pose().popMatrix();
+				graphics.pose().popPose();
 			}
 		}
 	}

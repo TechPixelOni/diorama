@@ -7,9 +7,9 @@ import dev.diorama.bake.TileKey;
 import java.util.List;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 //? if >=1.21.4 && fabric {
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerConnection;
+/*import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
-//?}
+*///?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -27,7 +27,7 @@ final class SeenBiomesTest {
 	}
 
 	//? if >=1.21.4 && fabric {
-	static void run(ClientGameTestContext context) {
+	/*static void run(ClientGameTestContext context) {
 		java.util.Properties properties = DioramaClientTest.serverProperties();
 		properties.setProperty("view-distance", "6");
 		try (TestDedicatedServerContext server = context.worldBuilder()
@@ -41,8 +41,8 @@ final class SeenBiomesTest {
 			int z = 18;
 			int y = surface(server, x, z) - 1;
 			BlockPos spot = new BlockPos(x, y, z);
-			String key = server.computeOnServer(s -> s.overworld().getNoiseBiome(x >> 2, y >> 2, z >> 2).unwrapKey().orElseThrow().identifier().toLanguageKey("biome"));
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			String key = server.computeOnServer(s -> s.overworld().getNoiseBiome(x >> 2, y >> 2, z >> 2).unwrapKey().orElseThrow().location().toLanguageKey("biome"));
+			try (TestServerConnection connection = server.connect()) {
 				teleport(server, x, z);
 				waitForMap(context);
 				teleport(server, x + AWAY, z);
@@ -50,7 +50,7 @@ final class SeenBiomesTest {
 				waitForMap(context);
 				named(context, spot, key, "seen-biomes-01-left", "after walking away");
 			}
-			try (TestDedicatedServerConnection connection = server.connect()) {
+			try (TestServerConnection connection = server.connect()) {
 				waitForMap(context);
 				if (context.computeOnClient(mc -> mc.level.getChunkSource().hasChunk(x >> 4, z >> 4))) {
 					throw new AssertionError("The client has the first place's chunk after joining again far from it: this wouldn't show the saved biome");
@@ -60,28 +60,28 @@ final class SeenBiomesTest {
 		}
 	}
 
-	/** Hovering the spot on the map names the biome the server has there. */
+	/^* Hovering the spot on the map names the biome the server has there. ^/
 	private static void named(ClientGameTestContext context, BlockPos spot, String key, String picture, String when) {
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(spot.getX() + 0.5, spot.getZ() + 0.5),
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(spot.getX() + 0.5, spot.getZ() + 0.5),
 			Projection.v(spot.getX() + 0.5, spot.getY() + 1, spot.getZ() + 0.5), 2, TileKey.SURFACE));
 		DioramaClientTest.settle(context, 40);
 		double[] at = context.computeOnClient(mc -> {
 			double scale = mc.getWindow().getGuiScale();
-			return new double[] {mc.gui.screen().width / 2.0 * scale, mc.gui.screen().height / 2.0 * scale};
+			return new double[] {mc.screen.width / 2.0 * scale, mc.screen.height / 2.0 * scale};
 		});
 		context.getInput().setCursorPos(at[0], at[1]);
 		// The biomes kept come off the disk a moment after they're first asked for.
 		try {
-			context.waitFor(mc -> ((MapScreen) mc.gui.screen()).biomeAt(spot) != null, 200);
+			context.waitFor(mc -> ((MapScreen) mc.screen).biomeAt(spot) != null, 200);
 		} catch (AssertionError e) {
 			// Said below, with the picture.
 		}
 		context.waitTicks(20);
 		context.takeScreenshot(picture);
 		String expected = context.computeOnClient(mc -> Component.translatable(key).getString());
-		Component biome = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).biomeAt(spot));
-		List<String> tooltip = context.computeOnClient(mc -> ((MapScreen) mc.gui.screen()).tooltipText());
+		Component biome = context.computeOnClient(mc -> ((MapScreen) mc.screen).biomeAt(spot));
+		List<String> tooltip = context.computeOnClient(mc -> ((MapScreen) mc.screen).tooltipText());
 		context.getInput().setCursorPos(0, 0);
 		context.setScreen(() -> null);
 		if (biome == null || !biome.getString().equals(expected)) {
@@ -96,7 +96,7 @@ final class SeenBiomesTest {
 		server.runCommand("tp @a " + x + " " + surface(server, x, z) + " " + z);
 	}
 
-	/** The first open y above a column, generating its chunk if it has to. */
+	/^* The first open y above a column, generating its chunk if it has to. ^/
 	private static int surface(TestDedicatedServerContext server, int x, int z) {
 		return server.computeOnServer(s -> s.overworld().getChunk(x >> 4, z >> 4).getHeight(Heightmap.Types.WORLD_SURFACE, x & 15, z & 15) + 1);
 	}
@@ -106,5 +106,5 @@ final class SeenBiomesTest {
 		context.waitTicks(100);
 		DioramaClientTest.settle(context, 20);
 	}
-	//?}
+	*///?}
 }

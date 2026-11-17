@@ -53,7 +53,7 @@ final class RedrawTest {
 			throw new AssertionError("The map remembers nothing after its tiles' label changed");
 		}
 		context.setScreen(MapScreen::new);
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(A + 24, Projection.v(ground, A + 24), 0.7, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(A + 24, Projection.v(ground, A + 24), 0.7, TileKey.SURFACE));
 		context.waitFor(mc -> MapSession.get().map().memory().shownTiles() > 0, 400);
 		context.waitTicks(10);
 		context.takeScreenshot("redraw-under-fog");
@@ -125,7 +125,7 @@ final class RedrawTest {
 		}
 		context.setScreen(MapScreen::new);
 		// The sky view: down here the map on its own would pick a cave slice.
-		context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), 0.7, TileKey.SURFACE));
+		context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(mc.player.getX(), Projection.v(mc.player.getY(), mc.player.getZ()), 0.7, TileKey.SURFACE));
 		context.waitFor(mc -> MapSession.get().map().memory().shownTiles() > 0, 400);
 		context.waitTicks(10);
 		context.takeScreenshot("redraw-under-smoke");

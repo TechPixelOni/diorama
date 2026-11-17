@@ -53,7 +53,7 @@ final class SharedMapRealTest {
 		}
 		try (RealServer server = RealServer.start(true)) {
 			server.command("time set noon");
-			server.command("gamerule advance_time false");
+			server.command("gamerule doDaylightCycle false");
 			server.command("weather clear");
 			server.vanillaPlayerJoins("Alice");
 			for (int x : ALICE_X) {
@@ -73,7 +73,7 @@ final class SharedMapRealTest {
 			}
 			context.setScreen(MapScreen::new);
 			// From this player's own land at spawn out over Alice's.
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(300, 8), Projection.v(300, ground, 8), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(300, 8), Projection.v(300, ground, 8), 1, TileKey.SURFACE));
 			context.waitFor(mc -> job().drewChunk(far >> 4, 0), 36000);
 			long drawn = System.nanoTime();
 			Diorama.LOGGER.info("Alice's land drawn on this player's map {} s after joining", Math.round((drawn - joined) / 1e9));
@@ -82,12 +82,12 @@ final class SharedMapRealTest {
 			DioramaClientTest.settle(context, 200);
 			context.takeScreenshot("shared-real-north");
 			// Up close where this player's own land meets Alice's.
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(120, 8), Projection.v(120, ground, 8), 3, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(120, 8), Projection.v(120, ground, 8), 3, TileKey.SURFACE));
 			DioramaClientTest.settle(context, 100);
 			context.takeScreenshot("shared-real-seam");
 
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(1));
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).lookAt(Projection.u(300, 8), Projection.v(300, ground, 8), 1, TileKey.SURFACE));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).turn(1));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).lookAt(Projection.u(300, 8), Projection.v(300, ground, 8), 1, TileKey.SURFACE));
 			context.waitTicks(40);
 			context.waitFor(mc -> job().drewChunk(far >> 4, 0) && job().idle(), 36000);
 			DioramaClientTest.settle(context, 200);
@@ -99,7 +99,7 @@ final class SharedMapRealTest {
 			context.waitTicks(200);
 			context.takeScreenshot("shared-real-east-night");
 			context.runOnClient(mc -> Settings.get().dayNight = Settings.DayNight.DAY);
-			context.runOnClient(mc -> ((MapScreen) mc.gui.screen()).turn(3));
+			context.runOnClient(mc -> ((MapScreen) mc.screen).turn(3));
 			context.waitTicks(40);
 			context.setScreen(() -> null);
 			RealServer.leave(context);
