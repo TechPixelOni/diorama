@@ -1,7 +1,6 @@
 package dev.gregedcolonies;
 
 import dev.gregedcolonies.bake.TileKey;
-import dev.gregedcolonies.compat.Cobblemon;
 import dev.gregedcolonies.render.Circle;
 import dev.gregedcolonies.render.MapLevel;
 import dev.gregedcolonies.render.MapViewport;
@@ -111,7 +110,7 @@ public final class MinimapHud implements HudElement {
 		*///?} else {
 		if (!placing && (!settings.minimap || mc.options.hideGui
 		//?}
-			|| screen != null && !(screen instanceof ChatScreen) || Cobblemon.inBattle()
+			|| screen != null && !(screen instanceof ChatScreen)
 			|| debugScreenOpen(mc)) || !this.canDraw(mc)) {
 			// Not drawn under any screen but chat, the way Xaero's Minimap and JourneyMap do it:
 			// screens fill the middle and other mods put theirs in the corners too, like the item

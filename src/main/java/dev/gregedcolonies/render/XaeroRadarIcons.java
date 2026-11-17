@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.gregedcolonies.GregedColonies;
-import dev.gregedcolonies.compat.Pixelmon;
 import dev.gregedcolonies.render.gpu.MapTexture;
 import dev.gregedcolonies.render.gpu.Sampling;
 import java.io.IOException;
@@ -107,29 +106,7 @@ public final class XaeroRadarIcons {
 				icon = definition.fallback();
 			}
 		}
-		return icon == null || icon == Basic.OWN_FACE ? pokemon(entity) : icon;
-	}
-
-	/**
-	 * A Pokémon's picture, outlined to stand out from the map like a face: Pixelmon's own sprite, or
-	 * Cobblemon's portrait of a Pokémon or NPC. A pack's file for the mob comes first.
-	 */
-	private static @Nullable Icon pokemon(Entity entity) {
-		ResourceLocation location = Pixelmon.sprite(entity);
-		if (location == null) {
-			return CobblemonPortraits.of(entity);
-		}
-		if (unreadable.contains(location)) {
-			return null;
-		}
-		ResourceManager manager = Minecraft.getInstance().getResourceManager();
-		List<String> problems = new ArrayList<>();
-		Sprite sprite = sprite(location, true, false, manager, problems);
-		if (sprite == null) {
-			unreadable.add(location);
-			GregedColonies.LOGGER.warn("Radar icon for {}: {}", entity.getType(), String.join("; ", problems));
-		}
-		return sprite;
+		return icon;
 	}
 
 	/**
@@ -166,7 +143,6 @@ public final class XaeroRadarIcons {
 		}
 		sprites.clear();
 		unreadable.clear();
-		CobblemonPortraits.clear();
 		Map<EntityType<?>, Definition> loaded = new HashMap<>();
 		// Like Xaero's, one file per mob in the game: the top pack's file wins, and files for mobs
 		// that aren't installed (Xaero's own example_mod, a modpack's leftovers) are never read.

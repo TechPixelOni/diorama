@@ -249,10 +249,6 @@ public final class Radar {
 				pixelCaret(icons, blip.x() + s * 0.7F + 1, blip.y() - s * 0.5F, below, alpha);
 			}
 		}
-		if (blip.kind() != Kind.PLAYER && CobblemonPortraits.shiny(blip.entity())) {
-			// On the corner across from the caret's. A mob's icon is 1.6 times its size across.
-			sparkle(icons, blip.x() - blip.size() * 0.8F, blip.y() - blip.size() * 0.8F, alpha);
-		}
 	}
 
 	/**

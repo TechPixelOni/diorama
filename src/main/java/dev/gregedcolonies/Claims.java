@@ -1,7 +1,6 @@
 package dev.gregedcolonies;
 
 import dev.gregedcolonies.compat.FtbChunks;
-import dev.gregedcolonies.compat.MineColonies;
 import dev.gregedcolonies.compat.OpenPartiesAndClaims;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,7 +85,7 @@ public final class Claims {
 
 	/** Whether there's anything to read claims from, so settings about them are worth showing. */
 	public static boolean supported() {
-		return FtbChunks.available() || OpenPartiesAndClaims.available() || MineColonies.available();
+		return FtbChunks.available() || OpenPartiesAndClaims.available();
 	}
 
 	/** Where a chunk's claim is kept in its region's array. */
@@ -147,7 +146,6 @@ public final class Claims {
 	public static void tick(Minecraft mc) {
 		long start = System.nanoTime();
 		OpenPartiesAndClaims.tick();
-		MineColonies.tick(mc);
 		if (++ticks % TEAM_CHECK_TICKS == 0) {
 			checkOwners();
 		}
@@ -274,7 +272,6 @@ public final class Claims {
 		changed.clear();
 		current = NONE;
 		OpenPartiesAndClaims.cleared();
-		MineColonies.cleared();
 	}
 
 	/** For tests: the most time spent on claims in one tick since the last call, in nanoseconds, and starts again. */
