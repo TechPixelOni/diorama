@@ -5015,24 +5015,6 @@ public class GregedColoniesClientTest implements FabricClientGameTest {
 		return context.computeOnClient(mc -> Claims.get().at(chunkX, chunkZ));
 	}
 
-	private static boolean isColony(Claims.Claim claim) {
-		return claim != null && claim.owner() instanceof dev.gregedcolonies.compat.MineColonies.Colony;
-	}
-
-	/** Calls a one-argument setter on a colony, on the server. */
-	private static void mineColony(TestSingleplayerContext world, int id, String setter, Class<?> type, Object value) {
-		world.getServer().runOnServer(server -> {
-			try {
-				Class<?> managers = Class.forName("com.minecolonies.api.colony.IColonyManager");
-				Object colony = managers.getMethod("getColonyByDimension", int.class, net.minecraft.resources.ResourceKey.class)
-					.invoke(managers.getMethod("getInstance").invoke(null), id, net.minecraft.world.level.Level.OVERWORLD);
-				Class.forName("com.minecolonies.api.colony.IColony").getMethod(setter, type).invoke(colony, value);
-			} catch (ReflectiveOperationException e) {
-				throw new AssertionError("Couldn't change the colony through MineColonies' colony manager", e);
-			}
-		});
-	}
-
 	/** Claims (or unclaims) 64 chunks in each of 20 by 20 regions from {@code regionX, regionZ}, for 50 owners, through Open Parties and Claims' server API. */
 	private static void opacBigServer(TestSingleplayerContext world, int regionX, int regionZ, boolean claim) {
 		world.getServer().runOnServer(server -> {

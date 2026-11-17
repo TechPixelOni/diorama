@@ -139,8 +139,6 @@ public final class Settings {
 	public java.util.List<RadarCategories.Category> radarCategories = new java.util.ArrayList<>();
 	/** The icon size and names of the fixed categories, by {@code Radar.Kind}; one that changes nothing isn't here. */
 	public java.util.Map<String, RadarCategories.KindLook> radarKinds = new java.util.TreeMap<>();
-	/** Whether the Pokémon category was made, so deleting it lasts. */
-	public boolean radarPokemonAdded = false;
 	/** Index into {@link #ARROW_COLORS}. */
 	public int arrowColor = 0;
 	/**

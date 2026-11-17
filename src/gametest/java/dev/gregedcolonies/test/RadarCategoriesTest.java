@@ -182,26 +182,6 @@ final class RadarCategoriesTest {
 			throw new AssertionError("With the cows' category off the map's radar shows " + shown);
 		}
 		context.setScreen(() -> null);
-		// The category GregedColonies makes when Cobblemon or Pixelmon is installed, as the list shows it.
-		context.runOnClient(mc -> {
-			Settings s = Settings.get();
-			RadarCategories.Category pokemon = new RadarCategories.Category();
-			pokemon.builtIn = RadarCategories.POKEMON;
-			pokemon.mobs.add("cobblemon:pokemon");
-			pokemon.mobs.add("pixelmon:pixelmon");
-			s.radarCategories.get(0).shown = true;
-			s.radarCategories.add(0, pokemon);
-			RadarCategories.changed();
-		});
-		context.setScreen(() -> new RadarCategoriesScreen(null));
-		context.waitTicks(5);
-		context.takeScreenshot("radar-categories-11-list-pokemon");
-		context.setScreen(() -> null);
-		context.runOnClient(mc -> {
-			Settings.get().radarCategories.remove(0);
-			RadarCategories.changed();
-			Settings.get().save();
-		});
 
 		// A file from before categories keeps what it switched off, and gains no category.
 		context.runOnClient(mc -> {

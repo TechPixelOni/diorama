@@ -33,9 +33,6 @@ import org.jspecify.annotations.Nullable;
 public final class RadarCategories {
 	/** An icon size that follows the Radar tab's. */
 	public static final int SAME_SIZE = 0;
-	/** What {@link Category#builtIn} says for the category GregedColonies makes when a Pokémon mod is installed. */
-	public static final String POKEMON = "pokemon";
-	private static final List<String> POKEMON_MOBS = List.of("cobblemon:pokemon", "pixelmon:pixelmon");
 
 	/** What the settings screens change, the same for a kind and for one of the player's categories. */
 	public interface Entry {
@@ -66,7 +63,7 @@ public final class RadarCategories {
 		public @Nullable String builtIn;
 		/**
 		 * The mobs in it: entity IDs like {@code minecraft:cow}, where {@code *} stands for anything, so
-		 * {@code cobblemon:*} is every mob Cobblemon adds.
+		 * {@code minecraft:*} is every mob Minecraft adds.
 		 */
 		public List<String> mobs = new ArrayList<>();
 		public boolean shown = true;
@@ -78,7 +75,7 @@ public final class RadarCategories {
 			if (this.name != null && !this.name.isBlank()) {
 				return Component.literal(this.name);
 			}
-			return Component.translatable(POKEMON.equals(this.builtIn) ? "gregedcolonies.radar_categories.pokemon" : "gregedcolonies.radar_categories.unnamed");
+			return Component.translatable("gregedcolonies.radar_categories.unnamed");
 		}
 
 		@Override
@@ -360,13 +357,6 @@ public final class RadarCategories {
 			}
 		}
 		settings.radarKinds = kinds;
-		if (!settings.radarPokemonAdded && (installed("cobblemon") || installed("pixelmon"))) {
-			settings.radarPokemonAdded = true;
-			Category pokemon = new Category();
-			pokemon.builtIn = POKEMON;
-			pokemon.mobs = new ArrayList<>(POKEMON_MOBS);
-			categories.add(0, pokemon);
-		}
 		changed();
 	}
 

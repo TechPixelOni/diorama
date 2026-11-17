@@ -15,10 +15,10 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Land claims from FTB Chunks, Open Parties and Claims or MineColonies, for the maps to draw.
+ * Land claims from FTB Chunks or Open Parties and Claims, for the maps to draw.
  * {@link FtbChunks} and {@link OpenPartiesAndClaims} hand over each chunk's owner as the claims mod
- * takes in the server's updates, in every dimension, from the full list sent on joining onwards;
- * {@link MineColonies} hands over the land of the colonies the server has sent. Once a tick,
+ * takes in the server's updates, in every dimension, from the full list sent on joining onwards.
+ * Once a tick,
  * changes in the player's dimension make a new {@link Snapshot}, which any thread can read.
  * Everything else here is client thread only.
  */
@@ -40,7 +40,7 @@ public final class Claims {
 
 	/**
 	 * Whoever owns claimed land, as their claims mod knows them: an FTB team, one of an Open
-	 * Parties and Claims player's claims, or a MineColonies colony. Equal owners own the same claim.
+	 * Parties and Claims player's claims. Equal owners own the same claim.
 	 */
 	public interface Owner {
 		/**
